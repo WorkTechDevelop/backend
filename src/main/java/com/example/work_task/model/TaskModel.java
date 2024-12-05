@@ -1,7 +1,12 @@
 package com.example.work_task.model;
 
+import com.example.work_task.model.enums.Priority;
+import com.example.work_task.model.enums.StatusName;
+import com.example.work_task.model.enums.TaskType;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.sql.Date;
 
 @Data
 @Entity
@@ -18,9 +23,36 @@ public class TaskModel {
     @Column
     private String description;
 
-    @Column(nullable = false)
-    private String implementer;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Priority priority;
 
-    @Column(nullable = false)
-    private String status;
+    @Column
+    private Integer creator;
+
+    @Column
+    private Integer assignee;
+
+    @Column
+    private Integer projectId;
+
+    @Column
+    private Integer sprintId;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private TaskType taskType;
+
+    @Column
+    private Integer estimation;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private StatusName status;
+
+    @Column
+    private Date creationDate;
+
+    @Column
+    private Date updateDate;
 }

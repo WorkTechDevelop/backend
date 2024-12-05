@@ -1,5 +1,6 @@
 package com.example.work_task.model;
 
+import com.example.work_task.model.enums.Roles;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ public class RoleModel {
     @Column
     private String isActive;
 
+    @Enumerated(EnumType.STRING)
     @Column
-    private String name;
+    private Roles roles;
 }
