@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class TaskService {
-    private final TaskRepository taskRepository;
+    private TaskRepository taskRepository;
 
     public List<TaskModel> getAllTask() {
         return taskRepository.findAll();

@@ -14,7 +14,7 @@ import java.util.Optional;
 @Slf4j
 @AllArgsConstructor
 public class TaskController {
-   private final TaskService taskService;
+   private TaskService taskService;
 
     @GetMapping("/{id}")
     public Optional<TaskModel> getTaskById(@PathVariable Integer id) {
