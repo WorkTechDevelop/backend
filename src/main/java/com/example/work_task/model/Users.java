@@ -16,22 +16,18 @@ public class Users {
     private String firstName;
     @Column(name = "middle_name")
     private String middleName;
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
     @Column(name = "phone")
     private String phone;
     @Column(name = "role_id")
-    private String roleId;
+    private Integer roleId;
     @Column(name = "birth_date")
     private String birthDate;
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean active;
     @Column(name = "gender")
     private Gender gender;
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
-
-
-
-
 }

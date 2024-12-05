@@ -8,7 +8,6 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 public enum Gender {
-    /** Водительское удостоверение */
     MALE("MALE"),
     FEMALE("FEMALE");
 
