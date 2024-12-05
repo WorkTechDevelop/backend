@@ -20,7 +20,7 @@ public class Users {
     private String email;
     @Column(name = "phone")
     private String phone;
-    @Column(name = "role_Id")
+    @Column(name = "role_id")
     private String roleId;
     @Column(name = "birth_date")
     private String birthDate;
