@@ -26,7 +26,9 @@ public class Users {
     private String birthDate;
     @Column(name = "is_active")
     private boolean isActive;
+    @Column(name = "gender")
     private Gender gender;
+    @Column(name = "password")
     private String password;
 
 
