@@ -29,7 +29,7 @@ public class AwaitUtils {
         return null;
     }
 
-    private void sleep(long millis) {
+    private static void sleep(long millis) {
         try {
             Thread.sleep(millis);
         } catch (Exception ignored) {}
