@@ -1,12 +1,13 @@
 package com.example.work_task.model;
 
-import com.example.work_task.model.enums.Roles;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
-@Table(name = "role_model")
+@Table(name = "roles")
 public class RoleModel {
 
     @Id
@@ -14,9 +15,8 @@ public class RoleModel {
     private Integer id;
 
     @Column
-    private String isActive;
+    private boolean isActive;
 
-    @Enumerated(EnumType.STRING)
-    @Column
-    private Roles roles;
+    @OneToMany(mappedBy = "role")
+    private List<Users> users;
 }
