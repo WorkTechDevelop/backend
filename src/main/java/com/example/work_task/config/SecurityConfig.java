@@ -28,11 +28,15 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/welcome").permitAll() // Доступ ко "всеобщей" странице
-                        .requestMatchers("/welcome/**").hasRole("ADMIN") // Доступ для ADMIN
+                        .requestMatchers("/work-task/v1/welcome").permitAll()
+                        .requestMatchers("/work-task/v1/admin").hasRole("ADMIN")
+                        .requestMatchers("/work-task/v1/default-user").hasRole("PROJECT_MEMBER")
                         .anyRequest().authenticated()
                 )
-                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll) // Настройка логина
+                .formLogin(form -> form
+                        .permitAll()
+                        .defaultSuccessUrl("/work-task/v1/welcome", true)
+                )
                 .build();
     }
 

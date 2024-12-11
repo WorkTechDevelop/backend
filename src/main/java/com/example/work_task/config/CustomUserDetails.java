@@ -1,13 +1,13 @@
 package com.example.work_task.config;
 
 import com.example.work_task.model.Users;
-import com.example.work_task.service.UsersDetailsService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
     private Users user;
