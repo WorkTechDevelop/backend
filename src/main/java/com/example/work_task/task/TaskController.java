@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/task")
+@RequestMapping("work-task/v1/task")
 @Slf4j
 @AllArgsConstructor
 public class TaskController {

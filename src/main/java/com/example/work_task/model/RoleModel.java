@@ -1,5 +1,6 @@
 package com.example.work_task.model;
 
+import com.example.work_task.model.enums.Roles;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,9 @@ public class RoleModel {
 
     @Column
     private boolean isActive;
+
+    @Enumerated(EnumType.STRING)
+    private Roles name;
 
     @OneToMany(mappedBy = "role")
     private List<Users> users;
