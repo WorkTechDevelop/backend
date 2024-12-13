@@ -4,37 +4,40 @@ import com.example.work_task.model.enums.Gender;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 @Entity
 @Table(name = "users")
 public class Users {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "BINARY(16)", nullable = false, unique = true)
+    private UUID id;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "middle_name")
+    @Column(name = "middle_name", nullable = false)
     private String middleName;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "role_id")
-    private Integer roleId;
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
+    private RoleModel role;
 
     @Column(name = "birth_date")
     private String birthDate;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private boolean active;
 
     @Enumerated(EnumType.STRING)
