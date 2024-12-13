@@ -1,18 +1,25 @@
 package com.example.work_task.config;
 
+import com.example.work_task.jwt.AuthEntryPointJwt;
+import com.example.work_task.jwt.AuthTokenFilter;
 import com.example.work_task.service.UsersDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,21 +30,42 @@ public class SecurityConfig {
         return new UsersDetailsService();
     }
 
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/work-task/v1/welcome").permitAll()
-                        .requestMatchers("/work-task/v1/admin").hasRole("ADMIN")
-                        .requestMatchers("/work-task/v1/default-user").hasRole("PROJECT_MEMBER")
-                        .anyRequest().authenticated()
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) throws Exception {
+        return builder.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
+                        .requestMatchers("work-task/v1/signin").permitAll()
+                        .anyRequest().authenticated());
+        http.sessionManagement(
+                session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS)
+        );
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
+        http.headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions
+                        .sameOrigin()
                 )
-                .formLogin(form -> form
-                        .permitAll()
-                        .defaultSuccessUrl("/work-task/v1/welcome", true)
-                )
-                .build();
+        );
+        http.csrf(csrf -> csrf.disable());
+        http.addFilterBefore(authenticationJwtTokenFilter(),
+                UsernamePasswordAuthenticationFilter.class);
+
+
+        return http.build();
     }
 
     @Bean
