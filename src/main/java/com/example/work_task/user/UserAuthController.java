@@ -1,8 +1,8 @@
 package com.example.work_task.user;
 
 import com.example.work_task.jwt.JwtUtils;
-import com.example.work_task.jwt.LoginRequest;
-import com.example.work_task.jwt.LoginResponse;
+import com.example.work_task.model.rest.LoginRequest;
+import com.example.work_task.model.rest.LoginResponse;
 import com.example.work_task.task.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class UserAuthController {
         return "Обычный гусь";
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
         try {
@@ -63,7 +63,7 @@ public class UserAuthController {
             Map<String, Object> map = new HashMap<>();
             map.put("message", "Bad credentials");
             map.put("status", false);
-            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(map, HttpStatus.UNAUTHORIZED);
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

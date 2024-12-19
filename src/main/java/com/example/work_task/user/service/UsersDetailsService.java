@@ -1,4 +1,4 @@
-package com.example.work_task.service;
+package com.example.work_task.user.service;
 
 import com.example.work_task.config.CustomUserDetails;
 import com.example.work_task.user.UserRepository;

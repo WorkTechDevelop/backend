@@ -1,19 +1,16 @@
-package com.example.work_task.model;
+package com.example.work_task.model.db;
 
-import com.example.work_task.model.enums.Gender;
+import com.example.work_task.model.db.enums.Gender;
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.util.UUID;
 
 @Data
 @Entity
 @Table(name = "users")
 public class Users {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", columnDefinition = "BINARY(16)", nullable = false, unique = true)
-    private UUID id;
+    @Column(name = "id", nullable = false, unique = true)
+    private String id;
 
     @Column(name = "last_name", nullable = false)
     private String lastName;

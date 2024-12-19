@@ -1,4 +1,4 @@
-package com.example.work_task.model.enums;
+package com.example.work_task.model.db.enums;
 
 public enum TaskType {
     BUG,

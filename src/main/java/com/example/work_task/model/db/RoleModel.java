@@ -1,6 +1,6 @@
-package com.example.work_task.model;
+package com.example.work_task.model.db;
 
-import com.example.work_task.model.enums.Roles;
+import com.example.work_task.model.db.enums.Roles;
 import jakarta.persistence.*;
 import lombok.Data;
 

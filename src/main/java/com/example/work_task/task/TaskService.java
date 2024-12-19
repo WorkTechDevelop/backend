@@ -1,6 +1,6 @@
 package com.example.work_task.task;
 
-import com.example.work_task.model.TaskModel;
+import com.example.work_task.model.db.TaskModel;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
