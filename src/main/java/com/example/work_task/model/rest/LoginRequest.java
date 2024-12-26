@@ -1,4 +1,4 @@
-package com.example.work_task.jwt;
+package com.example.work_task.model.rest;
 
 import lombok.Data;
 

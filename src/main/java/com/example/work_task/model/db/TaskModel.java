@@ -1,8 +1,8 @@
-package com.example.work_task.model;
+package com.example.work_task.model.db;
 
-import com.example.work_task.model.enums.Priority;
-import com.example.work_task.model.enums.StatusName;
-import com.example.work_task.model.enums.TaskType;
+import com.example.work_task.model.db.enums.Priority;
+import com.example.work_task.model.db.enums.StatusName;
+import com.example.work_task.model.db.enums.TaskType;
 import jakarta.persistence.*;
 import lombok.Data;
 

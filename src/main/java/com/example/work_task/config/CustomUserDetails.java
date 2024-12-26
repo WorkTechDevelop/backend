@@ -1,6 +1,6 @@
 package com.example.work_task.config;
 
-import com.example.work_task.model.Users;
+import com.example.work_task.model.db.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

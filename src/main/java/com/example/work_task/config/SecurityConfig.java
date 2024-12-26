@@ -2,7 +2,7 @@ package com.example.work_task.config;
 
 import com.example.work_task.jwt.AuthEntryPointJwt;
 import com.example.work_task.jwt.AuthTokenFilter;
-import com.example.work_task.service.UsersDetailsService;
+import com.example.work_task.user.service.UsersDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +45,7 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
-                        .requestMatchers("work-task/v1/signin").permitAll()
+                        .requestMatchers("work-task/v1/login").permitAll()
                         .anyRequest().authenticated());
         http.sessionManagement(
                 session ->
@@ -61,7 +61,6 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.addFilterBefore(authenticationJwtTokenFilter(),
                 UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }
