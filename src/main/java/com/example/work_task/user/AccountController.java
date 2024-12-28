@@ -4,11 +4,13 @@ import com.example.work_task.model.db.RoleModel;
 import com.example.work_task.model.db.Users;
 import com.example.work_task.model.db.enums.Roles;
 import com.example.work_task.model.rest.RegisterDto;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +32,7 @@ public class AccountController {
 
 
     @PostMapping("/registry")
-    public  ResponseEntity<?> registry(@RequestBody RegisterDto registerDto) {
+    public ResponseEntity<?> registry(@Valid @RequestBody RegisterDto registerDto) {
 
         if(userRepository.existsByEmail(registerDto.getEmail())) {
             return new ResponseEntity<>("Пользователь с таким email уже зарегестрирован", HttpStatus.BAD_REQUEST);

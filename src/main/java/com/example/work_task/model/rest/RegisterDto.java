@@ -1,31 +1,40 @@
 package com.example.work_task.model.rest;
 
 import com.example.work_task.model.db.enums.Gender;
+import com.example.work_task.user.ValidGender;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 
 public class RegisterDto {
-    @NotEmpty
+
+    @NotBlank(message = "Email не может быть пустым")
+    @Email(message = "Неверный формат email")
     private String email;
 
+    @NotBlank(message = "Пароль не может быть пустым")
+    @Size(min = 8, message = "Пароль должен быть не менее 8 символов")
     private String password;
 
+    @NotBlank(message = " Поле не может быть пустым")
     private String confirmPassword;
-    @NotEmpty
-    private String lastName;
-
-    @NotEmpty
+    @NotBlank(message = "Имя не может быть пустым")
     private String firstName;
 
+    @NotBlank(message = "Фамилия не может быть пустым")
     @NotEmpty
     private String middleName;
+    private String lastName;
 
     private String phone;
 
     private String birthDate;
 
+    //@ValidGender
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

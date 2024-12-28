@@ -2,6 +2,7 @@ package com.example.work_task.model.db;
 
 import com.example.work_task.model.db.enums.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
