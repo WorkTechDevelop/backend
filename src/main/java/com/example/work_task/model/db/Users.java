@@ -2,6 +2,7 @@ package com.example.work_task.model.db;
 
 import com.example.work_task.model.db.enums.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -9,6 +10,7 @@ import lombok.Data;
 @Table(name = "users")
 public class Users {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, unique = true)
     private String id;
 

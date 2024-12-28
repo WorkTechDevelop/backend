@@ -46,6 +46,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
                         .requestMatchers("work-task/v1/login").permitAll()
+                        .requestMatchers("work-task/v1/registry").permitAll()
                         .anyRequest().authenticated());
         http.sessionManagement(
                 session ->
