@@ -4,9 +4,13 @@ import com.example.work_task.model.db.enums.Priority;
 import com.example.work_task.model.db.enums.StatusName;
 import com.example.work_task.model.db.enums.TaskType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NonNull;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -17,12 +21,16 @@ public class TaskModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
+    @Size(max = 255)
     @Column
     private String title;
 
+    @Size(max = 4096)
     @Column
     private String description;
 
+    @NotBlank
     @Enumerated(EnumType.STRING)
     @Column
     private Priority priority;
@@ -33,12 +41,14 @@ public class TaskModel {
     @Column
     private Integer assignee;
 
+    @NonNull
     @Column
     private Integer projectId;
 
     @Column
     private Integer sprintId;
 
+    @NotBlank
     @Enumerated(EnumType.STRING)
     @Column
     private TaskType taskType;
@@ -51,8 +61,8 @@ public class TaskModel {
     private StatusName status;
 
     @Column
-    private Date creationDate;
+    private Timestamp creationDate;
 
     @Column
-    private Date updateDate;
+    private Timestamp updateDate;
 }
