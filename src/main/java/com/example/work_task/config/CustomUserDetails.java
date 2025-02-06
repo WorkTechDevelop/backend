@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
     private Users user;
@@ -21,6 +22,14 @@ public class CustomUserDetails implements UserDetails {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName().toString()));
         return authorities;
+    }
+
+    public String getGuid() {
+        return user.getId();
+    }
+
+    public String getFullUserName() {
+        return String.join(" ", user.getLastName(), user.getFirstName(), user.getMiddleName());
     }
 
     @Override
@@ -52,4 +61,6 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }

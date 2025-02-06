@@ -18,8 +18,8 @@ import java.sql.Timestamp;
 public class TaskModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @NotBlank
     @Size(max = 255)
@@ -36,17 +36,17 @@ public class TaskModel {
     private Priority priority;
 
     @Column
-    private Integer creator;
+    private String creator;
 
     @Column
-    private Integer assignee;
+    private String assignee;
 
     @NonNull
     @Column
-    private Integer projectId;
+    private String projectId;
 
     @Column
-    private Integer sprintId;
+    private String sprintId;
 
     @NotBlank
     @Enumerated(EnumType.STRING)

@@ -10,8 +10,8 @@ import java.sql.Date;
 @Table(name = "sprints")
 public class Sprints {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column
     private String name;

@@ -1,5 +1,6 @@
 package com.example.work_task.user;
 
+import com.example.work_task.config.CustomUserDetails;
 import com.example.work_task.jwt.JwtUtils;
 import com.example.work_task.model.rest.LoginRequest;
 import com.example.work_task.model.rest.LoginResponse;
@@ -68,15 +69,11 @@ public class UserAuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String jwtToken = jwtUtils.generateTokenFromUserDetails(userDetails);
 
-        String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        LoginResponse response = new LoginResponse(userDetails.getUsername(), roles, jwtToken);
+        LoginResponse response = new LoginResponse(userDetails.getUsername(), jwtToken);
 
         return ResponseEntity.ok(response);
     }
