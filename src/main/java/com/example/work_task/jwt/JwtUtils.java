@@ -78,13 +78,13 @@ public class JwtUtils {
 
     public String generateTokenFromUserDetails(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("guid", userDetails.getGuid()); // добавляем GUID в payload
+        claims.put("guid", userDetails.getGuid());
 
         return Jwts.builder().claims(claims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // JWT_VALIDITY в секундах
-                .signWith(key()) // ваш секретный ключ
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(key())
                 .compact();
     }
 
