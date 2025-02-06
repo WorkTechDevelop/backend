@@ -1,7 +1,9 @@
 package com.example.work_task.jwt;
 
-import com.example.work_task.config.CustomUserDetails;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,17 +16,13 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static javax.crypto.Cipher.SECRET_KEY;
 
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     @Value("${spring.app.jwtSecret}")
-    private static String jwtSecret;
+    private String jwtSecret;
 
     @Value("${spring.app.jwtExpirationMs}")
     private int jwtExpirationMs;
@@ -55,7 +53,7 @@ public class JwtUtils {
                 .getPayload().getSubject();
     }
 
-    private static Key key() {
+    private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
@@ -76,25 +74,4 @@ public class JwtUtils {
         return false;
     }
 
-    public String generateTokenFromUserDetails(CustomUserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("guid", userDetails.getGuid()); // добавляем GUID в payload
-
-        return Jwts.builder().claims(claims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // JWT_VALIDITY в секундах
-                .signWith(key()) // ваш секретный ключ
-                .compact();
-    }
-
-    public static String getUserGuidFromJwtToken(String jwtToken) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(key())
-                .build()
-                .parseClaimsJws(jwtToken)
-                .getBody();
-
-        return claims.get("guid", String.class);
-    }
 }
