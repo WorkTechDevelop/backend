@@ -26,20 +26,4 @@ public class TaskService {
         TaskModel createdTask = taskRepository.save(taskModel);
         return createdTask.getId();
     }
-
-
-                                                /*Deprecated*/
-
-
-//        public List<TaskModel> getAllTask() {
-//        return taskRepository.findAll();
-//    }
-//
-//    public Optional<TaskModel> getTaskById(Integer id) {
-//        return taskRepository.findById(id);
-//    }
-
-//    public void deleteTask(Integer id) {
-//        taskRepository.deleteById(id);
-//    }
 }

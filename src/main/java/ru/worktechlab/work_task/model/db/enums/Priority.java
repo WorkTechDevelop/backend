@@ -4,5 +4,5 @@ public enum Priority {
     BLOCKER,
     HIGH,
     MEDIUM,
-    LOW;
+    LOW
 }

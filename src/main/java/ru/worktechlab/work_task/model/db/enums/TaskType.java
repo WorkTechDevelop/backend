@@ -4,5 +4,5 @@ public enum TaskType {
     BUG,
     TASK,
     RESEARCH,
-    STORY;
+    STORY
 }

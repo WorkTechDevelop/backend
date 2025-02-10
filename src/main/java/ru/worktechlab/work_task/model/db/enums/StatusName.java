@@ -8,6 +8,5 @@ public enum StatusName {
     CANCELED,
     DONE,
     DELETED,
-    REVIEW;
-
+    REVIEW
 }
