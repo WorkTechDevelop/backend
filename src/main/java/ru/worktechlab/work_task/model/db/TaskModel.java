@@ -3,11 +3,13 @@ package ru.worktechlab.work_task.model.db;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
 
+@AllArgsConstructor
 @Data
 @Entity
 @Table(name = "task_model")
@@ -57,4 +59,7 @@ public class TaskModel {
 
     @Column
     private Timestamp updateDate;
+
+    public TaskModel() {
+    }
 }

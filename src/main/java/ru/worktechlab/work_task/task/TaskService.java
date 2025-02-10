@@ -14,16 +14,19 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TaskService {
     private TaskRepository taskRepository;
-    private SprintsRepository sprintsRepository;
     private JwtUtils jwtUtils;
 
     public String createTask(TaskModel taskModel, String jwtToken) {
         taskModel.setId(UUID.randomUUID().toString());
-        taskModel.setCreator(jwtUtils.getUserGuidFromJwtToken(jwtToken));
+        taskModel.setCreator(jwtUtils.getUserGuidFromJwtToken(formatJwtToken(jwtToken)));
         taskModel.setStatus(StatusName.NEW.toString());
         taskModel.setCreationDate(new Timestamp(System.currentTimeMillis()));
         taskModel.setUpdateDate(new Timestamp(System.currentTimeMillis()));
         TaskModel createdTask = taskRepository.save(taskModel);
         return createdTask.getId();
+    }
+
+    public String formatJwtToken(String jwtToken) {
+        return jwtToken.replace("Bearer", "").trim();
     }
 }

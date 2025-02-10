@@ -86,16 +86,16 @@ public class JwtUtils {
                 .compact();
     }
 
-    public Claims extractPayloadFromToken(String token) {
+    public JwtParser parseToken() {
         return Jwts.parser()
-                .verifyWith((SecretKey) key()) // Устанавливаем ключ для проверки подписи
-                .build()
-                .parseSignedClaims(token) // Парсим токен
-                .getPayload(); // Получаем полезную нагрузку
+                .verifyWith((SecretKey) key())
+                .build();
     }
 
     public String getUserGuidFromJwtToken(String jwtToken) {
-        return extractPayloadFromToken(jwtToken).get("guid", String.class);
+        return parseToken().parseSignedClaims(jwtToken)
+                .getPayload()
+                .get("guid", String.class);
     }
 
 }

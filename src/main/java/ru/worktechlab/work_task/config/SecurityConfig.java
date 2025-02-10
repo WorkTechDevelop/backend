@@ -47,7 +47,7 @@ public class SecurityConfig {
                 authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
                         .requestMatchers("work-task/v1/login").permitAll()
                         .requestMatchers("work-task/v1/registry").permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().permitAll()); //.authenticated());
         http.sessionManagement(
                 session ->
                         session.sessionCreationPolicy(

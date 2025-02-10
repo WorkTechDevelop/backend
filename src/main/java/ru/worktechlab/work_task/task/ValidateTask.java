@@ -1,5 +1,7 @@
 package ru.worktechlab.work_task.task;
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import io.micrometer.common.util.StringUtils;
 import ru.worktechlab.work_task.model.db.Sprints;
 import ru.worktechlab.work_task.model.db.TaskModel;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+@AllArgsConstructor
+@Component
 public class ValidateTask {
     private SprintsRepository sprintsRepository;
 
@@ -19,7 +23,7 @@ public class ValidateTask {
     private static final String ERROR_ESTIMATION_FORMAT = "Некорректный формат поля ESTIMATION";
     private static final String ERROR_PRIORITY_VALUE = "Некорректное значение поля PRIORITY";
     private static final String ERROR_TASK_TYPE_VALUE = "Некорректное значение поля TASK_TYPE";
-    public List<String> errors = new ArrayList<>();
+    public List<String> errors;
 
     public List<String> validateTask(TaskModel taskModel) {
         validateTitle(taskModel);
