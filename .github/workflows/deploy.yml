@@ -17,6 +17,8 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '21'
+      - name: Делаем gradlew исполемым
+        run: chmod +x gradlew
 
       - name: Сборка JAR файла
         run: ./gradlew build -x test
