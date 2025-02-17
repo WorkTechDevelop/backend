@@ -9,9 +9,9 @@ import java.sql.Date;
 @Entity
 @Table(name = "projects")
 public class Projects {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     @Column
     private String name;

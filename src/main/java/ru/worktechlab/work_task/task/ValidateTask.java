@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.task;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import io.micrometer.common.util.StringUtils;
+import ru.worktechlab.work_task.model.db.Projects;
 import ru.worktechlab.work_task.model.db.Sprints;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.db.enums.Priority;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 @Component
 public class ValidateTask {
     private SprintsRepository sprintsRepository;
+    private ProjectRepository projectRepository;
 
     private static final String ERROR_TITLE_FORMAT = "Некорректный формат поля TITLE";
     private static final String ERROR_DESCRIPTION_FORMAT = "Некорректный формат поля DESCRIPTION";
@@ -23,6 +25,7 @@ public class ValidateTask {
     private static final String ERROR_ESTIMATION_FORMAT = "Некорректный формат поля ESTIMATION";
     private static final String ERROR_PRIORITY_VALUE = "Некорректное значение поля PRIORITY";
     private static final String ERROR_TASK_TYPE_VALUE = "Некорректное значение поля TASK_TYPE";
+    private static final String ERROR_PROJECT_ID_VALUE = "Проект закрыт или не существует";
     public List<String> errors;
 
     public List<String> validateTask(TaskModel taskModel) {
@@ -32,7 +35,23 @@ public class ValidateTask {
         validateEstimation(taskModel);
         validatePriority(taskModel);
         validateTaskType(taskModel);
+        validateProjectId(taskModel);
         return errors;
+    }
+
+    private void validateProjectId(TaskModel taskModel) {
+        if (taskModel.getSprintId() != null) {
+            Projects projects = findProjectById(taskModel.getProjectId());
+            if (!projects.isActive()) {
+                errors.add(ERROR_PROJECT_ID_VALUE);
+            }
+        } else  {
+            errors.add(ERROR_PROJECT_ID_VALUE);
+        }
+    }
+
+    private Projects findProjectById(String projectId) {
+        return projectRepository.findById(projectId).orElse(null);
     }
 
     private void validateTitle(TaskModel taskModel) {
