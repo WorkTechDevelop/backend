@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -36,4 +37,7 @@ public class Projects {
 
     @Column
     private String finisher;
+
+    @ManyToMany(mappedBy = "projects")
+    private List<Users> users;
 }

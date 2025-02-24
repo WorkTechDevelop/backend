@@ -93,9 +93,13 @@ public class JwtUtils {
     }
 
     public String getUserGuidFromJwtToken(String jwtToken) {
-        return parseToken().parseSignedClaims(jwtToken)
+        return parseToken().parseSignedClaims(formatJwtToken(jwtToken))
                 .getPayload()
                 .get("guid", String.class);
+    }
+
+    public String formatJwtToken(String jwtToken) {
+        return jwtToken.replace("Bearer", "").trim();
     }
 
 }

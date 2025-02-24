@@ -1,4 +1,4 @@
-package ru.worktechlab.work_task.task;
+package ru.worktechlab.work_task.projects;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

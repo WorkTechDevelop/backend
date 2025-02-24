@@ -1,15 +1,16 @@
 package ru.worktechlab.work_task.task;
 
 import jakarta.transaction.Transactional;
-import ru.worktechlab.work_task.jwt.JwtUtils;
-import ru.worktechlab.work_task.model.db.TaskModel;
-import ru.worktechlab.work_task.model.db.enums.StatusName;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.worktechlab.work_task.jwt.JwtUtils;
+import ru.worktechlab.work_task.model.db.TaskModel;
+import ru.worktechlab.work_task.model.db.Users;
+import ru.worktechlab.work_task.model.db.enums.StatusName;
+import ru.worktechlab.work_task.user.UserRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -17,20 +18,17 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TaskService {
     private TaskRepository taskRepository;
+    private UserRepository userRepository;
     private JwtUtils jwtUtils;
 
     public String createTask(TaskModel taskModel, String jwtToken) {
         taskModel.setId(UUID.randomUUID().toString());
-        taskModel.setCreator(jwtUtils.getUserGuidFromJwtToken(formatJwtToken(jwtToken)));
+        taskModel.setCreator(jwtUtils.getUserGuidFromJwtToken(jwtToken));
         taskModel.setStatus(StatusName.NEW.toString());
         taskModel.setCreationDate(new Timestamp(System.currentTimeMillis()));
         taskModel.setUpdateDate(new Timestamp(System.currentTimeMillis()));
         TaskModel createdTask = taskRepository.save(taskModel);
         return createdTask.getId();
-    }
-
-    public String formatJwtToken(String jwtToken) {
-        return jwtToken.replace("Bearer", "").trim();
     }
 
     @Transactional
@@ -61,4 +59,13 @@ public class TaskService {
     public List<TaskModel> getTasksByProjectId(String projectId) {
         return taskRepository.findByProjectId(projectId);
     }
+
+    public List<TaskModel> getProjectTaskByUserGuid(String jwtToken) {
+        String userId = jwtUtils.getUserGuidFromJwtToken(jwtToken);
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
+        return taskRepository.findByProjectId(user.getLastProjectId());
+    }
 }
+
+

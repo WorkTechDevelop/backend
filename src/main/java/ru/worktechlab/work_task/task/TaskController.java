@@ -47,7 +47,7 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/project/{projectId}")
+    @GetMapping("/project-tasks/{projectId}")
     public ResponseEntity<List<TaskModel>> getTasksByProjectId(
             @PathVariable String projectId) {
         log.info("Получение задач по projectId: {}", projectId);
@@ -61,7 +61,22 @@ public class TaskController {
                     .body(Collections.emptyList());
         }
     }
-    
+
+    @GetMapping("/main-page")
+    public ResponseEntity<List<TaskModel>> getProjectTasksByUserGuid(
+            @RequestHeader("Authorization") String jwtToken) {
+        log.info("Вывод задач проекта по guid пользователя");
+
+        try {
+            List<TaskModel> tasks = taskService.getProjectTaskByUserGuid(jwtToken);
+            return ResponseEntity.ok(tasks);
+        } catch (RuntimeException e) {
+            log.error("Ошибка при получении задач: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
+    }
+
     private ResponseEntity<TaskResponse> validateAndProcessTask(
             TaskModel taskModel, String jwtToken, boolean isCreate) {
         log.info("Processing task with model: {}", taskModel);
