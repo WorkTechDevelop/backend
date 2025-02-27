@@ -24,6 +24,9 @@ jobs:
       - name: Сборка JAR-файла с версией
         run: ./gradlew build -x test
 
+      - name: DEBAG проверка текущей директории
+        run: pwd
+
       - name: Определяем версию JAR
         id: version
         run: echo "JAR_VERSION=$(ls build/libs/WorkTask-0.0.1-*.jar | grep -o '0.0.1-[a-f0-9]*' | head -n 1)" >> $GITHUB_ENV
@@ -34,7 +37,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "build/libs/WorkTask-0.0.1-${{ env.JAR_VERSION }}.jar"
+          source: "build/libs/WorkTask-${{ env.JAR_VERSION }}.jar"
           target: "/home/deployer/backend"
 
   deploy:
@@ -50,9 +53,10 @@ jobs:
           script: |
             set -e  # Остановка при ошибке
             cd /home/deployer/backend
-            
+              
             # Получаем версию JAR
-            JAR_VERSION=$(ls WorkTask-0.0.1-*.jar | grep -o '0.0.1-[a-f0-9]*')
+            JAR_VERSION=$(ls build/libs/WorkTask-0.0.1-*.jar | grep -o '0.0.1-[a-f0-9]*')
+            echo "JAR_VERSION: $JAR_VERSION"
             
             # Переименовываем JAR для Dockerfile
             mv WorkTask-${JAR_VERSION}.jar app.jar
