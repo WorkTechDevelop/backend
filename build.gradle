@@ -17,6 +17,7 @@ version = appVersion
 jar {
     archiveBaseName.set("WorkTask")
     archiveVersion.set(appVersion)
+    archiveClassifier.set("")
 }
 
 java {
