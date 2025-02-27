@@ -14,16 +14,13 @@ ext {
 
 version = appVersion
 
-jar {
+tasks.named('bootJar') {
     archiveBaseName.set("WorkTask")
     archiveVersion.set(appVersion)
-    archiveClassifier.set("")
+}
 
-    manifest {
-        attributes(
-                'Main-Class': 'ru.worktechlab.work_task.WorkTaskApplication'
-        )
-    }
+tasks.named('jar') {
+    enabled = false
 }
 
 java {
