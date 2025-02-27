@@ -34,7 +34,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "build/libs/WorkTask-${{ env.JAR_VERSION }}.jar"
+          source: "build/libs/WorkTask-0.0.1-${{ env.JAR_VERSION }}.jar"
           target: "/home/deployer/backend"
 
   deploy:
