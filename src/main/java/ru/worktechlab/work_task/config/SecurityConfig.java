@@ -1,5 +1,10 @@
 package ru.worktechlab.work_task.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.config.Customizer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.worktechlab.work_task.jwt.AuthEntryPointJwt;
 import ru.worktechlab.work_task.jwt.AuthTokenFilter;
 import ru.worktechlab.work_task.user.service.UsersDetailsService;
@@ -19,9 +24,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${cors.allowed.origins}")
+    private String allowedOrigins;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -43,6 +53,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.cors(Customizer.withDefaults());
         http.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
                         .requestMatchers("work-task/v1/login").permitAll()
@@ -64,6 +75,19 @@ public class SecurityConfig {
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(allowedOrigins)); // Разрешаем фронтенд
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers"));
+        configuration.setAllowCredentials(true); // Разрешаем куки и аутентификацию
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
