@@ -18,6 +18,12 @@ jar {
     archiveBaseName.set("WorkTask")
     archiveVersion.set(appVersion)
     archiveClassifier.set("")
+
+    manifest {
+        attributes(
+                'Main-Class': 'ru.worktechlab.work_task.WorkTaskApplication'
+        )
+    }
 }
 
 java {

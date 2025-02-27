@@ -72,7 +72,7 @@ jobs:
             
             # Сохраняем образ и загружаем в K3s
             docker save -o backend.tar backend:$COMMIT_SHA
-            ctr -n k8s.io images import /home/deployer/backend.tar
+            ctr -n k8s.io images import /home/deployer/backend/backend.tar
             
             # Обновляем образ в Kubernetes
             k3s kubectl set image deployment myapp myapp=backend:$COMMIT_SHA || k3s kubectl apply -f deployment.yaml
