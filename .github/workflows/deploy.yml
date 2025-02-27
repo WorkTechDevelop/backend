@@ -26,7 +26,7 @@ jobs:
 
       - name: Определяем версию JAR
         id: version
-        run: echo "JAR_VERSION=$(ls build/libs/WorkTask-0.0.1-*.jar | grep -o '0.0.1-[a-f0-9]*')" >> $GITHUB_ENV
+        run: echo "JAR_VERSION=$(ls build/libs/WorkTask-0.0.1-*.jar | grep -o '0.0.1-[a-f0-9]*' | head -n 1)" >> $GITHUB_ENV
 
       - name: Копирование JAR-файла на сервер
         uses: appleboy/scp-action@v0.1.4
