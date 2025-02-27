@@ -62,7 +62,7 @@ jobs:
             rm -f app.jar
             
             # Переименовываем JAR для Dockerfile
-            mv WorkTask-${JAR_VERSION}.jar app.jar
+            mv build/libs/WorkTask-${JAR_VERSION}.jar app.jar
             
             # Определяем тег образа
             COMMIT_SHA=$(git rev-parse --short HEAD)
