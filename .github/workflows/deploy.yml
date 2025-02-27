@@ -58,6 +58,9 @@ jobs:
             JAR_VERSION=$(ls build/libs/WorkTask-0.0.1-*.jar | grep -o '0.0.1-[a-f0-9]*')
             echo "JAR_VERSION: $JAR_VERSION"
             
+            # Удаляем файл если он существует
+            rm -f app.jar
+            
             # Переименовываем JAR для Dockerfile
             mv WorkTask-${JAR_VERSION}.jar app.jar
             
