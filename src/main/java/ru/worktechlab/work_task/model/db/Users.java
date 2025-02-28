@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import ru.worktechlab.work_task.model.db.enums.Gender;
 
-import java.util.List;
-
 @Data
 @Entity
 @Table(name = "users")
@@ -48,12 +46,4 @@ public class Users {
 
     @Column(name = "last_project_id")
     private String lastProjectId;
-
-    @ManyToMany
-    @JoinTable(
-            name = "Users_Projects",
-            joinColumns = @JoinColumn(name = "User_id"),
-            inverseJoinColumns = @JoinColumn(name = "Project_id")
-    )
-    private List<Projects> projects;
 }

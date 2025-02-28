@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.model.db.Projects;
 import ru.worktechlab.work_task.model.db.TaskModel;
 
 import java.util.Collections;
@@ -19,12 +18,12 @@ public class ProjectsController {
     private ProjectsService projectsService;
 
     @GetMapping("/all-user-project")
-    public ResponseEntity<List<Projects>> getAllUserProjects(
+    public ResponseEntity<List<String>> getAllUserProjects(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Вывод всех проектов пользователя");
 
         try {
-            List<Projects> projects = projectsService.getAllUserProjects(jwtToken);
+            List<String> projects = projectsService.getAllUserProjects(jwtToken);
             return ResponseEntity.ok(projects);
         } catch (RuntimeException e) {
             log.error("Ошибка при получении проектов: {}", e.getMessage(), e);
