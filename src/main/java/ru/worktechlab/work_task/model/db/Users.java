@@ -1,8 +1,8 @@
 package ru.worktechlab.work_task.model.db;
 
-import ru.worktechlab.work_task.model.db.enums.Gender;
 import jakarta.persistence.*;
 import lombok.Data;
+import ru.worktechlab.work_task.model.db.enums.Gender;
 
 @Data
 @Entity
@@ -43,4 +43,7 @@ public class Users {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "last_project_id")
+    private String lastProjectId;
 }
