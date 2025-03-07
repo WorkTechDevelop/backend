@@ -63,13 +63,17 @@ public class TaskController {
     }
 
     @GetMapping("/main-page")
-    public ResponseEntity<List<TaskModel>> getProjectTasksByUserGuid(
+    public ResponseEntity<?> getProjectTasksByUserGuid(
             @RequestHeader("Authorization") String jwtToken) {
-        log.info("Вывод задач проекта по guid пользователя");
+        log.info("Вывод главной страницы");
 
         try {
             List<TaskModel> tasks = taskService.getProjectTaskByUserGuid(jwtToken);
-            return ResponseEntity.ok(tasks);
+            String sprintName = taskService.getSprintName(jwtToken);
+            List<Object[]> projects = taskService.getUserProject(jwtToken);
+            String activeProject = taskService.getLastProjectId(jwtToken);
+            TaskResponse response = new TaskResponse(tasks, sprintName, projects, activeProject);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             log.error("Ошибка при получении задач: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -7,6 +7,9 @@ import ru.worktechlab.work_task.jwt.JwtUtils;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.model.db.enums.StatusName;
+import ru.worktechlab.work_task.projects.ProjectRepository;
+import ru.worktechlab.work_task.projects.UsersProjectsRepository;
+import ru.worktechlab.work_task.sprints.SprintsRepository;
 import ru.worktechlab.work_task.user.UserRepository;
 
 import java.sql.Timestamp;
@@ -18,6 +21,9 @@ import java.util.UUID;
 public class TaskService {
     private TaskRepository taskRepository;
     private UserRepository userRepository;
+    private UsersProjectsRepository usersProjectsRepository;
+    private ProjectRepository projectRepository;
+    private SprintsRepository sprintsRepository;
     private JwtUtils jwtUtils;
 
     public String createTask(TaskModel taskModel, String jwtToken) {
@@ -64,6 +70,24 @@ public class TaskService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
         return taskRepository.findByProjectId(user.getLastProjectId());
+    }
+
+    public String getLastProjectId(String jwtToken) {
+        String userId = jwtUtils.getUserGuidFromJwtToken(jwtToken);
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
+        return user.getLastProjectId();
+    }
+
+    public List<Object[]> getUserProject(String jwtToken) {
+        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(jwtUtils.getUserGuidFromJwtToken(jwtToken));
+        return projectRepository.findProjectIdAndNameByIds(projectIds);
+    }
+
+    public String getSprintName(String jwtToken) {
+        Users user = userRepository.findById(jwtUtils.getUserGuidFromJwtToken(jwtToken))
+                .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", jwtUtils.getUserGuidFromJwtToken(jwtToken))));
+        return sprintsRepository.getSprintName(user.getLastProjectId());
     }
 }
 
