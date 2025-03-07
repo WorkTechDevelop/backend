@@ -1,7 +1,7 @@
 package ru.worktechlab.work_task.model.db.enums;
 
 public enum StatusName {
-    NEW,
+    TODO,
     IN_PROGRESS,
     POSTPONED,
     BLOCKED,
