@@ -29,7 +29,7 @@ public class TaskService {
     public String createTask(TaskModel taskModel, String jwtToken) {
         taskModel.setId(UUID.randomUUID().toString());
         taskModel.setCreator(jwtUtils.getUserGuidFromJwtToken(jwtToken));
-        taskModel.setStatus(StatusName.NEW.toString());
+        taskModel.setStatus(StatusName.TODO.toString());
         taskModel.setCreationDate(new Timestamp(System.currentTimeMillis()));
         taskModel.setUpdateDate(new Timestamp(System.currentTimeMillis()));
         TaskModel createdTask = taskRepository.save(taskModel);
