@@ -31,4 +31,7 @@ public class Sprints {
     @Column
     private String finisher;
 
+    @Column(name = "project_id")
+    private String projectId;
+
 }
