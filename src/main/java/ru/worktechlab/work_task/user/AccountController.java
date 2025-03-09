@@ -1,6 +1,7 @@
 package ru.worktechlab.work_task.user;
 
 import ru.worktechlab.work_task.model.db.RoleModel;
+import ru.worktechlab.work_task.model.db.UserBuilder;
 import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.model.db.enums.Roles;
 import ru.worktechlab.work_task.model.rest.RegisterDto;
@@ -29,33 +30,49 @@ public class AccountController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     @PostMapping("/registry")
     public ResponseEntity<?> registry(@Valid @RequestBody RegisterDto registerDto) {
-
-        if(userRepository.existsByEmail(registerDto.getEmail())) {
-            return new ResponseEntity<>("Пользователь с таким email уже зарегестрирован", HttpStatus.BAD_REQUEST);
-        }
-        if(!registerDto.getPassword().equals(registerDto.getConfirmPassword())) {
-            return new ResponseEntity<>("Пароли не совпадают", HttpStatus.BAD_REQUEST);
-        }
-
-        Users user = new Users();
-        user.setEmail(registerDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-
-            user.setFirstName(registerDto.getFirstName());
-            user.setLastName(registerDto.getLastName());
-            user.setMiddleName(registerDto.getMiddleName());
-            user.setPhone(registerDto.getPhone());
-            user.setGender(registerDto.getGender());
-            user.setActive(false);
-
-            RoleModel defaultRole = roleModelRepository.findByName(Roles.PROJECT_MEMBER)
-                    .orElseThrow(() -> new RuntimeException("Роль не найдена в БД"));
-            user.setRole_id(defaultRole.getId());
+        try {
+            validateRegistrationData(registerDto);
+            RoleModel defaultRole = getDefaultRole();
+            Users user = buildUser(registerDto, defaultRole);
             userRepository.save(user);
-
             return new ResponseEntity<>("Пользователь успешно зарегестрирован", HttpStatus.OK);
+        } catch (IllegalArgumentException exception) {
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private Users buildUser(RegisterDto registerDto, RoleModel role) {
+        return new UserBuilder()
+                .email(registerDto.getEmail())
+                .password(passwordEncoder.encode(registerDto.getPassword()))
+                .firstName(registerDto.getFirstName())
+                .lastName(registerDto.getLastName())
+                .middleName(registerDto.getMiddleName())
+                .phone(registerDto.getPhone())
+                .gender(registerDto.getGender())
+                .birthDate(registerDto.getBirthDate())
+                .active(false)
+                .roleId(role.getId())
+                .lastProjectId(null)
+                .build();
+    }
+
+    private RoleModel getDefaultRole() {
+        return roleModelRepository.findByName(Roles.PROJECT_MEMBER)
+                .orElseThrow(() -> new RuntimeException("Роль не найдена в БД"));
+    }
+
+    private void validateRegistrationData(RegisterDto registerDto) {
+        if (userRepository.existsByEmail(registerDto.getEmail())) {
+            throw new IllegalArgumentException("Пользователь с таким email уже зарегистрирован");
+        }
+
+        if (!registerDto.getPassword().equals(registerDto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Пароли не совпадают");
+        }
     }
 }

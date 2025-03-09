@@ -1,10 +1,12 @@
 package ru.worktechlab.work_task.model.db;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import ru.worktechlab.work_task.model.db.enums.Gender;
 
 @Data
+@Builder
 @Entity
 @Table(name = "users")
 public class Users {
