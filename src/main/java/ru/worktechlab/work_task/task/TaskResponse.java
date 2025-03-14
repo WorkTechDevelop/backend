@@ -3,6 +3,9 @@ package ru.worktechlab.work_task.task;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import ru.worktechlab.work_task.model.db.TaskModel;
+import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
+import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
+import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 
 import java.util.List;
 
@@ -13,9 +16,11 @@ public class TaskResponse {
     private String taskId;
     private List<String> errors;
     private List<TaskModel> tasks;
-    private String sprintName;
-    private List<Object[]> projects;
+    private SprintInfoDTO sprintInfo;
+    private List<UsersProjectsDTO> projects;
     private String activeProject;
+    private List<UsersTasksInProjectDTO> userTasks;
+
 
     public TaskResponse(String taskId) {
         this.taskId = taskId;
@@ -29,9 +34,9 @@ public class TaskResponse {
         this.task = task;
     }
 
-    public TaskResponse(List<TaskModel> tasks, String sprintName, List<Object[]> projects, String activeProject) {
-        this.tasks = tasks;
-        this.sprintName = sprintName;
+    public TaskResponse(List<UsersTasksInProjectDTO> userTasks, SprintInfoDTO sprintInfo, List<UsersProjectsDTO> projects, String activeProject) {
+        this.userTasks = userTasks;
+        this.sprintInfo = sprintInfo;
         this.projects = projects;
         this.activeProject = activeProject;
     }

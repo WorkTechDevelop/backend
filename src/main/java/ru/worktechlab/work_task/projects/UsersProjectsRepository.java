@@ -13,4 +13,7 @@ public interface UsersProjectsRepository extends JpaRepository<UsersProjects, St
 
     @Query("SELECT up.projectId FROM UsersProjects up WHERE up.userId = :userId")
     List<String> findProjectsByUserId(@Param("userId") String userId);
+
+    @Query("SELECT up.userId FROM UsersProjects up WHERE up.projectId = :projectId")
+    List<String> findUserByProjectId(@Param("projectId") String projectId);
 }

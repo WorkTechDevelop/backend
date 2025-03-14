@@ -9,12 +9,17 @@ import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.model.db.enums.StatusName;
 import ru.worktechlab.work_task.projects.ProjectRepository;
 import ru.worktechlab.work_task.projects.UsersProjectsRepository;
+import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
+import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
+import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.sprints.SprintsRepository;
 import ru.worktechlab.work_task.user.UserRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -65,11 +70,24 @@ public class TaskService {
         return taskRepository.findByProjectId(projectId);
     }
 
-    public List<TaskModel> getProjectTaskByUserGuid(String jwtToken) {
+    public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid(String jwtToken) {
         String userId = jwtUtils.getUserGuidFromJwtToken(jwtToken);
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
-        return taskRepository.findByProjectId(user.getLastProjectId());
+        List<String> userIds = usersProjectsRepository.findUserByProjectId(user.getLastProjectId());
+        List<UsersTasksInProjectDTO> userTasks = taskRepository.findUserTasksByUserIds(userIds);
+        Map<String, List<TaskModel>> tasksByUser = userTasks.stream()
+                .collect(Collectors.groupingBy(
+                        UsersTasksInProjectDTO::getUserName,
+                        Collectors.flatMapping(
+                                dto -> dto.getTasks().stream(),
+                                Collectors.toList()
+                        )
+                ));
+
+        return tasksByUser.entrySet().stream()
+                .map(entry -> new UsersTasksInProjectDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     public String getLastProjectId(String jwtToken) {
@@ -79,15 +97,15 @@ public class TaskService {
         return user.getLastProjectId();
     }
 
-    public List<Object[]> getUserProject(String jwtToken) {
+    public List<UsersProjectsDTO> getUserProject(String jwtToken) {
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(jwtUtils.getUserGuidFromJwtToken(jwtToken));
         return projectRepository.findProjectIdAndNameByIds(projectIds);
     }
 
-    public String getSprintName(String jwtToken) {
+    public SprintInfoDTO getSprintName(String jwtToken) {
         Users user = userRepository.findById(jwtUtils.getUserGuidFromJwtToken(jwtToken))
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", jwtUtils.getUserGuidFromJwtToken(jwtToken))));
-        return sprintsRepository.getSprintName(user.getLastProjectId());
+        return sprintsRepository.getSprintInfoByProjectId(user.getLastProjectId());
     }
 }
 
