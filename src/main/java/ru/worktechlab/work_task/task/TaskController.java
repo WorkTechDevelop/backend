@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
+import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
+import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
+import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,17 +65,17 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/main-page")
+    @GetMapping("/main-page") //todo Модельки
     public ResponseEntity<?> getProjectTasksByUserGuid(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Вывод главной страницы");
 
         try {
-            List<TaskModel> tasks = taskService.getProjectTaskByUserGuid(jwtToken);
-            String sprintName = taskService.getSprintName(jwtToken);
-            List<Object[]> projects = taskService.getUserProject(jwtToken);
+            List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
+            SprintInfoDTO sprintInfo = taskService.getSprintName(jwtToken);
+            List<UsersProjectsDTO> projects = taskService.getUserProject(jwtToken);
             String activeProject = taskService.getLastProjectId(jwtToken);
-            TaskResponse response = new TaskResponse(tasks, sprintName, projects, activeProject);
+            TaskResponse response = new TaskResponse(usersTasks, sprintInfo, projects, activeProject);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             log.error("Ошибка при получении задач: {}", e.getMessage(), e);

@@ -1,8 +1,8 @@
 package ru.worktechlab.work_task.task;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import io.micrometer.common.util.StringUtils;
 import ru.worktechlab.work_task.model.db.Projects;
 import ru.worktechlab.work_task.model.db.Sprints;
 import ru.worktechlab.work_task.model.db.TaskModel;
@@ -11,6 +11,7 @@ import ru.worktechlab.work_task.model.db.enums.TaskType;
 import ru.worktechlab.work_task.projects.ProjectRepository;
 import ru.worktechlab.work_task.sprints.SprintsRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -37,7 +38,10 @@ public class ValidateTask {
         validatePriority(taskModel);
         validateTaskType(taskModel);
         validateProjectId(taskModel);
-        return errors;
+
+        List<String> error = new ArrayList<>(errors); //todo костыль
+        errors.clear();
+        return error;
     }
 
     private void validateProjectId(TaskModel taskModel) {
