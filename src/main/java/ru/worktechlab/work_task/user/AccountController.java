@@ -2,7 +2,7 @@ package ru.worktechlab.work_task.user;
 
 import ru.worktechlab.work_task.model.db.RoleModel;
 import ru.worktechlab.work_task.model.db.Users;
-import ru.worktechlab.work_task.model.db.enums.Roles;
+import ru.worktechlab.work_task.model.mappers.UserMapper;
 import ru.worktechlab.work_task.model.rest.RegisterDto;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -14,48 +14,29 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.worktechlab.work_task.user.service.RoleService;
 
 @RestController
 @RequestMapping("/work-task/v1")
 @AllArgsConstructor
 public class AccountController {
 
+    private final RoleService roleService;
+
+    private final UserMapper userMapper;
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private RoleModelRepository roleModelRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
 
     @PostMapping("/registry")
     public ResponseEntity<?> registry(@Valid @RequestBody RegisterDto registerDto) {
-
-        if(userRepository.existsByEmail(registerDto.getEmail())) {
-            return new ResponseEntity<>("Пользователь с таким email уже зарегестрирован", HttpStatus.BAD_REQUEST);
-        }
-        if(!registerDto.getPassword().equals(registerDto.getConfirmPassword())) {
-            return new ResponseEntity<>("Пароли не совпадают", HttpStatus.BAD_REQUEST);
-        }
-
-        Users user = new Users();
-        user.setEmail(registerDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-
-            user.setFirstName(registerDto.getFirstName());
-            user.setLastName(registerDto.getLastName());
-            user.setMiddleName(registerDto.getMiddleName());
-            user.setPhone(registerDto.getPhone());
-            user.setGender(registerDto.getGender());
-            user.setActive(false);
-
-            RoleModel defaultRole = roleModelRepository.findByName(Roles.PROJECT_MEMBER)
-                    .orElseThrow(() -> new RuntimeException("Роль не найдена в БД"));
-            user.setRole_id(defaultRole.getId());
+            RoleModel defaultRole = roleService.getDefaultRole();
+            Users user = userMapper.registerDtoToUser(registerDto, defaultRole);
+            user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
             userRepository.save(user);
-
             return new ResponseEntity<>("Пользователь успешно зарегестрирован", HttpStatus.OK);
     }
 }
