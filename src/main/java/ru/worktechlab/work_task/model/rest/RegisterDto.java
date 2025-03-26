@@ -4,11 +4,13 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.worktechlab.work_task.model.db.enums.Gender;
+import ru.worktechlab.work_task.user.PasswordMatch;
+
 @Data
+@PasswordMatch
 public class RegisterDto {
 
     @NotBlank(message = "Email не может быть пустым")
@@ -25,11 +27,9 @@ public class RegisterDto {
     private String firstName;
 
     @NotBlank(message = "Фамилия не может быть пустым")
-    @NotEmpty
     private String lastName;
 
     @NotBlank(message = "Отчество не может быть пустым")
-    @NotEmpty
     private String middleName;
 
     private String phone;
