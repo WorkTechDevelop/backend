@@ -1,5 +1,6 @@
 package ru.worktechlab.work_task.user.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,16 +12,12 @@ import ru.worktechlab.work_task.model.rest.LoginRequest;
 import ru.worktechlab.work_task.model.rest.LoginResponse;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
+
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final AuthMapper authMapper;
-
-    public AuthService(AuthenticationManager authenticationManager, JwtUtils jwtUtils, AuthMapper authMapper) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-        this.authMapper = authMapper;
-    }
 
     public LoginResponse authenticate(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -32,5 +29,4 @@ public class AuthService {
         String jwtToken = jwtUtils.generateTokenFromUserDetails(userDetails);
         return authMapper.toLoginResponse(userDetails, jwtToken);
     }
-
 }
