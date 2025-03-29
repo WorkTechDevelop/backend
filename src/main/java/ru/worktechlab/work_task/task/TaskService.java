@@ -4,9 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.jwt.JwtUtils;
+import ru.worktechlab.work_task.jwt.TokenService;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.model.db.enums.StatusName;
+import ru.worktechlab.work_task.model.mappers.TaskModelMapper;
+import ru.worktechlab.work_task.model.rest.TaskModelDTO;
 import ru.worktechlab.work_task.projects.ProjectRepository;
 import ru.worktechlab.work_task.projects.UsersProjectsRepository;
 import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
@@ -30,6 +33,9 @@ public class TaskService {
     private ProjectRepository projectRepository;
     private SprintsRepository sprintsRepository;
     private JwtUtils jwtUtils;
+
+    private final TaskModelMapper taskModelMapper;
+    private final TokenService tokenService;
 
     public String createTask(TaskModel taskModel, String jwtToken) {
         taskModel.setId(UUID.randomUUID().toString());
@@ -107,6 +113,10 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", jwtUtils.getUserGuidFromJwtToken(jwtToken))));
         return sprintsRepository.getSprintInfoByProjectId(user.getLastProjectId());
     }
+
+    public TaskResponse createTask(TaskModelDTO taskDTO, String jwtToken) {
+        TaskModel task = taskModelMapper.toEntity(taskDTO, tokenService.getUserGuidFromJwtToken(jwtToken));
+        taskRepository.save(task);
+        return new TaskResponse(task.getId());
+    }
 }
-
-

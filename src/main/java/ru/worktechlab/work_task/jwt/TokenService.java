@@ -13,4 +13,8 @@ public class TokenService {
     public String generateToken(CustomUserDetails userDetails) {
         return jwtUtils.generateTokenFromUserDetails(userDetails);
     }
+
+    public String getUserGuidFromJwtToken(String jwtToken) {
+        return jwtUtils.getUserGuidFromJwtToken(jwtToken);
+    }
 }
