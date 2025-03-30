@@ -49,14 +49,8 @@ public class TaskController {
             @PathVariable String id) {
         log.info("Получение задачи по id: {}", id);
 
-        try {
-            TaskModel task = taskService.getTaskById(id);
-            return ResponseEntity.ok(new TaskResponse(task));
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении задачи: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new TaskResponse("Задача не найдена: " + e.getMessage()));
-        }
+        TaskModel task = taskService.findTaskByIdOrThrow(id);
+        return ResponseEntity.ok(new TaskResponse(task));
     }
 
     @GetMapping("/project-tasks/{projectId}")

@@ -134,7 +134,7 @@ public class TaskService {
         return new TaskResponse(task.getId());
     }
 
-    private TaskModel findTaskByIdOrThrow(String taskId) {
+    public TaskModel findTaskByIdOrThrow(String taskId) {
         return taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с id: %s не найдена", taskId)));
     }
