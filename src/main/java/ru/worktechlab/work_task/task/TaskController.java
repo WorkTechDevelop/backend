@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
+import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
 import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
 import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
@@ -35,9 +36,12 @@ public class TaskController {
 
     @PutMapping("/update-task")
     public ResponseEntity<TaskResponse> updateTask(
-            @RequestBody TaskModel taskModel,
+            @Valid
+            @RequestBody UpdateTaskModelDTO updateTaskModelDTO,
             @RequestHeader("Authorization") String jwtToken) {
-        return validateAndProcessTask(taskModel, jwtToken, false);
+        log.info("Processing update-task with model: {}", updateTaskModelDTO);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.updateTask(updateTaskModelDTO));
     }
 
     @GetMapping("/{id}")

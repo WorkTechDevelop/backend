@@ -1,7 +1,9 @@
 package ru.worktechlab.work_task.task;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.jwt.JwtUtils;
 import ru.worktechlab.work_task.jwt.TokenService;
@@ -10,6 +12,7 @@ import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.model.db.enums.StatusName;
 import ru.worktechlab.work_task.model.mappers.TaskModelMapper;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
+import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.projects.ProjectRepository;
 import ru.worktechlab.work_task.projects.UsersProjectsRepository;
 import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
@@ -25,6 +28,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class TaskService {
     private TaskRepository taskRepository;
@@ -65,6 +69,16 @@ public class TaskService {
         taskRepository.save(existingTask);
 
         return String.format("Задача %s обновлена", existingTask.getId());
+    }
+
+    @Transactional
+    public TaskResponse updateTask(UpdateTaskModelDTO dto) {
+        TaskModel existingTask = findTaskByIdOrThrow(dto.getId());
+        taskModelMapper.updateTaskFromDto(dto, existingTask);
+        taskRepository.save(existingTask);
+
+        log.info("Задача обновлена: id={}, title={}", existingTask.getId(), existingTask.getTitle());
+        return new TaskResponse(existingTask.getId());
     }
 
     public TaskModel getTaskById(String id) {
@@ -118,5 +132,10 @@ public class TaskService {
         TaskModel task = taskModelMapper.toEntity(taskDTO, tokenService.getUserGuidFromJwtToken(jwtToken));
         taskRepository.save(task);
         return new TaskResponse(task.getId());
+    }
+
+    private TaskModel findTaskByIdOrThrow(String taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с id: %s не найдена", taskId)));
     }
 }

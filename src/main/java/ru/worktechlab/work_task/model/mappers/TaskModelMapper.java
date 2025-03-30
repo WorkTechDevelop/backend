@@ -1,9 +1,9 @@
 package ru.worktechlab.work_task.model.mappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
+import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
 
 import java.util.UUID;
 
@@ -23,4 +23,12 @@ public interface TaskModelMapper {
         task.setCreator(creatorGuid);
         return task;
     }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
+    void updateTaskFromDto(UpdateTaskModelDTO dto, @MappingTarget TaskModel task);
+
 }
