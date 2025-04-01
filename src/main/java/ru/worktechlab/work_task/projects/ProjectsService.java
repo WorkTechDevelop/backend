@@ -21,7 +21,6 @@ public class ProjectsService {
     private UsersProjectsRepository usersProjectsRepository;
     private TaskService taskService;
     private ProjectRepository projectRepository;
-    private UserService userService;
 
     public List<UsersProjectsDTO> getAllUserProjects(String jwtToken) {
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(
@@ -42,8 +41,4 @@ public class ProjectsService {
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(user.getId());
         return projectRepository.findProjectIdAndNameByIds(projectIds);
     }
-
-//    public String getLastProjectId(String jwtToken) {
-//        return user.getLastProjectId();
-//    }
 }
