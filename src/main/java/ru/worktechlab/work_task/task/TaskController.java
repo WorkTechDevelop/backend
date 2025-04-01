@@ -9,11 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
-import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
-import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -22,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskController {
     private TaskService taskService;
-    private ValidateTask validateTask;
+    private MainPageService mainPageService;
 
     @PostMapping("/create-task")
     public ResponseEntity<TaskResponse> createTask(
@@ -48,7 +44,6 @@ public class TaskController {
     public ResponseEntity<TaskResponse> getTaskById(
             @PathVariable String id) {
         log.info("Получение задачи по id: {}", id);
-
         TaskModel task = taskService.findTaskByIdOrThrow(id);
         return ResponseEntity.ok(new TaskResponse(task));
     }
@@ -57,62 +52,14 @@ public class TaskController {
     public ResponseEntity<List<TaskModel>> getTasksByProjectId(
             @PathVariable String projectId) {
         log.info("Получение задач по projectId: {}", projectId);
-
-        try {
-            List<TaskModel> tasks = taskService.getTasksByProjectId(projectId);
-            return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении задач: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.emptyList());
-        }
+        List<TaskModel> tasks = taskService.getTasksByProjectIdOrThrow(projectId);
+        return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/main-page") //todo Модельки
     public ResponseEntity<?> getProjectTasksByUserGuid(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Вывод главной страницы");
-
-        try {
-            List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
-            SprintInfoDTO sprintInfo = taskService.getSprintName(jwtToken);
-            List<UsersProjectsDTO> projects = taskService.getUserProject(jwtToken);
-            String activeProject = taskService.getLastProjectId(jwtToken);
-            TaskResponse response = new TaskResponse(usersTasks, sprintInfo, projects, activeProject);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении задач: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.emptyList());
-        }
-    }
-
-    private ResponseEntity<TaskResponse> validateAndProcessTask(
-            TaskModel taskModel, String jwtToken, boolean isCreate) {
-        log.info("Processing task with model: {}", taskModel);
-        List<String> validationErrors = validateTask.validateTask(taskModel);
-
-        if (!validationErrors.isEmpty()) {
-            log.error("Validation errors: {}", validationErrors);
-            return ResponseEntity.badRequest()
-                    .body(new TaskResponse(validationErrors));
-        }
-
-        try {
-            String taskId;
-            if (isCreate) {
-                taskId = taskService.createTask(taskModel, jwtToken);
-            } else {
-                taskId = taskService.updateTask(taskModel);
-            }
-            HttpStatus status = isCreate ? HttpStatus.CREATED : HttpStatus.OK;
-            return ResponseEntity.status(status)
-                    .body(new TaskResponse(taskId));
-        } catch (RuntimeException e) {
-            String errorMessage = isCreate ? "creating" : "updating";
-            log.error("Error {} task: {}", errorMessage, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new TaskResponse("Internal server error: " + e.getMessage()));
-        }
+        return ResponseEntity.ok(mainPageService.getMainPageData(jwtToken));
     }
 }

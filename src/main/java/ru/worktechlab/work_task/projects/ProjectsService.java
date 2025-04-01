@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.jwt.JwtUtils;
 import ru.worktechlab.work_task.model.db.TaskModel;
+import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
 import ru.worktechlab.work_task.task.TaskService;
 import ru.worktechlab.work_task.user.UserRepository;
+import ru.worktechlab.work_task.user.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,7 @@ public class ProjectsService {
     private UsersProjectsRepository usersProjectsRepository;
     private TaskService taskService;
     private ProjectRepository projectRepository;
+    private UserService userService;
 
     public List<UsersProjectsDTO> getAllUserProjects(String jwtToken) {
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(
@@ -34,4 +37,13 @@ public class ProjectsService {
         userRepository.updateLastProjectIdById(jwtUtils.getUserGuidFromJwtToken(jwtToken), projectId);
         return taskService.getTasksByProjectId(projectId);
     }
+
+    public List<UsersProjectsDTO> getUserProject(Users user) {
+        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(user.getId());
+        return projectRepository.findProjectIdAndNameByIds(projectIds);
+    }
+
+//    public String getLastProjectId(String jwtToken) {
+//        return user.getLastProjectId();
+//    }
 }
