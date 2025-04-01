@@ -8,7 +8,6 @@ import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
 import ru.worktechlab.work_task.task.TaskService;
 import ru.worktechlab.work_task.user.UserRepository;
-import ru.worktechlab.work_task.user.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
