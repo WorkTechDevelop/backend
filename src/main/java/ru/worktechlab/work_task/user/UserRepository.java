@@ -24,4 +24,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
     void updateLastProjectIdById(@Param("id") String id, @Param("lastProjectId") String lastProjectId);
 
     boolean existsByEmail(String email);
+
+    @Query("SELECT u.active FROM Users u WHERE u.id = :id")
+    Boolean isUserActive(@Param("id") String id);
 }

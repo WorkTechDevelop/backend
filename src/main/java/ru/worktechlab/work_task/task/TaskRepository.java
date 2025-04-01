@@ -1,11 +1,10 @@
 package ru.worktechlab.work_task.task;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.worktechlab.work_task.model.db.TaskModel;
-
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 
 import java.util.List;

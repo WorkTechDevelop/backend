@@ -12,4 +12,7 @@ public interface SprintsRepository extends JpaRepository<Sprints, String> {
 
     @Query("SELECT NEW ru.worktechlab.work_task.responseDTO.SprintInfoDTO(s.name, s.startDate, s.endDate) FROM Sprints s WHERE s.projectId = :projectId AND s.active = true")
     SprintInfoDTO getSprintInfoByProjectId(@Param("projectId") String projectId);
+
+    @Query("SELECT s.active FROM Sprints s WHERE s.id = :id")
+    Boolean isSprintActive(@Param("id") String id);
 }
