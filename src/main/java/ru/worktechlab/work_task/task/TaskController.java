@@ -65,22 +65,57 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/main-page") //todo Модельки
-    public ResponseEntity<?> getProjectTasksByUserGuid(
+    @GetMapping("/tasks-in-project")
+    public ResponseEntity<List<UsersTasksInProjectDTO>> getTasksInProject(
             @RequestHeader("Authorization") String jwtToken) {
-        log.info("Вывод главной страницы");
+        log.info("Вывод всех задач проекта отсартированных по пользователям");
+       try {
+           List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
+           return ResponseEntity.ok(usersTasks);
+       } catch (RuntimeException e) {
+           log.error("Ошибка при получении задач: {}", e.getMessage(), e);
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                   .body(Collections.emptyList());
+       }
+    }
 
+    @GetMapping("/sprint-info")
+    public ResponseEntity<SprintInfoDTO> getSprintInfo(
+            @RequestHeader("Authorization") String jwtToken) {
+        log.info("Вывод информации о спринте");
         try {
-            List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
             SprintInfoDTO sprintInfo = taskService.getSprintName(jwtToken);
-            List<UsersProjectsDTO> projects = taskService.getUserProject(jwtToken);
-            String activeProject = taskService.getLastProjectId(jwtToken);
-            TaskResponse response = new TaskResponse(usersTasks, sprintInfo, projects, activeProject);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(sprintInfo);
         } catch (RuntimeException e) {
-            log.error("Ошибка при получении задач: {}", e.getMessage(), e);
+            log.error("Ошибка при получении информации о спринте: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/users-projects")
+    public ResponseEntity<List<UsersProjectsDTO>> getProjectByUser(
+            @RequestHeader("Authorization") String jwtToken) {
+        log.info("Вывод всех проектов пользователя");
+        try {
+            List<UsersProjectsDTO> projects = taskService.getUserProject(jwtToken);
+            return ResponseEntity.ok(projects);
+        } catch (RuntimeException e) {
+            log.error("Ошибка при получении проектов: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.emptyList());
+        }
+    }
+
+    @GetMapping("/active-project")
+    public ResponseEntity<String> getActiveProject(
+            @RequestHeader("Authorization") String jwtToken) {
+        log.info("Получить id активного проекта");
+        try {
+            String activeProject = taskService.getLastProjectId(jwtToken);
+            return ResponseEntity.ok(activeProject);
+        } catch (RuntimeException e) {
+            log.error("Ошибка при получении активного проекта: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
