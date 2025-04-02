@@ -1,16 +1,15 @@
 package ru.worktechlab.work_task.task;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
-import ru.worktechlab.work_task.responseDTO.SprintInfoDTO;
-import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
-import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.model.rest.TaskModelDTO;
+import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -19,55 +18,49 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskController {
     private TaskService taskService;
-    private ValidateTask validateTask;
+    private MainPageService mainPageService;
 
     @PostMapping("/create-task")
     public ResponseEntity<TaskResponse> createTask(
-            @RequestBody TaskModel taskModel,
+            @Valid
+            @RequestBody TaskModelDTO taskModelDTO,
             @RequestHeader("Authorization") String jwtToken) {
-        return validateAndProcessTask(taskModel, jwtToken, true);
+        log.info("Processing create-task with model: {}", taskModelDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(taskService.createTask(taskModelDTO, jwtToken));
     }
 
     @PutMapping("/update-task")
     public ResponseEntity<TaskResponse> updateTask(
-            @RequestBody TaskModel taskModel,
+            @Valid
+            @RequestBody UpdateTaskModelDTO updateTaskModelDTO,
             @RequestHeader("Authorization") String jwtToken) {
-        return validateAndProcessTask(taskModel, jwtToken, false);
+        log.info("Processing update-task with model: {}", updateTaskModelDTO);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.updateTask(updateTaskModelDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(
             @PathVariable String id) {
         log.info("Получение задачи по id: {}", id);
-
-        try {
-            TaskModel task = taskService.getTaskById(id);
-            return ResponseEntity.ok(new TaskResponse(task));
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении задачи: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new TaskResponse("Задача не найдена: " + e.getMessage()));
-        }
+        TaskModel task = taskService.findTaskByIdOrThrow(id);
+        return ResponseEntity.ok(new TaskResponse(task));
     }
 
     @GetMapping("/project-tasks/{projectId}")
     public ResponseEntity<List<TaskModel>> getTasksByProjectId(
             @PathVariable String projectId) {
         log.info("Получение задач по projectId: {}", projectId);
-
-        try {
-            List<TaskModel> tasks = taskService.getTasksByProjectId(projectId);
-            return ResponseEntity.ok(tasks);
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении задач: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.emptyList());
-        }
+        List<TaskModel> tasks = taskService.getTasksByProjectIdOrThrow(projectId);
+        return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/tasks-in-project")
     public ResponseEntity<List<UsersTasksInProjectDTO>> getTasksInProject(
             @RequestHeader("Authorization") String jwtToken) {
+        log.info("Вывод главной страницы");
+        return ResponseEntity.ok(mainPageService.getMainPageData(jwtToken));
         log.info("Вывод всех задач проекта отсартированных по пользователям");
        try {
            List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);

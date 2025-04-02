@@ -13,4 +13,7 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Projects, String> {
     @Query("SELECT NEW ru.worktechlab.work_task.responseDTO.UsersProjectsDTO(p.name, p.id) FROM Projects p WHERE p.id IN :projectIds AND p.active = true")
     List<UsersProjectsDTO> findProjectIdAndNameByIds(@Param("projectIds") List<String> projectIds);
+
+    @Query("SELECT p.active FROM Projects p WHERE p.id = :id")
+    Boolean isProjectActive(@Param("id") String id);
 }
