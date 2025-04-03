@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
+import ru.worktechlab.work_task.model.rest.UpdateStatusRequestDto;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 
 import java.util.List;
 
@@ -18,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskController {
     private TaskService taskService;
-    private MainPageService mainPageService;
 
     @PostMapping("/create-task")
     public ResponseEntity<TaskResponse> createTask(
@@ -40,6 +41,15 @@ public class TaskController {
                 .body(taskService.updateTask(updateTaskModelDTO));
     }
 
+    @PutMapping("/update-status")
+    public ResponseEntity<TaskModel> updateTask(
+            @Valid
+            @RequestBody UpdateStatusRequestDto requestDto) {
+        log.info("Обновить статус задачи");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.updateTaskStatus(requestDto));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(
             @PathVariable String id) {
@@ -48,7 +58,7 @@ public class TaskController {
         return ResponseEntity.ok(new TaskResponse(task));
     }
 
-    @GetMapping("/project-tasks/{projectId}")
+    @GetMapping("/project-tasks/{projectId}") //todo mb delete?
     public ResponseEntity<List<TaskModel>> getTasksByProjectId(
             @PathVariable String projectId) {
         log.info("Получение задач по projectId: {}", projectId);
@@ -56,10 +66,11 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/main-page") //todo Модельки
-    public ResponseEntity<?> getProjectTasksByUserGuid(
+    @GetMapping("/tasks-in-project")
+    public ResponseEntity<List<UsersTasksInProjectDTO>> getTasksInProject(
             @RequestHeader("Authorization") String jwtToken) {
-        log.info("Вывод главной страницы");
-        return ResponseEntity.ok(mainPageService.getMainPageData(jwtToken));
+        log.info("Вывод всех задач проекта отсартированных по пользователям");
+        List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
+        return ResponseEntity.ok(usersTasks);
     }
 }

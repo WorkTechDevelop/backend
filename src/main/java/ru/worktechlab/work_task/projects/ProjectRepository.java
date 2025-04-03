@@ -16,4 +16,7 @@ public interface ProjectRepository extends JpaRepository<Projects, String> {
 
     @Query("SELECT p.active FROM Projects p WHERE p.id = :id")
     Boolean isProjectActive(@Param("id") String id);
+
+    @Query("SELECT p.name FROM Projects p WHERE p.id = :id")
+    String getProjectNameById(@Param("id") String id);
 }

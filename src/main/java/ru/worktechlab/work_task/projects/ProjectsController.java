@@ -34,4 +34,20 @@ public class ProjectsController {
         List<TaskModel> tasks = projectsService.setMainProject(id, jwtToken);
         return ResponseEntity.ok(tasks);
     }
+
+    @GetMapping("/users-projects")
+    public ResponseEntity<List<UsersProjectsDTO>> getProjectByUser(
+            @RequestHeader("Authorization") String jwtToken) {
+        log.info("Вывод всех проектов пользователя");
+        List<UsersProjectsDTO> projects = projectsService.getUserProject(jwtToken);
+        return ResponseEntity.ok(projects);
+    }
+
+    @GetMapping("/active-project")
+    public ResponseEntity<String> getActiveProject(
+            @RequestHeader("Authorization") String jwtToken) {
+        log.info("Получить id активного проекта");
+        String activeProject = projectsService.getLastProjectId(jwtToken);
+        return ResponseEntity.ok(activeProject);
+    }
 }
