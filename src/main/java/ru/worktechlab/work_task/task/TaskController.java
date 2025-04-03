@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
+import ru.worktechlab.work_task.model.rest.UpdateStatusRequestDto;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 
 import java.util.List;
 
@@ -18,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 public class TaskController {
     private TaskService taskService;
-    private MainPageService mainPageService;
 
     @PostMapping("/create-task")
     public ResponseEntity<TaskResponse> createTask(
@@ -40,6 +41,15 @@ public class TaskController {
                 .body(taskService.updateTask(updateTaskModelDTO));
     }
 
+    @PutMapping("/update-status")
+    public ResponseEntity<TaskModel> updateTask(
+            @Valid
+            @RequestBody UpdateStatusRequestDto requestDto) {
+        log.info("Обновить статус задачи");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(taskService.updateTaskStatus(requestDto));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(
             @PathVariable String id) {
@@ -48,7 +58,7 @@ public class TaskController {
         return ResponseEntity.ok(new TaskResponse(task));
     }
 
-    @GetMapping("/project-tasks/{projectId}")
+    @GetMapping("/project-tasks/{projectId}") //todo mb delete?
     public ResponseEntity<List<TaskModel>> getTasksByProjectId(
             @PathVariable String projectId) {
         log.info("Получение задач по projectId: {}", projectId);
@@ -59,85 +69,8 @@ public class TaskController {
     @GetMapping("/tasks-in-project")
     public ResponseEntity<List<UsersTasksInProjectDTO>> getTasksInProject(
             @RequestHeader("Authorization") String jwtToken) {
-        log.info("Вывод главной страницы");
-        return ResponseEntity.ok(mainPageService.getMainPageData(jwtToken));
         log.info("Вывод всех задач проекта отсартированных по пользователям");
-       try {
-           List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
-           return ResponseEntity.ok(usersTasks);
-       } catch (RuntimeException e) {
-           log.error("Ошибка при получении задач: {}", e.getMessage(), e);
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                   .body(Collections.emptyList());
-       }
-    }
-
-    @GetMapping("/sprint-info")
-    public ResponseEntity<SprintInfoDTO> getSprintInfo(
-            @RequestHeader("Authorization") String jwtToken) {
-        log.info("Вывод информации о спринте");
-        try {
-            SprintInfoDTO sprintInfo = taskService.getSprintName(jwtToken);
-            return ResponseEntity.ok(sprintInfo);
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении информации о спринте: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @GetMapping("/users-projects")
-    public ResponseEntity<List<UsersProjectsDTO>> getProjectByUser(
-            @RequestHeader("Authorization") String jwtToken) {
-        log.info("Вывод всех проектов пользователя");
-        try {
-            List<UsersProjectsDTO> projects = taskService.getUserProject(jwtToken);
-            return ResponseEntity.ok(projects);
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении проектов: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.emptyList());
-        }
-    }
-
-    @GetMapping("/active-project")
-    public ResponseEntity<String> getActiveProject(
-            @RequestHeader("Authorization") String jwtToken) {
-        log.info("Получить id активного проекта");
-        try {
-            String activeProject = taskService.getLastProjectId(jwtToken);
-            return ResponseEntity.ok(activeProject);
-        } catch (RuntimeException e) {
-            log.error("Ошибка при получении активного проекта: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    private ResponseEntity<TaskResponse> validateAndProcessTask(
-            TaskModel taskModel, String jwtToken, boolean isCreate) {
-        log.info("Processing task with model: {}", taskModel);
-        List<String> validationErrors = validateTask.validateTask(taskModel);
-
-        if (!validationErrors.isEmpty()) {
-            log.error("Validation errors: {}", validationErrors);
-            return ResponseEntity.badRequest()
-                    .body(new TaskResponse(validationErrors));
-        }
-
-        try {
-            String taskId;
-            if (isCreate) {
-                taskId = taskService.createTask(taskModel, jwtToken);
-            } else {
-                taskId = taskService.updateTask(taskModel);
-            }
-            HttpStatus status = isCreate ? HttpStatus.CREATED : HttpStatus.OK;
-            return ResponseEntity.status(status)
-                    .body(new TaskResponse(taskId));
-        } catch (RuntimeException e) {
-            String errorMessage = isCreate ? "creating" : "updating";
-            log.error("Error {} task: {}", errorMessage, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new TaskResponse("Internal server error: " + e.getMessage()));
-        }
+        List<UsersTasksInProjectDTO> usersTasks = taskService.getProjectTaskByUserGuid(jwtToken);
+        return ResponseEntity.ok(usersTasks);
     }
 }

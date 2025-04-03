@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.projects;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.jwt.JwtUtils;
+import ru.worktechlab.work_task.jwt.TokenService;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.responseDTO.UsersProjectsDTO;
@@ -20,6 +21,8 @@ public class ProjectsService {
     private UsersProjectsRepository usersProjectsRepository;
     private TaskService taskService;
     private ProjectRepository projectRepository;
+    private final TokenService tokenService;
+
 
     public List<UsersProjectsDTO> getAllUserProjects(String jwtToken) {
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(
@@ -39,5 +42,17 @@ public class ProjectsService {
     public List<UsersProjectsDTO> getUserProject(Users user) {
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(user.getId());
         return projectRepository.findProjectIdAndNameByIds(projectIds);
+    }
+
+    public List<UsersProjectsDTO> getUserProject(String jwtToken) {
+        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(tokenService.getUserGuidFromJwtToken(jwtToken));
+        return projectRepository.findProjectIdAndNameByIds(projectIds);
+    }
+
+    public String getLastProjectId(String jwtToken) {
+        String userId = tokenService.getUserGuidFromJwtToken(jwtToken);
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
+        return user.getLastProjectId();
     }
 }
