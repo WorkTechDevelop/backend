@@ -58,6 +58,11 @@ public class SecurityConfig {
                 authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
                         .requestMatchers("work-task/v1/login").permitAll()
                         .requestMatchers("work-task/v1/registry").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated()); /// .permitAll())
         http.sessionManagement(
                 session ->
