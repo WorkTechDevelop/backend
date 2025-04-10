@@ -80,7 +80,7 @@ jobs:
             cd /home/deployer/backend
 
             # Импортируем образ в containerd
-            sudo k3s ctr -n k8s.io images import /home/deployer/backend/github/workspace/backend.tar
+            k3s ctr -n k8s.io images import /home/deployer/backend/github/workspace/backend.tar
             
             cd /home/deployer/backend
 
