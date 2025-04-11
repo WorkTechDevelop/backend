@@ -85,8 +85,8 @@ jobs:
             set -e
             cd /home/deployer/backend
 
-            # Импортируем образ в containerd
-            k3s ctr -n k8s.io images import backend.tar
+            # Импортируем образ в containerd путь импорта брать из source
+            k3s ctr -n k8s.io images import k3s ctr -n k8s.io images import /home/deployer/backend/github/workspace/backend.tar
 
             # Определяем namespace и директорию с манифестами
           
