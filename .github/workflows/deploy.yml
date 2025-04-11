@@ -98,4 +98,4 @@ jobs:
             k3s kubectl set image deployment myapp myapp=backend:${{ env.IMAGE_TAG }} -n ${{ env.NAMESPACE }}
 
             # Рестарт деплоймента
-            k3s kubectl rollout restart deployment myapp -n "$NAMESPACE"
+            k3s kubectl rollout restart deployment myapp -n ${{ env.NAMESPACE }}
