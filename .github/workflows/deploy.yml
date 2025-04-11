@@ -90,7 +90,7 @@ jobs:
 
             # Определяем namespace и директорию с манифестами
           
-            echo "Деплой в окружение: ${{ env.ENV }} (namespace: ${{ env.NAMESPACE }})"
+            echo "Деплой в окружение: ${{ env.ENV }}
             echo "Директория для манифеста: ${{ env.MANIFEST_DIR }}
             cd ${{ env.MANIFEST_DIR }}
 
