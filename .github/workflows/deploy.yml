@@ -1,9 +1,16 @@
 name: Deploy to K3s
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+          - test-env
 
 jobs:
   build:
@@ -39,18 +46,14 @@ jobs:
       - name: Копируем JAR в нужное имя для Docker
         run: cp build/libs/WorkTask-${{ env.JAR_VERSION }}.jar app.jar
 
-      - name: Собираем Docker-образ
-        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+      - name: Собираем Docker-образ с профилем
+        run: |
+          docker build \
+            --build-arg SPRING_PROFILES_ACTIVE=${{ github.event.inputs.environment }} \
+            -t $IMAGE_NAME:$IMAGE_TAG .
 
       - name: Сохраняем Docker-образ в TAR
         run: docker save $IMAGE_NAME:$IMAGE_TAG -o $IMAGE_FILE
-
-
-      - name: Check file permissions for tar file
-        run: ls -l ${{ github.workspace }}/backend.tar
-
-      - name: Fix permissions for tar file
-        run: chmod 644 ${{ github.workspace }}/backend.tar
 
       - name: Копируем образ на сервер
         uses: appleboy/scp-action@v0.1.4
@@ -67,6 +70,9 @@ jobs:
 
     env:
       IMAGE_TAG: build-${{ github.run_number }}
+      ENV: "${{ github.event.inputs.environment }}"
+      MANIFEST_DIR: "/home/deployer/backend/k8s/$ENV"
+      NAMESPACE: "$ENV"
 
     steps:
       - name: Подключение по SSH и деплой
@@ -80,12 +86,19 @@ jobs:
             cd /home/deployer/backend
 
             # Импортируем образ в containerd
-            k3s ctr -n k8s.io images import /home/deployer/backend/github/workspace/backend.tar
-            
-            cd /home/deployer/backend
+            k3s ctr -n k8s.io images import backend.tar
 
-            # Обновляем образ в deployment (обрати внимание на имя контейнера!)
-            k3s kubectl set image deployment myapp myapp=backend:${{ env.IMAGE_TAG }} -n default
+            # Определяем namespace и директорию с манифестами
+            ENV="${{ github.event.inputs.environment }}"
+            MANIFEST_DIR="/home/deployer/k8s/$ENV"
+            NAMESPACE="$ENV"
 
-            # Принудительный рестарт, если нужно
-            k3s kubectl rollout restart deployment myapp -n default
+            echo "Деплой в окружение: $ENV (namespace: $NAMESPACE)"
+            echo "Директория для манифеста: $MANIFEST_DIR"
+            сd $MANIFEST_DIR
+
+            # Обновляем образ (возможно, потребуется имя контейнера внутри Pod'а)
+            k3s kubectl set image deployment myapp myapp=backend:${{ env.IMAGE_TAG }} -n "$NAMESPACE"
+
+            # Рестарт деплоймента
+            k3s kubectl rollout restart deployment myapp -n "$NAMESPACE"
