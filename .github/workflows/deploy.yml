@@ -71,8 +71,8 @@ jobs:
     env:
       IMAGE_TAG: build-${{ github.run_number }}
       ENV: "${{ github.event.inputs.environment }}"
-      MANIFEST_DIR: "/home/deployer/backend/k8s/$ENV"
-      NAMESPACE: "$ENV"
+      MANIFEST_DIR: "/home/deployer/backend/k8s/${{ github.event.inputs.environment }}"
+      NAMESPACE: "${{ github.event.inputs.environment }}"
 
     steps:
       - name: Подключение по SSH и деплой
@@ -89,16 +89,13 @@ jobs:
             k3s ctr -n k8s.io images import backend.tar
 
             # Определяем namespace и директорию с манифестами
-            ENV="${{ github.event.inputs.environment }}"
-            MANIFEST_DIR="/home/deployer/k8s/$ENV"
-            NAMESPACE="$ENV"
-
-            echo "Деплой в окружение: $ENV (namespace: $NAMESPACE)"
-            echo "Директория для манифеста: $MANIFEST_DIR"
-            сd $MANIFEST_DIR
+          
+            echo "Деплой в окружение: $ENV (namespace: ${{ env.NAMESPACE }})"
+            echo "Директория для манифеста: ${{ env.MANIFEST_DIR }}
+            cd ${{ env.MANIFEST_DIR }}
 
             # Обновляем образ (возможно, потребуется имя контейнера внутри Pod'а)
-            k3s kubectl set image deployment myapp myapp=backend:${{ env.IMAGE_TAG }} -n "$NAMESPACE"
+            k3s kubectl set image deployment myapp myapp=backend:${{ env.IMAGE_TAG }} -n ${{ env.NAMESPACE }}
 
             # Рестарт деплоймента
             k3s kubectl rollout restart deployment myapp -n "$NAMESPACE"
