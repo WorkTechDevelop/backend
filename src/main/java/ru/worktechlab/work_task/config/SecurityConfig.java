@@ -1,6 +1,8 @@
 package ru.worktechlab.work_task.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -25,12 +27,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
-
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${cors.allowed.origins}")
+    @Value("${spring.cors.allowed.origins}")
     private String allowedOrigins;
 
     @Bean

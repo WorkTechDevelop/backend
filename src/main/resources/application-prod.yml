@@ -1,0 +1,23 @@
+spring:
+  app:
+    jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
+    jwtExpirationMs: 1800000
+
+#  server:
+#    port: 8080
+#    servlet:
+#      context-path: /prod/work-task/v1
+
+  datasource:
+    url: jdbc:mysql://91.211.249.37:32700/testlink_db
+    username: testlink_user
+    password: djk&kskfld19
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  cors:
+    allowed:
+      origins: http://91.211.249.37:30080
