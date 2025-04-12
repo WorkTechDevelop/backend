@@ -3,11 +3,6 @@ spring:
     jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
     jwtExpirationMs: 1800000
 
-#  server:
-#    port: 8080
-#    servlet:
-#      context-path: /prod/work-task/v1
-
   datasource:
     url: jdbc:mysql://91.211.249.37:32700/testlink_db
     username: testlink_user
@@ -21,3 +16,8 @@ spring:
   cors:
     allowed:
       origins: http://91.211.249.37:30080
+
+server:
+  port: 8080
+  servlet:
+    context-path: /prod
