@@ -15,7 +15,8 @@ spring:
 
   cors:
     allowed:
-      origins: "*"
+      origins: http://91.211.249.37:30080
+      local: http://localhost:3000
 
 server:
   port: 8080
