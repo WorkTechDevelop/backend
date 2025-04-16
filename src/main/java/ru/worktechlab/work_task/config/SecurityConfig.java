@@ -34,6 +34,9 @@ public class SecurityConfig {
     @Value("${spring.cors.allowed.origins}")
     private String allowedOrigins;
 
+    @Value("${spring.cors.allowed.local}")
+    private String allowedLocal;
+
     @Bean
     public UserDetailsService userDetailsService() {
         return new UsersDetailsService();
@@ -86,7 +89,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(allowedOrigins)); // Разрешаем фронтенд
+        configuration.setAllowedOrigins(List.of(allowedOrigins, allowedLocal)); // Разрешаем фронтенд
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers"));
         configuration.setAllowCredentials(true); // Разрешаем куки и аутентификацию
