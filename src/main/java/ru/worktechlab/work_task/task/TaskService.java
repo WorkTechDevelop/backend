@@ -12,6 +12,7 @@ import ru.worktechlab.work_task.model.mappers.TaskModelMapper;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
 import ru.worktechlab.work_task.model.rest.UpdateStatusRequestDto;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.projects.ProjectRepository;
 import ru.worktechlab.work_task.projects.UsersProjectsRepository;
 import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.task.validators.ProjectValidator;
@@ -33,6 +34,7 @@ public class TaskService {
     private final ProjectValidator projectValidator;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
+    private final ProjectRepository projectRepository;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
@@ -95,9 +97,17 @@ public class TaskService {
     }
 
     public TaskResponse createTask(TaskModelDTO taskDTO, String jwtToken) {
-        TaskModel task = taskModelMapper.toEntity(taskDTO, tokenService.getUserGuidFromJwtToken(jwtToken));
+        TaskModel task = taskModelMapper.toEntity(taskDTO, tokenService.getUserGuidFromJwtToken(jwtToken),
+                getTaskCode(taskDTO.getProjectId()));
         taskRepository.save(task);
         return new TaskResponse(task.getId());
+    }
+
+    public String getTaskCode(String projectId) {
+      String code = projectRepository.getCodeById(projectId);
+        projectRepository.incrementCount(projectId);
+       Integer count = projectRepository.getCountById(projectId);
+        return code + "-" + String.format("%04d", count);
     }
 
     public TaskModel findTaskByIdOrThrow(String taskId) {

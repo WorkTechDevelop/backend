@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.sql.Date;
@@ -16,12 +17,15 @@ public class Projects {
     @Id
     private String id;
 
+    @NotNull
     @Column
     private String name;
 
+    @NotNull
     @Column
     private String owner;
 
+    @NotNull
     @Column
     private Date creationDate;
 
@@ -39,4 +43,11 @@ public class Projects {
 
     @Column
     private String finisher;
+
+    @NotNull
+    @Column
+    private String code;
+
+    @Column
+    private Integer count;
 }
