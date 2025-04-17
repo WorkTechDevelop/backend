@@ -38,7 +38,7 @@ public class TaskService {
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
-        TaskModel existingTask = findTaskByIdOrThrow(dto.getId());
+        TaskModel existingTask = findTaskByCodeOrThrow(dto.getCode());
         taskModelMapper.updateTaskFromDto(dto, existingTask);
         taskRepository.save(existingTask);
 
@@ -110,14 +110,14 @@ public class TaskService {
         return code + "-" + String.format("%04d", count);
     }
 
-    public TaskModel findTaskByIdOrThrow(String taskId) {
-        return taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с id: %s не найдена", taskId)));
+    public TaskModel findTaskByCodeOrThrow(String taskCode) {
+        return taskRepository.findByCode(taskCode)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с кодом: %s не найдена", taskCode)));
     }
 
     @Transactional
     public TaskModel updateTaskStatus(UpdateStatusRequestDto requestDto) {
-        TaskModel task = findTaskByIdOrThrow(requestDto.getId());
+        TaskModel task = findTaskByCodeOrThrow(requestDto.getCode());
         task.setStatus(requestDto.getStatus());
         return taskRepository.save(task);
     }

@@ -49,4 +49,7 @@ public class UpdateTaskModelDTO {
     @NotNull(message = "Поле ESTIMATION не может быть пустым")
     @Min(value = 1, message = "ESTIMATION должен быть больше 0")
     private Integer estimation;
+
+    @NotNull(message = "Поле CODE не может быть пустым")
+    private String code;
 }

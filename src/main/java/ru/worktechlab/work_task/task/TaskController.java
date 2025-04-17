@@ -50,11 +50,11 @@ public class TaskController {
                 .body(taskService.updateTaskStatus(requestDto));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskResponse> getTaskById(
-            @PathVariable String id) {
-        log.info("Получение задачи по id: {}", id);
-        TaskModel task = taskService.findTaskByIdOrThrow(id);
+    @GetMapping("/{code}")
+    public ResponseEntity<TaskResponse> getTaskByCode(
+            @PathVariable String code) {
+        log.info("Получение задачи по коду: {}", code);
+        TaskModel task = taskService.findTaskByCodeOrThrow(code);
         return ResponseEntity.ok(new TaskResponse(task));
     }
 
