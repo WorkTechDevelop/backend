@@ -1,6 +1,9 @@
 package ru.worktechlab.work_task.model.db;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -59,6 +62,9 @@ public class TaskModel {
 
     @Column
     private Timestamp updateDate;
+
+    @Column
+    private String code;
 
     public TaskModel() {
     }
