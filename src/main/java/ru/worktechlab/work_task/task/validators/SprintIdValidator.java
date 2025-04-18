@@ -16,7 +16,7 @@ public class SprintIdValidator implements ConstraintValidator<ValidSprintId, Str
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) return false;
+        if (value.isEmpty()) return true;
         Boolean isActive = sprintsRepository.isSprintActive(value);
         return Boolean.TRUE.equals(isActive);
     }

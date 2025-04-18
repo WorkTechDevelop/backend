@@ -1,5 +1,6 @@
 package ru.worktechlab.work_task.model.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import ru.worktechlab.work_task.task.validators.*;
@@ -11,7 +12,6 @@ public class TaskModelDTO {
     @Size(max = 255, message = "Длина поля TITLE не может быть более 255 символов")
     private String title;
 
-    @NotBlank(message = "Поле DESCRIPTION не может быть пустым")
     @Size(max = 4096, message = "Длина поля DESCRIPTION не может быть более 4096 символов")
     private String description;
 
@@ -27,7 +27,6 @@ public class TaskModelDTO {
     @ValidProjectId
     private String projectId;
 
-    @NotNull(message = "Поле SPRINT_ID не может быть пустым")
     @ValidSprintId
     private String sprintId;
 
@@ -35,8 +34,6 @@ public class TaskModelDTO {
     @ValidTaskType
     private String taskType;
 
-    @NotNull(message = "Поле ESTIMATION не может быть пустым")
-    @Min(value = 1, message = "ESTIMATION должен быть больше 0")
-    @Max(value = 20, message = "ESTIMATION должен быть меньше 20")
+    @Max(value = 999, message = "ESTIMATION должен быть меньше 1000")
     private Integer estimation;
 }
