@@ -18,6 +18,7 @@ public interface TaskModelMapper {
     @Mapping(target = "creationDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "code", ignore = true)
+    @Mapping(target = "sprintId", expression = "java(normalizeSprintId(dto.getSprintId()))")
     TaskModel toEntity(TaskModelDTO dto);
 
     default TaskModel toEntity(TaskModelDTO dto, String creatorGuid, String code) {
@@ -26,6 +27,10 @@ public interface TaskModelMapper {
         task.setCreator(creatorGuid);
         task.setCode(code);
         return task;
+    }
+
+    default String normalizeSprintId(String sprintId) {
+        return (sprintId == null || sprintId.isBlank()) ? null : sprintId;
     }
 
     @Mapping(target = "id", ignore = true)
