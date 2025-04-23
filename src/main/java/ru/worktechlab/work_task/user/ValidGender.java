@@ -3,16 +3,16 @@ package ru.worktechlab.work_task.user;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
-@Constraint(validatedBy = GenderValidator.class)
-@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
+@Documented
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = GenderValidator.class)
 public @interface ValidGender {
-    String message() default "Некорректное значение для gender. Допустимые значения: MALE, FEMALE, OTHER";
+    String message() default "Некорректное значение для Gender. Допустимые значения: MALE, FEMALE";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,13 +1,11 @@
 package ru.worktechlab.work_task.model.rest;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ru.worktechlab.work_task.model.db.enums.Gender;
 import ru.worktechlab.work_task.user.PasswordMatch;
+import ru.worktechlab.work_task.user.ValidGender;
 
 @Data
 @PasswordMatch
@@ -36,7 +34,7 @@ public class RegisterDto {
 
     private String birthDate;
 
-    //@ValidGender
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    @NotBlank(message = "Gender не может быть пустым")
+    @ValidGender
+    private String gender;
 }

@@ -1,8 +1,8 @@
 package ru.worktechlab.work_task.user;
 
-import ru.worktechlab.work_task.model.db.enums.Gender;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import ru.worktechlab.work_task.model.db.enums.Gender;
 
 import java.util.Arrays;
 
@@ -10,11 +10,9 @@ public class GenderValidator implements ConstraintValidator<ValidGender, String>
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null || value.isEmpty()) {
-            return false;
-        }
+        if (value == null) return false;
         return Arrays.stream(Gender.values())
-                .anyMatch(gender -> gender.name().equalsIgnoreCase(value));
+                .map(Enum::name)
+                .anyMatch(v -> v.equals(value));
     }
-
-    }
+}
