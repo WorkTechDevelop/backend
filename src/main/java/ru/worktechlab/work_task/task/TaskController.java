@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.model.db.TaskModel;
+import ru.worktechlab.work_task.model.rest.TaskModeResponselDTO;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
 import ru.worktechlab.work_task.model.rest.UpdateStatusRequestDto;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
@@ -59,11 +60,11 @@ public class TaskController {
     }
 
     @GetMapping("/project-tasks/{projectId}") //todo mb delete?
-    public ResponseEntity<List<TaskModel>> getTasksByProjectId(
+    public ResponseEntity<List<TaskModeResponselDTO>> getTasksByProjectId(
             @PathVariable String projectId) {
         log.info("Получение задач по projectId: {}", projectId);
-        List<TaskModel> tasks = taskService.getTasksByProjectIdOrThrow(projectId);
-        return ResponseEntity.ok(tasks);
+        List<TaskModeResponselDTO> taskModeResponseDTO = taskService.getTasksModelResponseByProjectIdOrThrow(projectId);
+        return ResponseEntity.ok(taskModeResponseDTO);
     }
 
     @GetMapping("/tasks-in-project")
