@@ -1,9 +1,6 @@
 package ru.worktechlab.work_task.model.rest;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import ru.worktechlab.work_task.task.validators.*;
 
@@ -36,6 +33,7 @@ public class TaskModelDTO {
     @ValidTaskType
     private String taskType;
 
+    @Min(value = 0, message = "ESTIMATION должен быть не меньше 0")
     @Max(value = 999, message = "ESTIMATION должен быть меньше 1000")
     private Integer estimation;
 }
