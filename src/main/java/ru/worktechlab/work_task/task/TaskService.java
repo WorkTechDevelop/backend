@@ -9,6 +9,7 @@ import ru.worktechlab.work_task.jwt.TokenService;
 import ru.worktechlab.work_task.model.db.TaskModel;
 import ru.worktechlab.work_task.model.db.Users;
 import ru.worktechlab.work_task.model.mappers.TaskModelMapper;
+import ru.worktechlab.work_task.model.rest.TaskModeResponselDTO;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
 import ru.worktechlab.work_task.model.rest.UpdateStatusRequestDto;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
@@ -18,10 +19,15 @@ import ru.worktechlab.work_task.responseDTO.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.task.validators.ProjectValidator;
 import ru.worktechlab.work_task.task.validators.TaskValidator;
 import ru.worktechlab.work_task.user.UserRepository;
+import ru.worktechlab.work_task.user.service.UserService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -35,6 +41,9 @@ public class TaskService {
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
+
+    private final UserService userService;
+    private final TaskModelConverter taskModelConverter;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
@@ -54,7 +63,31 @@ public class TaskService {
         projectValidator.validateProjectExist(projectId);
         List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
         taskValidator.validateTasksExist(tasks, projectId);
+
         return tasks;
+    }
+
+    public List<TaskModeResponselDTO> getTasksModelResponseByProjectIdOrThrow(String projectId) {
+        validateProjectAndTasks(projectId);
+        List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
+        Map<String, Users> usersById = preloadUsers(tasks);
+        return taskModelConverter.convertTasks(tasks, usersById);
+    }
+
+    private void validateProjectAndTasks(String projectId) {
+        projectValidator.validateProjectExist(projectId);
+        List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
+        taskValidator.validateTasksExist(tasks, projectId);
+    }
+
+    private Map<String, Users> preloadUsers(List<TaskModel> tasks) {
+        Set<String> userIds = tasks.stream()
+                .flatMap(task -> Stream.of(task.getCreator(), task.getAssignee()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        return userService.findAllByIds(userIds).stream()
+                .collect(Collectors.toMap(Users::getId, Function.identity()));
     }
 
     public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid(String jwtToken) {
@@ -104,9 +137,9 @@ public class TaskService {
     }
 
     public String getTaskCode(String projectId) {
-      String code = projectRepository.getCodeById(projectId);
+        String code = projectRepository.getCodeById(projectId);
         projectRepository.incrementCount(projectId);
-       Integer count = projectRepository.getCountById(projectId);
+        Integer count = projectRepository.getCountById(projectId);
         return code + "-" + String.format("%04d", count);
     }
 

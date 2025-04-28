@@ -13,6 +13,7 @@ import ru.worktechlab.work_task.projects.UsersProjectsRepository;
 import ru.worktechlab.work_task.user.InvalidUserException;
 import ru.worktechlab.work_task.user.UserRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -51,5 +52,9 @@ public class UserService {
                 .filter(Users::isActive)
                 .orElseThrow(() -> new InvalidUserException(
                         String.format("Пользователь с ID %s не найден или не активен", userId)));
+    }
+
+    public List<Users> findAllByIds(Collection<String> ids) {
+        return userRepository.findAllById(ids);
     }
 }

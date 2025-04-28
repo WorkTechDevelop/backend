@@ -4,6 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.worktechlab.work_task.model.db.TaskModel;
+import ru.worktechlab.work_task.model.db.Users;
+import ru.worktechlab.work_task.model.rest.TaskModeResponselDTO;
 import ru.worktechlab.work_task.model.rest.TaskModelDTO;
 import ru.worktechlab.work_task.model.rest.UpdateTaskModelDTO;
 
@@ -40,5 +42,18 @@ public interface TaskModelMapper {
     @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "code", ignore = true)
     void updateTaskFromDto(UpdateTaskModelDTO dto, @MappingTarget TaskModel task);
+
+    TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task);
+
+    default TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task, Users creator, Users assignee) {
+        TaskModeResponselDTO dto = taskModelResponseFromEntity(task);
+        dto.setCreator(formatName(creator));
+        dto.setAssignee(assignee != null ? formatName(assignee) : null);
+        return dto;
+    }
+
+    private static String formatName(Users user) {
+        return user.getFirstName() + " " + user.getLastName();
+    }
 
 }
