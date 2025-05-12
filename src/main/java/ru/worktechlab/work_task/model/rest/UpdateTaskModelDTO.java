@@ -1,6 +1,5 @@
 package ru.worktechlab.work_task.model.rest;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,8 +17,7 @@ public class UpdateTaskModelDTO {
     @Size(max = 255, message = "Длина поля TITLE не может быть более 255 символов")
     private String title;
 
-    @NotBlank(message = "Поле DESCRIPTION не может быть пустым")
-    @Size(max = 4096, message = "Длина поля DESCRIPTION не может быть более 4096 символов")
+    @ValidDescription
     private String description;
 
     @NotBlank(message = "Поле PRIORITY не может быть пустым")
@@ -34,7 +32,6 @@ public class UpdateTaskModelDTO {
     @ValidProjectId
     private String projectId;
 
-    @NotNull(message = "Поле SPRINT_ID не может быть пустым")
     @ValidSprintId
     private String sprintId;
 
@@ -46,8 +43,7 @@ public class UpdateTaskModelDTO {
     @ValidTaskStatus
     private String status;
 
-    @NotNull(message = "Поле ESTIMATION не может быть пустым")
-    @Min(value = 1, message = "ESTIMATION должен быть больше 0")
+    @ValidEstimation
     private Integer estimation;
 
     @NotNull(message = "Поле CODE не может быть пустым")
