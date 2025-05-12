@@ -1,7 +1,6 @@
 package ru.worktechlab.work_task.task.validators;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintValidator;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
