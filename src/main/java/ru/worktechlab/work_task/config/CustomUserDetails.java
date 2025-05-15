@@ -1,6 +1,6 @@
 package ru.worktechlab.work_task.config;
 
-import ru.worktechlab.work_task.model.db.Users;
+import ru.worktechlab.work_task.models.tables.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

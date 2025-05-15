@@ -21,9 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import ru.worktechlab.work_task.jwt.AuthEntryPointJwt;
-import ru.worktechlab.work_task.jwt.AuthTokenFilter;
-import ru.worktechlab.work_task.user.service.UsersDetailsService;
+import ru.worktechlab.work_task.authorization.jwt.AuthEntryPointJwt;
+import ru.worktechlab.work_task.authorization.jwt.AuthTokenFilter;
+import ru.worktechlab.work_task.services.UsersDetailsService;
 
 import java.util.List;
 @Slf4j
