@@ -1,6 +1,6 @@
 package ru.worktechlab.work_task.controllers;
 
-import ru.worktechlab.work_task.models.request_dto.LoginRequestDTO;
+import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,13 +1,13 @@
-package ru.worktechlab.work_task.models.mappers;
+package ru.worktechlab.work_task.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.Users;
-import ru.worktechlab.work_task.models.response_dto.TaskModeResponselDTO;
-import ru.worktechlab.work_task.models.request_dto.TaskModelDTO;
-import ru.worktechlab.work_task.models.request_dto.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.models.tables.User;
+import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
+import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
+import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 
 import java.util.UUID;
 
@@ -45,14 +45,14 @@ public interface TaskModelMapper {
 
     TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task);
 
-    default TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task, Users creator, Users assignee) {
+    default TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task, User creator, User assignee) {
         TaskModeResponselDTO dto = taskModelResponseFromEntity(task);
         dto.setCreator(formatName(creator));
         dto.setAssignee(assignee != null ? formatName(assignee) : null);
         return dto;
     }
 
-    private static String formatName(Users user) {
+    private static String formatName(User user) {
         return user.getFirstName() + " " + user.getLastName();
     }
 

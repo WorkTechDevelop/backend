@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.response_dto.UsersProjectsDTO;
+import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.services.ProjectsService;
 
 import java.util.List;

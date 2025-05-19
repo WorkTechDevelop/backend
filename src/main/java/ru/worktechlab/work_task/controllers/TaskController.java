@@ -7,13 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.response_dto.TaskModeResponselDTO;
-import ru.worktechlab.work_task.models.request_dto.TaskModelDTO;
-import ru.worktechlab.work_task.models.request_dto.UpdateStatusRequestDTO;
-import ru.worktechlab.work_task.models.request_dto.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.models.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
+import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
+import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
+import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.services.TaskService;
-import ru.worktechlab.work_task.models.response.TaskResponse;
+import ru.worktechlab.work_task.dto.response.TaskResponse;
 
 import java.util.List;
 

@@ -2,9 +2,9 @@ package ru.worktechlab.work_task.utils;
 
 import org.springframework.stereotype.Component;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.Users;
-import ru.worktechlab.work_task.models.mappers.TaskModelMapper;
-import ru.worktechlab.work_task.models.response_dto.TaskModeResponselDTO;
+import ru.worktechlab.work_task.models.tables.User;
+import ru.worktechlab.work_task.mappers.TaskModelMapper;
+import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -17,11 +17,11 @@ public class TaskModelConverter {
         this.taskModelMapper = taskModelMapper;
     }
 
-    public List<TaskModeResponselDTO> convertTasks(List<TaskModel> tasks, Map<String, Users> usersById) {
+    public List<TaskModeResponselDTO> convertTasks(List<TaskModel> tasks, Map<String, User> usersById) {
         return tasks.stream()
                 .map(task -> {
-                    Users creator = usersById.get(task.getCreator());
-                    Users assignee = usersById.get(task.getAssignee());
+                    User creator = usersById.get(task.getCreator());
+                    User assignee = usersById.get(task.getAssignee());
                     return taskModelMapper.taskModelResponseFromEntity(task, creator, assignee);
                 })
                 .collect(Collectors.toList());

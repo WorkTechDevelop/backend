@@ -7,7 +7,7 @@ import ru.worktechlab.work_task.models.enums.Gender;
 @Data
 @Entity
 @Table(name = "users")
-public class Users {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, unique = true)
@@ -19,7 +19,7 @@ public class Users {
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "middle_name", nullable = false)
+    @Column(name = "middle_name")
     private String middleName;
 
     @Column(name = "email", nullable = false, unique = true)

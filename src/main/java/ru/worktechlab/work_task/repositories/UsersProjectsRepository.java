@@ -4,12 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.worktechlab.work_task.models.tables.UsersProjects;
+import ru.worktechlab.work_task.models.tables.UsersProject;
 
 import java.util.List;
 
 @Repository
-public interface UsersProjectsRepository extends JpaRepository<UsersProjects, String> {
+public interface UsersProjectsRepository extends JpaRepository<UsersProject, String> {
 
     @Query("SELECT up.projectId FROM UsersProjects up WHERE up.userId = :userId")
     List<String> findProjectsByUserId(@Param("userId") String userId);

@@ -6,18 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.Users;
-import ru.worktechlab.work_task.models.mappers.TaskModelMapper;
-import ru.worktechlab.work_task.models.response_dto.TaskModeResponselDTO;
-import ru.worktechlab.work_task.models.request_dto.TaskModelDTO;
-import ru.worktechlab.work_task.models.request_dto.UpdateStatusRequestDTO;
-import ru.worktechlab.work_task.models.request_dto.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.models.tables.User;
+import ru.worktechlab.work_task.mappers.TaskModelMapper;
+import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
+import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
+import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
+import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.repositories.ProjectRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
-import ru.worktechlab.work_task.models.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.utils.TaskModelConverter;
 import ru.worktechlab.work_task.repositories.TaskRepository;
-import ru.worktechlab.work_task.models.response.TaskResponse;
+import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.validators.ProjectValidator;
 import ru.worktechlab.work_task.validators.TaskValidator;
 import ru.worktechlab.work_task.repositories.UserRepository;
@@ -71,7 +71,7 @@ public class TaskService {
     public List<TaskModeResponselDTO> getTasksModelResponseByProjectIdOrThrow(String projectId) {
         validateProjectAndTasks(projectId);
         List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
-        Map<String, Users> usersById = preloadUsers(tasks);
+        Map<String, User> usersById = preloadUsers(tasks);
         return taskModelConverter.convertTasks(tasks, usersById);
     }
 
@@ -81,19 +81,19 @@ public class TaskService {
         taskValidator.validateTasksExist(tasks, projectId);
     }
 
-    private Map<String, Users> preloadUsers(List<TaskModel> tasks) {
+    private Map<String, User> preloadUsers(List<TaskModel> tasks) {
         Set<String> userIds = tasks.stream()
                 .flatMap(task -> Stream.of(task.getCreator(), task.getAssignee()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         return userService.findAllByIds(userIds).stream()
-                .collect(Collectors.toMap(Users::getId, Function.identity()));
+                .collect(Collectors.toMap(User::getId, Function.identity()));
     }
 
     public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid(String jwtToken) {
         String userId = tokenService.getUserGuidFromJwtToken(jwtToken);
-        Users user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
         List<String> userIds = usersProjectsRepository.findUserByProjectId(user.getLastProjectId());
         List<UsersTasksInProjectDTO> userTasks = taskRepository.findUserTasksByUserIds(userIds);
@@ -141,7 +141,7 @@ public class TaskService {
         String code = projectRepository.getCodeById(projectId);
         projectRepository.incrementCount(projectId);
         Integer count = projectRepository.getCountById(projectId);
-        return code + "-" + String.format("%04d", count);
+        return code + "-" + count;
     }
 
     public TaskModel findTaskByCodeOrThrow(String taskCode) {

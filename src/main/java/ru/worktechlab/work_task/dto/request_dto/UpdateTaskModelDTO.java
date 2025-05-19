@@ -1,17 +1,24 @@
-package ru.worktechlab.work_task.models.request_dto;
+package ru.worktechlab.work_task.dto.request_dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.validators.*;
 
 @Data
-public class TaskModelDTO {
+public class UpdateTaskModelDTO {
+
+    @NotBlank(message = "Поле ID не может быть пустым")
+    @ValidTaskId
+    private String id;
 
     @NotBlank(message = "Поле TITLE не может быть пустым")
     @Size(max = 255, message = "Длина поля TITLE не может быть более 255 символов")
     private String title;
 
-    @Size(max = 4096, message = "Длина поля DESCRIPTION не может быть более 4096 символов")
+    @ValidDescription
     private String description;
 
     @NotBlank(message = "Поле PRIORITY не может быть пустым")
@@ -33,7 +40,13 @@ public class TaskModelDTO {
     @ValidTaskType
     private String taskType;
 
-    @Min(value = 0, message = "ESTIMATION должен быть не меньше 0")
-    @Max(value = 999, message = "ESTIMATION должен быть меньше 1000")
+    @NotBlank(message = "Поле STATUS не может быть пустым")
+    @ValidTaskStatus
+    private String status;
+
+    @ValidEstimation
     private Integer estimation;
+
+    @NotNull(message = "Поле CODE не может быть пустым")
+    private String code;
 }

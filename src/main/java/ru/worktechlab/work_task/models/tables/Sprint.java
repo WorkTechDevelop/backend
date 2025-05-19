@@ -8,7 +8,7 @@ import java.sql.Date;
 @Data
 @Entity
 @Table(name = "sprints")
-public class Sprints {
+public class Sprint {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;

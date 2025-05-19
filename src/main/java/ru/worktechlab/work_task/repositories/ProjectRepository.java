@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.worktechlab.work_task.models.tables.Projects;
-import ru.worktechlab.work_task.models.response_dto.UsersProjectsDTO;
+import ru.worktechlab.work_task.models.tables.Project;
+import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 
 import java.util.List;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Projects, String> {
+public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT NEW ru.worktechlab.work_task.model.response_dto.UsersProjectsDTO(p.name, p.id) FROM Projects p WHERE p.id IN :projectIds AND p.active = true")
     List<UsersProjectsDTO> findProjectIdAndNameByIds(@Param("projectIds") List<String> projectIds);
 

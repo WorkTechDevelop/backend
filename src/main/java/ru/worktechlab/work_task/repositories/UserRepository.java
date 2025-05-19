@@ -7,13 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.worktechlab.work_task.models.tables.RoleModel;
-import ru.worktechlab.work_task.models.tables.Users;
+import ru.worktechlab.work_task.models.tables.User;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<Users, String> {
-    Optional<Users> findByEmail(String email);
+public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByEmail(String email);
 
     @Query("SELECT u.role_id FROM Users u WHERE u.email = :email")
     Optional<RoleModel> findRoleByEmail(@Param("email") String email);

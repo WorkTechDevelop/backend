@@ -1,11 +1,11 @@
-package ru.worktechlab.work_task.models.mappers;
+package ru.worktechlab.work_task.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import ru.worktechlab.work_task.config.CustomUserDetails;
-import ru.worktechlab.work_task.models.request_dto.LoginRequestDTO;
-import ru.worktechlab.work_task.models.response_dto.LoginResponseDTO;
+import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
+import ru.worktechlab.work_task.dto.response_dto.LoginResponseDTO;
 
 @Mapper(componentModel = "spring")
 public interface AuthMapper {

@@ -1,4 +1,4 @@
-package ru.worktechlab.work_task.models.request_dto;
+package ru.worktechlab.work_task.dto.request_dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.worktechlab.work_task.authorization.PasswordMatch;
 import ru.worktechlab.work_task.authorization.ValidGender;
+import ru.worktechlab.work_task.models.enums.Gender;
 
 @Data
 @PasswordMatch
@@ -27,7 +28,6 @@ public class RegisterDTO {
     @NotBlank(message = "Фамилия не может быть пустым")
     private String lastName;
 
-    @NotBlank(message = "Отчество не может быть пустым")
     private String middleName;
 
     private String phone;
@@ -36,5 +36,5 @@ public class RegisterDTO {
 
     @NotBlank(message = "Gender не может быть пустым")
     @ValidGender
-    private String gender;
+    private Gender gender;
 }

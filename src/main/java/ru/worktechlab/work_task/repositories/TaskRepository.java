@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 
 import java.util.List;
 import java.util.Optional;

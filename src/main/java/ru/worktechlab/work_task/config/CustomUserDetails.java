@@ -1,6 +1,6 @@
 package ru.worktechlab.work_task.config;
 
-import ru.worktechlab.work_task.models.tables.Users;
+import ru.worktechlab.work_task.models.tables.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
-    private Users user;
+    private User user;
 
-    public CustomUserDetails(Users user) {
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 

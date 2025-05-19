@@ -3,7 +3,7 @@ package ru.worktechlab.work_task.validators;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import ru.worktechlab.work_task.authorization.PasswordMatch;
-import ru.worktechlab.work_task.models.request_dto.RegisterDTO;
+import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
 
 public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, RegisterDTO> {
 

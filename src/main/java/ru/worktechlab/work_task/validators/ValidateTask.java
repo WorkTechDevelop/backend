@@ -3,8 +3,8 @@ package ru.worktechlab.work_task.validators;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.worktechlab.work_task.models.tables.Projects;
-import ru.worktechlab.work_task.models.tables.Sprints;
+import ru.worktechlab.work_task.models.tables.Project;
+import ru.worktechlab.work_task.models.tables.Sprint;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.enums.Priority;
 import ru.worktechlab.work_task.models.enums.TaskType;
@@ -46,7 +46,7 @@ public class ValidateTask {
 
     private void validateProjectId(TaskModel taskModel) {
         if (taskModel.getSprintId() != null) {
-            Projects projects = findProjectById(taskModel.getProjectId());
+            Project projects = findProjectById(taskModel.getProjectId());
             if (!projects.isActive()) {
                 errors.add(ERROR_PROJECT_ID_VALUE);
             }
@@ -55,7 +55,7 @@ public class ValidateTask {
         }
     }
 
-    private Projects findProjectById(String projectId) {
+    private Project findProjectById(String projectId) {
         return projectRepository.findById(projectId).orElse(null);
     }
 
@@ -75,14 +75,14 @@ public class ValidateTask {
 
     private void validateSprintId(TaskModel taskModel) {
         if (taskModel.getSprintId() != null) {
-            Sprints sprint = findSprintById(taskModel.getSprintId());
+            Sprint sprint = findSprintById(taskModel.getSprintId());
             if (sprint == null || !sprint.isActive()) {
                 errors.add(ERROR_SPRINT_NOT_FOUND_OR_CLOSED);
             }
         }
     }
 
-    private Sprints findSprintById(String sprintId) {
+    private Sprint findSprintById(String sprintId) {
         return sprintsRepository.findById(sprintId).orElse(null);
     }
 

@@ -1,4 +1,4 @@
-package ru.worktechlab.work_task.models.request_dto;
+package ru.worktechlab.work_task.dto.request_dto;
 
 import lombok.Data;
 

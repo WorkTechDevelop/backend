@@ -12,7 +12,7 @@ import java.sql.Date;
 @Data
 @Entity
 @Table(name = "projects")
-public class Projects {
+public class Project {
 
     @Id
     private String id;
