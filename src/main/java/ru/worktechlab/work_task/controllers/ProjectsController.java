@@ -1,5 +1,7 @@
 package ru.worktechlab.work_task.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,12 @@ import java.util.List;
 @RequestMapping("work-task/v1/projects")
 @Slf4j
 @AllArgsConstructor
+@Tag(name = "Project", description = "Управление проектами")
 public class ProjectsController {
     private ProjectsService projectsService;
 
     @GetMapping("/all-user-project")
+    @Operation(summary = "Вывести список проектов пользователя")
     public ResponseEntity<List<UsersProjectsDTO>> getAllUserProjects(
             @RequestHeader("Authorization") String jwtToken) {
 
@@ -27,6 +31,7 @@ public class ProjectsController {
     }
 
     @PostMapping("/set-project/{id}")
+    @Operation(summary = "Устанавливает выбранный по ID проект - основным проектом пользователя")
     public ResponseEntity<List<TaskModel>> setMainProject(
             @PathVariable String id,
             @RequestHeader("Authorization") String jwtToken) {
@@ -37,6 +42,7 @@ public class ProjectsController {
     }
 
     @GetMapping("/users-projects")
+    @Operation(summary = "Вывести список всех проектов пользователя")
     public ResponseEntity<List<UsersProjectsDTO>> getProjectByUser(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Вывод всех проектов пользователя");
@@ -45,6 +51,7 @@ public class ProjectsController {
     }
 
     @GetMapping("/active-project")
+    @Operation(summary = "Получить ID основного проекта пользователя")
     public ResponseEntity<String> getActiveProject(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Получить id активного проекта");

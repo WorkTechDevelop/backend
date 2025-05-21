@@ -1,5 +1,7 @@
 package ru.worktechlab.work_task.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,12 @@ import ru.worktechlab.work_task.services.SprintsService;
 @RequestMapping("work-task/v1/sprint")
 @Slf4j
 @AllArgsConstructor
+@Tag(name = "Sprint", description = "Управление спринтами")
 public class SprintController {
     private final SprintsService sprintsService;
 
     @GetMapping("/sprint-info")
+    @Operation(summary = "Вывести информацию об активном спринте")
     public ResponseEntity<SprintInfoDTO> getSprintInfo(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Вывод информации о спринте");

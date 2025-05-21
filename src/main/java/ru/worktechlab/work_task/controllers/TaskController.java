@@ -1,19 +1,20 @@
 package ru.worktechlab.work_task.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
 import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.services.TaskService;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
+import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.models.tables.TaskModel;
+import ru.worktechlab.work_task.services.TaskService;
 
 import java.util.List;
 
@@ -21,10 +22,12 @@ import java.util.List;
 @RequestMapping("work-task/v1/task")
 @Slf4j
 @AllArgsConstructor
+@Tag(name = "Task", description = "Управление задачами")
 public class TaskController {
     private TaskService taskService;
 
     @PostMapping("/create-task")
+    @Operation(summary = "Создать задачу")
     public ResponseEntity<TaskResponse> createTask(
             @Valid
             @RequestBody TaskModelDTO taskModelDTO,
@@ -35,6 +38,7 @@ public class TaskController {
     }
 
     @PutMapping("/update-task")
+    @Operation(summary = "Обновить задачу")
     public ResponseEntity<TaskResponse> updateTask(
             @Valid
             @RequestBody UpdateTaskModelDTO updateTaskModelDTO,
@@ -45,6 +49,7 @@ public class TaskController {
     }
 
     @PutMapping("/update-status")
+    @Operation(summary = "Обновить статус задачи")
     public ResponseEntity<TaskModel> updateTask(
             @Valid
             @RequestBody UpdateStatusRequestDTO requestDto) {
@@ -54,6 +59,7 @@ public class TaskController {
     }
 
     @GetMapping("/{code}")
+    @Operation(summary = "Получить задачу по коду {code}")
     public ResponseEntity<TaskResponse> getTaskByCode(
             @PathVariable String code) {
         log.info("Получение задачи по коду: {}", code);
@@ -61,15 +67,8 @@ public class TaskController {
         return ResponseEntity.ok(new TaskResponse(task));
     }
 
-    @GetMapping("/project-tasks/{projectId}") //todo mb delete?
-    public ResponseEntity<List<TaskModeResponselDTO>> getTasksByProjectId(
-            @PathVariable String projectId) {
-        log.info("Получение задач по projectId: {}", projectId);
-        List<TaskModeResponselDTO> taskModeResponseDTO = taskService.getTasksModelResponseByProjectIdOrThrow(projectId);
-        return ResponseEntity.ok(taskModeResponseDTO);
-    }
-
     @GetMapping("/tasks-in-project")
+    @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
     public ResponseEntity<List<UsersTasksInProjectDTO>> getTasksInProject(
             @RequestHeader("Authorization") String jwtToken) {
         log.info("Вывод всех задач проекта отсартированных по пользователям");
