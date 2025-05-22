@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   mysql:
@@ -12,8 +12,4 @@ services:
       MYSQL_DATABASE: mydb
       MYSQL_USER: myuser
       MYSQL_PASSWORD: mypassword
-    volumes:
-      - mysql_d ata:/var/lib/mysql
 
-volumes:
-  mysql_data:
