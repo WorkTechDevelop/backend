@@ -77,6 +77,7 @@ public class JwtUtils {
     public String generateTokenFromUserDetails(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("guid", userDetails.getGuid());
+        claims.put("role", userDetails.getAuthorities());
 
         return Jwts.builder().claims(claims)
                 .subject(userDetails.getUsername())
