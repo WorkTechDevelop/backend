@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.worktechlab.work_task.config.CustomUserDetails;
+import ru.worktechlab.work_task.utils.UserContext;
 
 import java.io.IOException;
 
@@ -24,6 +26,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private UserContext userContext;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
@@ -37,6 +42,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                CustomUserDetails customUserDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+                userContext.setThreadLocal(customUserDetails.getGuid(), userDetails.getUsername(), userDetails.getAuthorities().toString());
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails,
@@ -47,12 +54,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                filterChain.doFilter(request, response);
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e.getMessage());
+        } finally {
+            userContext.clearThreadLocal();
         }
 
-        filterChain.doFilter(request, response);
     }
 
     private String parseJwt(HttpServletRequest request) {
