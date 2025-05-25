@@ -2,6 +2,7 @@ spring:
   app:
     jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
     jwtExpirationMs: 1800000
+    refreshExpiration: 86400000
 # Добавить настройки вашей локальной бд
   datasource:
     url: jdbc:mysql://localhost:3306/mydb?allowPublicKeyRetrieval=true&useSSL=false

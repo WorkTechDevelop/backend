@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.authorization.jwt.JwtUtils;
 import ru.worktechlab.work_task.config.CustomUserDetails;
+import ru.worktechlab.work_task.models.tables.RefreshToken;
+import ru.worktechlab.work_task.models.tables.User;
 
 @Service
 @RequiredArgsConstructor
@@ -17,5 +19,9 @@ public class TokenService {
 
     public String getUserGuidFromJwtToken(String jwtToken) {
         return jwtUtils.getUserGuidFromJwtToken(jwtToken);
+    }
+
+    public RefreshToken createRefreshToken(User user) {
+        return jwtUtils.createRefreshToken(user);
     }
 }

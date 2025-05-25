@@ -211,4 +211,7 @@
     <changeSet author="a1234 (generated)" id="1747312572093-24">
         <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="users" constraintName="users_roles_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
     </changeSet>
+
+    <include file="db/changelog/changes/2025-05-20-add-refresh-token.xml"/>
+
 </databaseChangeLog>

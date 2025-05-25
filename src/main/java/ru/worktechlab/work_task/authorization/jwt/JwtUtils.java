@@ -1,18 +1,25 @@
 package ru.worktechlab.work_task.authorization.jwt;
 
-import ru.worktechlab.work_task.config.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import ru.worktechlab.work_task.config.CustomUserDetails;
+import ru.worktechlab.work_task.models.tables.RefreshToken;
+import ru.worktechlab.work_task.models.tables.User;
+import ru.worktechlab.work_task.repositories.RefreshTokenRepository;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,11 +28,17 @@ import java.util.Map;
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
     @Value("${spring.app.jwtSecret}")
     private String jwtSecret;
 
     @Value("${spring.app.jwtExpirationMs}")
     private int jwtExpirationMs;
+
+    @Value("${spring.app.refreshExpiration}")
+    private long refreshExpirationMs;
 
     public String getJwtFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
@@ -77,7 +90,6 @@ public class JwtUtils {
     public String generateTokenFromUserDetails(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("guid", userDetails.getGuid());
-        claims.put("role", userDetails.getAuthorities());
 
         return Jwts.builder().claims(claims)
                 .subject(userDetails.getUsername())
@@ -85,6 +97,26 @@ public class JwtUtils {
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key())
                 .compact();
+    }
+
+    public RefreshToken createRefreshToken(User user) {
+        String token = generateSecureToken(64);
+        Instant expiry = Instant.now().plusMillis(refreshExpirationMs);
+
+        return refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .token(token)
+                        .user(user)
+                        .expiryDate(expiry)
+                        .build()
+        );
+    }
+
+
+    public String generateSecureToken(int byteLength) {
+        byte[] bytes = new byte[byteLength];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     public JwtParser parseToken() {

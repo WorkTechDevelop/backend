@@ -2,6 +2,7 @@ spring:
   app:
     jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
     jwtExpirationMs: 1800000
+    refreshExpiration: 86400000
 
   datasource:
     url: jdbc:mysql://91.211.249.37:32500/wt_backend_test

@@ -2,18 +2,17 @@ package ru.worktechlab.work_task.utils;
 
 import lombok.*;
 import org.springframework.stereotype.Component;
+import ru.worktechlab.work_task.exceptions.UserContextNotInitializedException;
 
 @Component
 @RequiredArgsConstructor
 public class UserContext {
     private final ThreadLocal<UserContextData> threadLocal = new ThreadLocal<>();
 
-    // TODO Добавить ошибку
-    // паттерн визитер чекнуть
-    public UserContextData getUserData() throws Exception {
+    public UserContextData getUserData() {
         UserContextData userContextData = threadLocal.get();
         if (userContextData == null) {
-            throw new Exception("ERROR");
+            throw new UserContextNotInitializedException();
         }
         return userContextData;
     }

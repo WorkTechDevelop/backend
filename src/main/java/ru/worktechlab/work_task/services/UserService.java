@@ -2,6 +2,7 @@ package ru.worktechlab.work_task.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.models.tables.RoleModel;
@@ -55,5 +56,10 @@ public class UserService {
 
     public List<User> findAllByIds(Collection<String> ids) {
         return userRepository.findAllById(ids);
+    }
+
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 }

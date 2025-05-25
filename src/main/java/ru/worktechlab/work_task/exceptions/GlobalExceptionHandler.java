@@ -60,4 +60,14 @@ public class GlobalExceptionHandler {
         log.error(error.get("error"));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<?> handleExpiredToken(ExpiredTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<?> handleInvalidToken(InvalidTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+    }
 }
