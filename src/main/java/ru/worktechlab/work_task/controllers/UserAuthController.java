@@ -1,6 +1,8 @@
 package ru.worktechlab.work_task.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,15 @@ public class UserAuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Войти в учетную запись")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<?> authenticateUser(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для аутентификации",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = LoginRequestDTO.class)
+                    )
+            )
+            @RequestBody LoginRequestDTO loginRequestDTO) {
         return ResponseEntity.ok(authService.authenticate(loginRequestDTO));
     }
 }
