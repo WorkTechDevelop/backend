@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import ru.worktechlab.work_task.config.CustomUserDetails;
 import ru.worktechlab.work_task.models.tables.RefreshToken;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.RefreshTokenRepository;
