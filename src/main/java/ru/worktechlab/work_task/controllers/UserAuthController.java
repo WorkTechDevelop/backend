@@ -6,6 +6,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
+import ru.worktechlab.work_task.dto.request_dto.TokenRefreshRequestDTO;
+import ru.worktechlab.work_task.dto.response_dto.LoginResponseDTO;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
 import ru.worktechlab.work_task.services.AuthService;
@@ -18,18 +25,9 @@ public class UserAuthController {
 
     private final AuthService authService;
 
-    @GetMapping("/welcome")
-    @Operation(
-            summary = "Добро пожаловать",
-            description = "Отображение страницы для неавторизованных пользователей"
-    )
-    public String welcome() {
-        return "Добро пожаловать на борт!";
-    }
-
     @PostMapping("/login")
     @Operation(summary = "Войти в учетную запись")
-    public ResponseEntity<?> authenticateUser(
+    public ResponseEntity<LoginResponseDTO> authenticateUser(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для аутентификации",
                     content = @Content(
@@ -40,4 +38,10 @@ public class UserAuthController {
             @RequestBody LoginRequestDTO loginRequestDTO) {
         return ResponseEntity.ok(authService.authenticate(loginRequestDTO));
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDTO> refreshToken(@RequestBody TokenRefreshRequestDTO request) {
+        return ResponseEntity.ok(authService.refreshAccessToken(request));
+    }
 }
+

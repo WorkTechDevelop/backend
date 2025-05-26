@@ -26,6 +26,7 @@ import ru.worktechlab.work_task.authorization.jwt.AuthTokenFilter;
 import ru.worktechlab.work_task.services.UsersDetailsService;
 
 import java.util.List;
+
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -59,9 +60,10 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults());
         http.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
+                authorizeRequests
                         .requestMatchers("work-task/v1/login").permitAll()
                         .requestMatchers("work-task/v1/registry").permitAll()
+                        .requestMatchers("work-task/v1/refresh").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",

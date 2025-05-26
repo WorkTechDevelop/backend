@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <include file="db/changelog/changes/users.xml"/>
+    <include file="db/changelog/changes/users_projects.xml"/>
+    <include file="db/changelog/changes/task_model.xml"/>
+    <include file="db/changelog/changes/sprints.xml"/>
+    <include file="db/changelog/changes/roles.xml"/>
+    <include file="db/changelog/changes/projects.xml"/>
+    <include file="db/changelog/changes/audit_log.xml"/>
+    <include file="db/changelog/changes/access.xml"/>
+    <include file="db/changelog/changes/2025-05-20-add-refresh-token.xml"/>
+
+    <changeSet author="a1234 (generated)" id="1747312572093-9">
+        <createIndex associatedWith="" indexName="Users_Projects_projects_FK" tableName="users_projects">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-10">
+        <createIndex associatedWith="" indexName="Users_Projects_users_FK" tableName="users_projects">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-11">
+        <createIndex associatedWith="" indexName="sprints_projects_FK" tableName="sprints">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-12">
+        <createIndex associatedWith="" indexName="task_model_projects_FK" tableName="task_model">
+            <column name="project_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-13">
+        <createIndex associatedWith="" indexName="task_model_sprints_FK" tableName="task_model">
+            <column name="sprint_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-14">
+        <createIndex associatedWith="" indexName="task_model_users_FK" tableName="task_model">
+            <column name="assignee"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-15">
+        <createIndex associatedWith="" indexName="task_model_users_FK_1" tableName="task_model">
+            <column name="creator"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-16">
+        <createIndex associatedWith="" indexName="users_roles_FK" tableName="users">
+            <column name="role_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-17">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="users_projects" constraintName="Users_Projects_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="projects" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-18">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="users_projects" constraintName="Users_Projects_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-19">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="sprints" constraintName="sprints_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="projects" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-20">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="task_model" constraintName="task_model_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="projects" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-21">
+        <addForeignKeyConstraint baseColumnNames="sprint_id" baseTableName="task_model" constraintName="task_model_sprints_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="sprints" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-22">
+        <addForeignKeyConstraint baseColumnNames="assignee" baseTableName="task_model" constraintName="task_model_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-23">
+        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="task_model" constraintName="task_model_users_FK_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+    </changeSet>
+    <changeSet author="a1234 (generated)" id="1747312572093-24">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="users" constraintName="users_roles_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="roles" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

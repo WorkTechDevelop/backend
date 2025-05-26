@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ru.worktechlab.work_task.authorization.PasswordMatch;
 import ru.worktechlab.work_task.authorization.ValidGender;
-import ru.worktechlab.work_task.models.enums.Gender;
 
 @Schema(description = "Модель регистрации пользователя")
 @Data
@@ -48,5 +47,5 @@ public class RegisterDTO {
     @Schema(description = "Пол пользователя", example = "MALE")
     @NotBlank(message = "Gender не может быть пустым")
     @ValidGender
-    private Gender gender;
+    private String gender;
 }
