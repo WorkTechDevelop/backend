@@ -18,16 +18,18 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
-    private final AuthenticationManager authenticationManager;
-    private final AuthMapper authMapper;
     private final TokenService tokenService;
     private final UserService userService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthenticationManager authenticationManager;
+    private final AuthMapper authMapper;
 
     public LoginResponseDTO authenticate(LoginRequestDTO loginRequestDTO) {
-        User user = userService.findUserByEmail(loginRequestDTO.getUsername());
+        authenticationManager.authenticate(
+                authMapper.toAuthenticationToken(loginRequestDTO)
+        );
 
+        User user = userService.findUserByEmail(loginRequestDTO.getUsername());
         String accessToken = tokenService.generateToken(user);
         RefreshToken refreshToken = tokenService.createRefreshToken(user);
 
