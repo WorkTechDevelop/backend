@@ -15,6 +15,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
+    @Query("FROM User u WHERE u.email = :email AND u.is_active")
+    Optional<User> findExistUserByEmail(String email);
+
     @Query("SELECT u.role_id FROM User u WHERE u.email = :email")
     Optional<RoleModel> findRoleByEmail(@Param("email") String email);
 

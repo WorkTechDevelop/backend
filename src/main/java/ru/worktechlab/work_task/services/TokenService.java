@@ -3,7 +3,6 @@ package ru.worktechlab.work_task.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.authorization.jwt.JwtUtils;
-import ru.worktechlab.work_task.config.CustomUserDetails;
 import ru.worktechlab.work_task.models.tables.RefreshToken;
 import ru.worktechlab.work_task.models.tables.User;
 
@@ -13,8 +12,8 @@ public class TokenService {
 
     private final JwtUtils jwtUtils;
 
-    public String generateToken(CustomUserDetails userDetails) {
-        return jwtUtils.generateTokenFromUserDetails(userDetails);
+    public String generateToken(User user) {
+        return jwtUtils.generateTokenFromUserDetails(user);
     }
 
     public String getUserGuidFromJwtToken(String jwtToken) {

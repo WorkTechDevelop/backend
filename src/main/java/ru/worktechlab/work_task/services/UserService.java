@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
+import ru.worktechlab.work_task.exceptions.InvalidUserException;
+import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.mappers.UserMapper;
-import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
-import ru.worktechlab.work_task.exceptions.InvalidUserException;
 import ru.worktechlab.work_task.repositories.UserRepository;
+import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 
 import java.util.Collection;
 import java.util.List;
@@ -59,7 +59,8 @@ public class UserService {
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        return userRepository.findExistUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Пользователь с email %s не найден или не активен" + email));
     }
 }

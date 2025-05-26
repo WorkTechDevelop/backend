@@ -87,12 +87,12 @@ public class JwtUtils {
         return false;
     }
 
-    public String generateTokenFromUserDetails(CustomUserDetails userDetails) {
+    public String generateTokenFromUserDetails(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("guid", userDetails.getGuid());
+        claims.put("guid", user.getId());
 
         return Jwts.builder().claims(claims)
-                .subject(userDetails.getUsername())
+                .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key())

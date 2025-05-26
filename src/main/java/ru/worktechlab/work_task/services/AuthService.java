@@ -2,10 +2,7 @@ package ru.worktechlab.work_task.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import ru.worktechlab.work_task.config.CustomUserDetails;
 import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.dto.response_dto.LoginResponseDTO;
@@ -29,16 +26,9 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public LoginResponseDTO authenticate(LoginRequestDTO loginRequestDTO) {
-        Authentication authentication = authenticationManager.authenticate(
-                authMapper.toAuthenticationToken(loginRequestDTO)
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        User user = userService.findUserByEmail(loginRequestDTO.getUsername());
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        User user = userService.findUserByEmail(userDetails.getUsername());
-
-        String accessToken = tokenService.generateToken(userDetails);
+        String accessToken = tokenService.generateToken(user);
         RefreshToken refreshToken = tokenService.createRefreshToken(user);
 
         return new LoginResponseDTO(accessToken, refreshToken.getToken());
@@ -54,8 +44,7 @@ public class AuthService {
         }
 
         User user = token.getUser();
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        String newAccessToken = tokenService.generateToken(userDetails);
+        String newAccessToken = tokenService.generateToken(user);
 
         return new LoginResponseDTO(newAccessToken, refreshToken.getRefreshToken());
     }
