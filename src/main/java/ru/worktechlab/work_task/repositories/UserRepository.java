@@ -15,16 +15,19 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
-    @Query("SELECT u.role_id FROM Users u WHERE u.email = :email")
+    @Query("FROM User u WHERE u.email = :email AND active")
+    Optional<User> findExistUserByEmail(String email);
+
+    @Query("SELECT u.role_id FROM User u WHERE u.email = :email")
     Optional<RoleModel> findRoleByEmail(@Param("email") String email);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Users u SET u.lastProjectId = :lastProjectId WHERE u.id = :id")
+    @Query("UPDATE User u SET u.lastProjectId = :lastProjectId WHERE u.id = :id")
     void updateLastProjectIdById(@Param("id") String id, @Param("lastProjectId") String lastProjectId);
 
     boolean existsByEmail(String email);
 
-    @Query("SELECT u.active FROM Users u WHERE u.id = :id")
+    @Query("SELECT u.active FROM User u WHERE u.id = :id")
     Boolean isUserActive(@Param("id") String id);
 }

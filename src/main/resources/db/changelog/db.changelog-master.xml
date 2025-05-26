@@ -1,152 +1,16 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <changeSet author="a1234 (generated)" id="1747312572093-1">
-        <createTable tableName="access">
-            <column name="role_id" type="INT">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="user_id" type="VARCHAR(36)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="id" type="VARCHAR(36)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="project_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-2">
-        <createTable tableName="audit_log">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="action_type" type="ENUM('LOGIN', 'LOGOUT')">
-                <constraints nullable="false"/>
-            </column>
-            <column name="ip_address" type="VARCHAR(255)"/>
-            <column name="timestamp" type="datetime">
-                <constraints nullable="false"/>
-            </column>
-            <column name="user_agent" type="VARCHAR(255)"/>
-            <column name="username" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-3">
-        <createTable tableName="projects">
-            <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="is_active" type="BIT(1)"/>
-            <column name="creation_date" type="date">
-                <constraints nullable="false"/>
-            </column>
-            <column name="creator" type="VARCHAR(255)"/>
-            <column name="description" type="VARCHAR(255)"/>
-            <column name="finisher" type="VARCHAR(255)"/>
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="owner" type="VARCHAR(255)"/>
-            <column name="update_date" type="date"/>
-            <column name="code" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="count" type="INT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-4">
-        <createTable tableName="roles">
-            <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="is_active" type="BIT(1)"/>
-            <column name="name" type="ENUM('ADMIN', 'PROJECT_MEMBER', 'PROJECT_OWNER')"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-5">
-        <createTable tableName="sprints">
-            <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="is_active" type="BIT(1)"/>
-            <column name="creator" type="VARCHAR(255)"/>
-            <column name="end_date" type="date"/>
-            <column name="finisher" type="VARCHAR(255)"/>
-            <column name="name" type="VARCHAR(255)"/>
-            <column name="start_date" type="date"/>
-            <column name="project_id" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-6">
-        <createTable tableName="task_model">
-            <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="assignee" type="VARCHAR(255)"/>
-            <column name="creation_date" type="datetime"/>
-            <column name="creator" type="VARCHAR(255)"/>
-            <column name="description" type="VARCHAR(4096)"/>
-            <column name="estimation" type="INT"/>
-            <column name="priority" type="VARCHAR(255)"/>
-            <column name="project_id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="sprint_id" type="VARCHAR(255)"/>
-            <column name="status" type="VARCHAR(255)"/>
-            <column name="task_type" type="VARCHAR(255)"/>
-            <column name="title" type="VARCHAR(255)"/>
-            <column name="update_date" type="datetime"/>
-            <column name="code" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-7">
-        <createTable tableName="users">
-            <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="is_active" type="BIT(1)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="birth_date" type="VARCHAR(255)"/>
-            <column name="email" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="first_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="gender" type="ENUM('FEMALE', 'MALE')"/>
-            <column name="last_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="middle_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="password" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="phone" type="VARCHAR(255)"/>
-            <column name="role_id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_project_id" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="a1234 (generated)" id="1747312572093-8">
-        <createTable tableName="users_projects">
-            <column name="user_id" type="VARCHAR(255)"/>
-            <column name="project_id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column autoIncrement="true" name="id" type="INT">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-        </createTable>
-    </changeSet>
+
+    <include file="db/changelog/changes/users.xml"/>
+    <include file="db/changelog/changes/users_projects.xml"/>
+    <include file="db/changelog/changes/task_model.xml"/>
+    <include file="db/changelog/changes/sprints.xml"/>
+    <include file="db/changelog/changes/roles.xml"/>
+    <include file="db/changelog/changes/projects.xml"/>
+    <include file="db/changelog/changes/audit_log.xml"/>
+    <include file="db/changelog/changes/access.xml"/>
+    <include file="db/changelog/changes/2025-05-20-add-refresh-token.xml"/>
+
     <changeSet author="a1234 (generated)" id="1747312572093-9">
         <createIndex associatedWith="" indexName="Users_Projects_projects_FK" tableName="users_projects">
             <column name="project_id"/>

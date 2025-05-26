@@ -13,24 +13,24 @@ import java.util.List;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
-    @Query("SELECT NEW ru.worktechlab.work_task.model.response_dto.UsersProjectsDTO(p.name, p.id) FROM Projects p WHERE p.id IN :projectIds AND p.active = true")
+    @Query("SELECT NEW ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO(p.name, p.id) FROM Project p WHERE p.id IN :projectIds AND p.active = true")
     List<UsersProjectsDTO> findProjectIdAndNameByIds(@Param("projectIds") List<String> projectIds);
 
-    @Query("SELECT p.active FROM Projects p WHERE p.id = :id")
+    @Query("SELECT p.active FROM Project p WHERE p.id = :id")
     Boolean isProjectActive(@Param("id") String id);
 
-    @Query("SELECT p.name FROM Projects p WHERE p.id = :id")
+    @Query("SELECT p.name FROM Project p WHERE p.id = :id")
     String getProjectNameById(@Param("id") String id);
 
-    @Query("SELECT p.code FROM Projects p WHERE p.id = :id")
+    @Query("SELECT p.code FROM Project p WHERE p.id = :id")
     String getCodeById(@Param("id") String id);
 
     @Transactional
     @Modifying
-    @Query("UPDATE Projects p SET p.count = p.count + 1 WHERE p.id = :id")
+    @Query("UPDATE Project p SET p.count = p.count + 1 WHERE p.id = :id")
     void incrementCount(@Param("id") String id);
 
-    @Query("SELECT p.count FROM Projects p WHERE p.id = :id")
+    @Query("SELECT p.count FROM Project p WHERE p.id = :id")
     Integer getCountById(@Param("id") String id);
 
 

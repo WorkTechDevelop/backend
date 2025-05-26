@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface UsersProjectsRepository extends JpaRepository<UsersProject, String> {
 
-    @Query("SELECT up.projectId FROM UsersProjects up WHERE up.userId = :userId")
+    @Query("SELECT up.projectId FROM UsersProject up WHERE up.userId = :userId")
     List<String> findProjectsByUserId(@Param("userId") String userId);
 
-    @Query("SELECT up.userId FROM UsersProjects up WHERE up.projectId = :projectId")
+    @Query("SELECT up.userId FROM UsersProject up WHERE up.projectId = :projectId")
     List<String> findUserByProjectId(@Param("projectId") String projectId);
 }

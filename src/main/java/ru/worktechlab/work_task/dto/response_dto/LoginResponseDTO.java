@@ -4,13 +4,12 @@ import lombok.Data;
 
 @Data
 public class LoginResponseDTO {
-    private String jwtToken;
+    private String accessToken;
+    private String refreshToken;
 
-    private String username;
 
-
-    public LoginResponseDTO(String username, String jwtToken) {
-        this.username = username;
-        this.jwtToken = jwtToken;
+    public LoginResponseDTO(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 }
