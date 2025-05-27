@@ -1,5 +1,9 @@
 package ru.worktechlab.work_task.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +15,25 @@ import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
 import ru.worktechlab.work_task.services.UserService;
 
 @RestController
-@RequestMapping("/work-task/v1")
+@RequestMapping("/work-task/v1/registration")
 @AllArgsConstructor
+@Tag(name = "Registration", description = "Регистрация пользователя")
 public class AccountController {
 
     private final UserService userService;
 
     @PostMapping("/registry")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterDTO registerDto) {
+    @Operation(summary = "Зарегистрироваться")
+    public ResponseEntity<String> registerUser(
+            @Valid
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Данные для регистрации",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RegisterDTO.class)
+                    )
+            )
+            @RequestBody RegisterDTO registerDto) {
         userService.registerUser(registerDto);
         return ResponseEntity.ok("Пользователь успешно зарегистрирован");
     }
