@@ -32,6 +32,9 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String[] AUTH_URLS = {"/work-task/v1/auth/login", "/work-task/v1/registration/registry", "/work-task/v1/auth/refresh"};
+    private static final String[] SWAGGER_URLS = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"};
+
     @Value("${spring.cors.allowed.origins}")
     private String allowedOrigins;
 
@@ -61,14 +64,8 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults());
         http.authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                        .requestMatchers("work-task/v1/login").permitAll()
-                        .requestMatchers("work-task/v1/registry").permitAll()
-                        .requestMatchers("work-task/v1/refresh").permitAll()
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/webjars/**"
-                        ).permitAll()
+                        .requestMatchers(AUTH_URLS).permitAll()
+                        .requestMatchers(SWAGGER_URLS).permitAll()
                         .anyRequest().authenticated()); /// .permitAll())
         http.sessionManagement(
                 session ->
