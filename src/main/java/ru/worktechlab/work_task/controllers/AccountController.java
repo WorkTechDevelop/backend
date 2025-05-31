@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +23,7 @@ public class AccountController {
 
     @PostMapping("/registry")
     @Operation(summary = "Зарегистрироваться")
-    public ResponseEntity<String> registerUser(
+    public String registerUser(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для регистрации",
@@ -35,6 +34,6 @@ public class AccountController {
             )
             @RequestBody RegisterDTO registerDto) {
         userService.registerUser(registerDto);
-        return ResponseEntity.ok("Пользователь успешно зарегистрирован");
+        return "Пользователь успешно зарегистрирован";
     }
 }

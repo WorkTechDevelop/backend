@@ -18,6 +18,7 @@ import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.utils.TaskModelConverter;
 import ru.worktechlab.work_task.repositories.TaskRepository;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
+import ru.worktechlab.work_task.utils.UserContext;
 import ru.worktechlab.work_task.validators.ProjectValidator;
 import ru.worktechlab.work_task.validators.TaskValidator;
 import ru.worktechlab.work_task.repositories.UserRepository;
@@ -34,17 +35,16 @@ import java.util.stream.Stream;
 @Slf4j
 @AllArgsConstructor
 public class TaskService {
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
     private final TaskModelMapper taskModelMapper;
-    private final TokenService tokenService;
     private final TaskValidator taskValidator;
     private final ProjectValidator projectValidator;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
-
     private final UserService userService;
     private final TaskModelConverter taskModelConverter;
+    private final UserContext userContext;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
@@ -91,8 +91,8 @@ public class TaskService {
                 .collect(Collectors.toMap(User::getId, Function.identity()));
     }
 
-    public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid(String jwtToken) {
-        String userId = tokenService.getUserGuidFromJwtToken(jwtToken);
+    public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid() {
+        String userId = userContext.getUserData().getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
         List<String> userIds = usersProjectsRepository.findUserByProjectId(user.getLastProjectId());
@@ -130,8 +130,8 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    public TaskResponse createTask(TaskModelDTO taskDTO, String jwtToken) {
-        TaskModel task = taskModelMapper.toEntity(taskDTO, tokenService.getUserGuidFromJwtToken(jwtToken),
+    public TaskResponse createTask(TaskModelDTO taskDTO) {
+        TaskModel task = taskModelMapper.toEntity(taskDTO, userContext.getUserData().getUserId(),
                 getTaskCode(taskDTO.getProjectId()));
         taskRepository.save(task);
         return new TaskResponse(task.getId());
