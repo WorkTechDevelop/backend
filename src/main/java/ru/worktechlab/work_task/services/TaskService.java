@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.services;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskModelMapper taskModelMapper;

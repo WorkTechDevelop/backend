@@ -25,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @Tag(name = "Task", description = "Управление задачами")
 public class TaskController {
-    private TaskService taskService;
+    private final TaskService taskService;
 
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
@@ -85,8 +85,7 @@ public class TaskController {
             )
             @PathVariable String code) {
         log.info("Получение задачи по коду: {}", code);
-        TaskModel task = taskService.findTaskByCodeOrThrow(code);
-        return new TaskResponse(task);
+        return new TaskResponse(taskService.findTaskByCodeOrThrow(code));
     }
 
     @GetMapping("/tasks-in-project")

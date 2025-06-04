@@ -1,6 +1,8 @@
 package ru.worktechlab.work_task.services;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -14,12 +16,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProjectsService {
-    private UserRepository userRepository;
-    private UsersProjectsRepository usersProjectsRepository;
-    private TaskService taskService;
-    private ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+    private final UsersProjectsRepository usersProjectsRepository;
+    private final TaskService taskService;
+    private final ProjectRepository projectRepository;
     private final UserService userService;
     private final UserContext userContext;
 
@@ -27,7 +29,7 @@ public class ProjectsService {
     public List<UsersProjectsDTO> getAllUserProjects() {
         String userId = userContext.getUserData().getUserId();
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(userId);
-        if (projectIds.isEmpty()) {
+        if (CollectionUtils.isEmpty(projectIds)) {
             return Collections.emptyList();
         }
         return projectRepository.findProjectIdAndNameByIds(projectIds);

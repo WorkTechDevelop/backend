@@ -1,6 +1,7 @@
 package ru.worktechlab.work_task.services;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.dto.response_dto.SprintInfoDTO;
@@ -10,7 +11,7 @@ import ru.worktechlab.work_task.utils.UserContext;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SprintsService {
     private final SprintsRepository sprintsRepository;
     private final UserService userService;

@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Tag(name = "Project", description = "Управление проектами")
 public class ProjectsController {
-    private ProjectsService projectsService;
+    private final ProjectsService projectsService;
 
     @GetMapping("/all-user-project")
     @Operation(summary = "Вывести список проектов пользователя")
