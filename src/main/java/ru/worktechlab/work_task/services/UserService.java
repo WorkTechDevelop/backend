@@ -38,11 +38,6 @@ public class UserService {
         return usersProjectsRepository.findUserByProjectId(user.getLastProjectId());
     }
 
-    public User getUser(String jwtToken) {
-        String userId = extractUserId(jwtToken);
-        return findUserById(userId);
-    }
-
     public String extractUserId(String jwtToken) {
         return tokenService.getUserGuidFromJwtToken(jwtToken);
     }

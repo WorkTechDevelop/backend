@@ -1,41 +1,46 @@
 package ru.worktechlab.work_task.services;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import ru.worktechlab.work_task.authorization.jwt.JwtUtils;
+import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.ProjectRepository;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
-import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.repositories.UserRepository;
+import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.utils.UserContext;
 
 import java.util.Collections;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 public class ProjectsService {
-    private JwtUtils jwtUtils;
-    private UserRepository userRepository;
-    private UsersProjectsRepository usersProjectsRepository;
-    private TaskService taskService;
-    private ProjectRepository projectRepository;
-    private final TokenService tokenService;
+    private final UserRepository userRepository;
+    private final UsersProjectsRepository usersProjectsRepository;
+    private final TaskService taskService;
+    private final ProjectRepository projectRepository;
+    private final UserService userService;
+    private final UserContext userContext;
 
 
-    public List<UsersProjectsDTO> getAllUserProjects(String jwtToken) {
-        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(
-                jwtUtils.getUserGuidFromJwtToken(jwtToken)
-        );
-        if (projectIds.isEmpty()) {
+    public List<UsersProjectsDTO> getAllUserProjects() {
+        log.debug("Вывод всех проектов пользователя");
+        String userId = userContext.getUserData().getUserId();
+        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(userId);
+        if (CollectionUtils.isEmpty(projectIds)) {
             return Collections.emptyList();
         }
         return projectRepository.findProjectIdAndNameByIds(projectIds);
     }
 
-    public List<TaskModel> setMainProject(String projectId, String jwtToken) {
-        userRepository.updateLastProjectIdById(jwtUtils.getUserGuidFromJwtToken(jwtToken), projectId);
+    public List<TaskModel> setMainProject(String projectId) {
+        log.debug("Установить проект основным {}", projectId);
+        String userId = userContext.getUserData().getUserId();
+        userRepository.updateLastProjectIdById(userId, projectId);
         return taskService.getTasksByProjectId(projectId);
     }
 
@@ -44,15 +49,17 @@ public class ProjectsService {
         return projectRepository.findProjectIdAndNameByIds(projectIds);
     }
 
-    public List<UsersProjectsDTO> getUserProject(String jwtToken) {
-        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(tokenService.getUserGuidFromJwtToken(jwtToken));
+    public List<UsersProjectsDTO> getUserProject() {
+        log.debug("Вывод всех проектов пользователя");
+        String userId = userContext.getUserData().getUserId();
+        List<String> projectIds = usersProjectsRepository.findProjectsByUserId(userId);
         return projectRepository.findProjectIdAndNameByIds(projectIds);
     }
 
-    public String getLastProjectId(String jwtToken) {
-        String userId = tokenService.getUserGuidFromJwtToken(jwtToken);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
+    public String getLastProjectId() {
+        log.debug("Получить id активного проекта");
+        String userId = userContext.getUserData().getUserId();
+        User user = userService.findUserById(userId);
         return user.getLastProjectId();
     }
 }
