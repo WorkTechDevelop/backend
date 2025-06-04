@@ -1,6 +1,7 @@
 package ru.worktechlab.work_task.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectsService {
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
@@ -26,6 +28,7 @@ public class ProjectsService {
 
 
     public List<UsersProjectsDTO> getAllUserProjects() {
+        log.debug("Вывод всех проектов пользователя");
         String userId = userContext.getUserData().getUserId();
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(userId);
         if (CollectionUtils.isEmpty(projectIds)) {
@@ -35,6 +38,7 @@ public class ProjectsService {
     }
 
     public List<TaskModel> setMainProject(String projectId) {
+        log.debug("Установить проект основным {}", projectId);
         String userId = userContext.getUserData().getUserId();
         userRepository.updateLastProjectIdById(userId, projectId);
         return taskService.getTasksByProjectId(projectId);
@@ -46,12 +50,14 @@ public class ProjectsService {
     }
 
     public List<UsersProjectsDTO> getUserProject() {
+        log.debug("Вывод всех проектов пользователя");
         String userId = userContext.getUserData().getUserId();
         List<String> projectIds = usersProjectsRepository.findProjectsByUserId(userId);
         return projectRepository.findProjectIdAndNameByIds(projectIds);
     }
 
     public String getLastProjectId() {
+        log.debug("Получить id активного проекта");
         String userId = userContext.getUserData().getUserId();
         User user = userService.findUserById(userId);
         return user.getLastProjectId();

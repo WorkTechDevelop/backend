@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
@@ -21,7 +20,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("work-task/v1/task")
-@Slf4j
 @AllArgsConstructor
 @Tag(name = "Task", description = "Управление задачами")
 public class TaskController {
@@ -39,7 +37,6 @@ public class TaskController {
                     )
             )
             @RequestBody TaskModelDTO taskModelDTO) {
-        log.info("Processing create-task with model: {}", taskModelDTO);
         return taskService.createTask(taskModelDTO);
     }
 
@@ -55,7 +52,6 @@ public class TaskController {
                     )
             )
             @RequestBody UpdateTaskModelDTO updateTaskModelDTO) {
-        log.info("Processing update-task with model: {}", updateTaskModelDTO);
         return taskService.updateTask(updateTaskModelDTO);
     }
 
@@ -71,7 +67,6 @@ public class TaskController {
                     )
             )
             @RequestBody UpdateStatusRequestDTO requestDto) {
-        log.info("Обновить статус задачи");
         return taskService.updateTaskStatus(requestDto);
     }
 
@@ -84,14 +79,12 @@ public class TaskController {
                     example = "TPO-0001"
             )
             @PathVariable String code) {
-        log.info("Получение задачи по коду: {}", code);
         return new TaskResponse(taskService.findTaskByCodeOrThrow(code));
     }
 
     @GetMapping("/tasks-in-project")
     @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
     public List<UsersTasksInProjectDTO>getTasksInProject() {
-        log.info("Вывод всех задач проекта отсартированных по пользователям");
         return taskService.getProjectTaskByUserGuid();
     }
 }

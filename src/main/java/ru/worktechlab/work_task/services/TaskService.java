@@ -48,6 +48,7 @@ public class TaskService {
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
+        log.debug("Processing update-task with model: {}", dto);
         TaskModel existingTask = findTaskByCodeOrThrow(dto.getCode());
         taskModelMapper.updateTaskFromDto(dto, existingTask);
         taskRepository.save(existingTask);
@@ -92,6 +93,7 @@ public class TaskService {
     }
 
     public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid() {
+        log.debug("Вывод всех задач проекта отсартированных по пользователям");
         String userId = userContext.getUserData().getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
@@ -131,6 +133,7 @@ public class TaskService {
     }
 
     public TaskResponse createTask(TaskModelDTO taskDTO) {
+        log.debug("Processing create-task with model: {}", taskDTO);
         TaskModel task = taskModelMapper.toEntity(taskDTO, userContext.getUserData().getUserId(),
                 getTaskCode(taskDTO.getProjectId()));
         taskRepository.save(task);
@@ -145,12 +148,14 @@ public class TaskService {
     }
 
     public TaskModel findTaskByCodeOrThrow(String taskCode) {
+        log.debug("Получение задачи по коду: {}", taskCode);
         return taskRepository.findByCode(taskCode)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с кодом: %s не найдена", taskCode)));
     }
 
     @Transactional
     public TaskModel updateTaskStatus(UpdateStatusRequestDTO requestDto) {
+        log.debug("Обновить статус задачи");
         TaskModel task = findTaskByCodeOrThrow(requestDto.getCode());
         task.setStatus(requestDto.getStatus());
         return taskRepository.save(task);

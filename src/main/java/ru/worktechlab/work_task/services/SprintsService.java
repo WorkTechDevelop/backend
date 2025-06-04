@@ -21,6 +21,7 @@ public class SprintsService {
     }
 
     public SprintInfoDTO getSprintName() {
+        log.debug("Вывод информации о спринте");
         String userId = userContext.getUserData().getUserId();
         User user = userService.findUserById(userId);
         return sprintsRepository.getSprintInfoByProjectId(user.getLastProjectId());
