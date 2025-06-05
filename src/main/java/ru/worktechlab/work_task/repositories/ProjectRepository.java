@@ -27,10 +27,10 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Project p SET p.count = p.count + 1 WHERE p.id = :id")
+    @Query("UPDATE Project p SET p.taskCounter = p.taskCounter + 1 WHERE p.id = :id")
     void incrementCount(@Param("id") String id);
 
-    @Query("SELECT p.count FROM Project p WHERE p.id = :id")
+    @Query("SELECT p.taskCounter FROM Project p WHERE p.id = :id")
     Integer getCountById(@Param("id") String id);
 
 

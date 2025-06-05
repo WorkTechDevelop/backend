@@ -6,7 +6,7 @@ import ru.worktechlab.work_task.models.enums.Gender;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
