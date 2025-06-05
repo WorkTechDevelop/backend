@@ -5,11 +5,11 @@
       http://www.liquibase.org/xml/ns/dbchangelog
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <changeSet author="a1234 (generated)" id="1747312572093-5">
-        <createTable tableName="sprints">
+        <createTable tableName="sprint">
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="is_active" type="BIT(1)"/>
+            <column name="is_active" type="BOOL"/>
             <column name="creator" type="VARCHAR(255)"/>
             <column name="end_date" type="date"/>
             <column name="finisher" type="VARCHAR(255)"/>
@@ -17,5 +17,6 @@
             <column name="start_date" type="date"/>
             <column name="project_id" type="VARCHAR(255)"/>
         </createTable>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="sprint" constraintName="sprints_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
     </changeSet>
 </databaseChangeLog>

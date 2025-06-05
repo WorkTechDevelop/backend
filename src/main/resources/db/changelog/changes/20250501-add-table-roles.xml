@@ -5,11 +5,11 @@
       http://www.liquibase.org/xml/ns/dbchangelog
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <changeSet author="a1234 (generated)" id="1747312572093-4">
-        <createTable tableName="roles">
+        <createTable tableName="role">
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="is_active" type="BIT(1)"/>
+            <column name="is_active" type="BOOL"/>
             <column name="name" type="ENUM('ADMIN', 'PROJECT_MEMBER', 'PROJECT_OWNER')"/>
         </createTable>
     </changeSet>

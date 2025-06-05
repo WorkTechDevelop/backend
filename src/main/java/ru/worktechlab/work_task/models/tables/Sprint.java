@@ -7,7 +7,7 @@ import java.sql.Date;
 
 @Data
 @Entity
-@Table(name = "sprints")
+@Table(name = "sprint")
 public class Sprint {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

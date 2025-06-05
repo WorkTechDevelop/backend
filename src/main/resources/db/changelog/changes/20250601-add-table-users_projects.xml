@@ -14,5 +14,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="users_projects" constraintName="Users_Projects_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="users_projects" constraintName="Users_Projects_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
     </changeSet>
 </databaseChangeLog>

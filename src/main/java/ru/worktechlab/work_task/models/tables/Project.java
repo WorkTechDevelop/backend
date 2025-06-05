@@ -11,7 +11,7 @@ import java.sql.Date;
 
 @Data
 @Entity
-@Table(name = "projects")
+@Table(name = "project")
 public class Project {
 
     @Id
@@ -28,6 +28,12 @@ public class Project {
     @NotNull
     @Column
     private Date creationDate;
+
+    @Column
+    private Date finishDate;
+
+    @Column
+    private Date startDate;
 
     @Column
     private Date updateDate;
@@ -49,5 +55,5 @@ public class Project {
     private String code;
 
     @Column
-    private Integer count;
+    private Integer taskCounter;
 }

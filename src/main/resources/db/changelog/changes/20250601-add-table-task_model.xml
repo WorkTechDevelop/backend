@@ -21,9 +21,15 @@
             <column name="sprint_id" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(255)"/>
             <column name="task_type" type="VARCHAR(255)"/>
-            <column name="title" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="update_date" type="datetime"/>
             <column name="code" type="VARCHAR(255)"/>
         </createTable>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="task_model" constraintName="task_model_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="sprint_id" baseTableName="task_model" constraintName="task_model_sprints_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="sprint" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="assignee" baseTableName="task_model" constraintName="task_model_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="task_model" constraintName="task_model_users_FK_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
     </changeSet>
 </databaseChangeLog>
