@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import ru.worktechlab.work_task.interfaces.TrackableEntity;
+import ru.worktechlab.work_task.listeners.TrackableEntityListener;
 
 import java.sql.Timestamp;
 
@@ -14,6 +15,7 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "task_model")
+@EntityListeners(TrackableEntityListener.class)
 public class TaskModel implements TrackableEntity<TaskModel> {
 
     @Id
@@ -80,10 +82,13 @@ public class TaskModel implements TrackableEntity<TaskModel> {
         copy.setDescription(this.description);
         copy.setPriority(this.priority);
         copy.setAssignee(this.assignee);
+        copy.setCreator(this.creator);
         copy.setSprintId(this.sprintId);
+        copy.setProjectId(this.projectId);
         copy.setTaskType(this.taskType);
         copy.setEstimation(this.estimation);
         copy.setStatus(this.status);
+        copy.setCode(this.code);
         // ... только нужные поля для сравнения
         return copy;
     }
