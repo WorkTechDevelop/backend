@@ -1,14 +1,12 @@
 package ru.worktechlab.work_task.models.tables;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
+import ru.worktechlab.work_task.interfaces.TrackableEntity;
 
 import java.sql.Timestamp;
 
@@ -16,7 +14,7 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "task_model")
-public class TaskModel {
+public class TaskModel implements TrackableEntity<TaskModel> {
 
     @Id
     private String id;
@@ -65,6 +63,42 @@ public class TaskModel {
 
     @Column
     private String code;
+
+    @Transient
+    private TaskModel previousState;
+
+    @PostLoad
+    public void captureState() {
+        this.previousState = this.clone();
+    }
+
+    @Override
+    public TaskModel clone() {
+        TaskModel copy = new TaskModel();
+        copy.setId(this.id);
+        copy.setTitle(this.title);
+        copy.setDescription(this.description);
+        copy.setPriority(this.priority);
+        copy.setAssignee(this.assignee);
+        copy.setSprintId(this.sprintId);
+        copy.setTaskType(this.taskType);
+        copy.setEstimation(this.estimation);
+        copy.setStatus(this.status);
+        // ... только нужные поля для сравнения
+        return copy;
+    }
+
+
+
+    @Override
+    public void setPreviousState(TaskModel previous) {
+        this.previousState = previous;
+    }
+
+    @Override
+    public TaskModel getPreviousState() {
+        return this.previousState;
+    }
 
     public TaskModel() {
     }
