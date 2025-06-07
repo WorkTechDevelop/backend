@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
+import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.dto.response_dto.LoginResponseDTO;
@@ -24,6 +25,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AuthMapper authMapper;
 
+    @TransactionRequired
     public LoginResponseDTO authenticate(LoginRequestDTO loginRequestDTO) {
         authenticationManager.authenticate(
                 authMapper.toAuthenticationToken(loginRequestDTO)

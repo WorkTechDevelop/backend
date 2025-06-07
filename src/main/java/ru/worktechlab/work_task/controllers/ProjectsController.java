@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
 import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.services.ProjectsService;
@@ -49,5 +51,13 @@ public class ProjectsController {
     @Operation(summary = "Получить ID основного проекта пользователя")
     public String getActiveProject() {
         return projectsService.getLastProjectId();
+    }
+
+    @PostMapping("/create-project")
+    @Operation(summary = "Создание проекта")
+    public String createProject(
+            @RequestBody @Valid ProjectRequestDto data
+    ) {
+        return projectsService.createProject(data);
     }
 }
