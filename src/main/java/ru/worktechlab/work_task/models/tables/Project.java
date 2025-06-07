@@ -1,59 +1,61 @@
 package ru.worktechlab.work_task.models.tables;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
+@Getter
 @Entity
 @Table(name = "project")
+@NoArgsConstructor
 public class Project {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    @NotNull
-    @Column
+    @Column(nullable = false)
     private String name;
-
-    @NotNull
-    @Column
+    @Column(nullable = false)
     private String owner;
-
-    @NotNull
+    @Column(nullable = false)
+    private LocalDate creationDate;
     @Column
-    private Date creationDate;
-
+    private LocalDate finishDate;
     @Column
-    private Date finishDate;
-
+    private LocalDate startDate;
     @Column
-    private Date startDate;
-
-    @Column
-    private Date updateDate;
-
+    private LocalDate updateDate;
     @Column
     private String description;
-
     @Column(name = "is_active")
     private boolean active;
-
     @Column
     private String creator;
-
     @Column
     private String finisher;
-
-    @NotNull
-    @Column
+    @Column(nullable = false)
     private String code;
-
     @Column
     private Integer taskCounter;
+    @OneToMany(mappedBy = "project")
+    private List<ProjectStatus> statuses = new ArrayList<>();
+
+    public Project(String name, String owner, String description, boolean active, String creator, String code) {
+        this.name = name;
+        this.owner = owner;
+        this.description = description;
+        this.active = active;
+        this.creator = creator;
+        this.code = code;
+        LocalDate date = LocalDate.now();
+        this.creationDate = date;
+        this.updateDate = date;
+        this.taskCounter = 0;
+        if (active)
+            this.startDate = date;
+    }
 }

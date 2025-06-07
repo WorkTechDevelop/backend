@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import ru.worktechlab.work_task.models.enums.Gender;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "user")
@@ -46,4 +49,10 @@ public class User {
 
     @Column(name = "last_project_id")
     private String lastProjectId;
+
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "users_projects",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id"))
+    private final List<Project> projects = new ArrayList<>();
 }
