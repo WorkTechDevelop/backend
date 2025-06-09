@@ -2,10 +2,13 @@ package ru.worktechlab.work_task.models.tables;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @Entity
 @Table(name = "users_projects")
+@NoArgsConstructor
 public class UsersProject {
 
     @Id
@@ -18,4 +21,9 @@ public class UsersProject {
 
     @Column(name = "project_id")
     private String projectId;
+
+    public UsersProject(String userId, String projectId) {
+        this.userId = userId;
+        this.projectId = projectId;
+    }
 }

@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import ru.worktechlab.work_task.config.MapStructConfiguration;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
@@ -11,7 +12,7 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 
 import java.util.UUID;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfiguration.class)
 public interface TaskModelMapper {
 
     @Mapping(target = "id", ignore = true)
