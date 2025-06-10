@@ -1,13 +1,13 @@
 spring:
   app:
     jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
-    jwtExpirationMs: 657000000
-    refreshExpiration: 658000000
+    jwtExpirationMs: 1800000
+    refreshExpiration: 86400000
 # Добавить настройки вашей локальной бд
   datasource:
-    url: jdbc:mysql://localhost:5499/work_tech?allowPublicKeyRetrieval=true&useSSL=false
-    username: user
-    password: password
+    url: jdbc:mysql://localhost:3306/mydb?allowPublicKeyRetrieval=true&useSSL=false
+    username: myuser
+    password: mypassword
 
   jpa:
     show-sql: true
@@ -21,3 +21,5 @@ spring:
 # Локальное приложение будет работать на url http://localhost:8080/local
 server:
   port: 8080
+  servlet:
+    context-path: /local

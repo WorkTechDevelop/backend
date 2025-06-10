@@ -4,13 +4,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.worktechlab.work_task.config.MapStructConfiguration;
-import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
 import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
-
-import java.util.UUID;
+import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
+import ru.worktechlab.work_task.models.tables.TaskModel;
+import ru.worktechlab.work_task.models.tables.User;
 
 @Mapper(config = MapStructConfiguration.class)
 public interface TaskModelMapper {
@@ -26,7 +24,6 @@ public interface TaskModelMapper {
 
     default TaskModel toEntity(TaskModelDTO dto, String creatorGuid, String code) {
         TaskModel task = toEntity(dto);
-        task.setId(UUID.randomUUID().toString());
         task.setCreator(creatorGuid);
         task.setCode(code);
         return task;
@@ -56,5 +53,4 @@ public interface TaskModelMapper {
     private static String formatName(User user) {
         return user.getFirstName() + " " + user.getLastName();
     }
-
 }

@@ -1,6 +1,6 @@
 package ru.worktechlab.work_task.utils;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.worktechlab.work_task.interfaces.EntityChangeDetector;
 import ru.worktechlab.work_task.models.tables.TaskHistory;
@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
+
 @Component
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TaskChangeDetector implements EntityChangeDetector<TaskModel> {
 
-    private final TaskHistoryFactory historyFactory;
+    private TaskHistoryFactory historyFactory;
 
     private static final Map<String, BiFunction<TaskModel, TaskModel, Boolean>> compareFields = Map.of(
             "TITLE", (oldF, newF) -> !Objects.equals(oldF.getTitle(), newF.getTitle()),
@@ -38,9 +39,13 @@ public class TaskChangeDetector implements EntityChangeDetector<TaskModel> {
             ),
             "ESTIMATION", (oldF, newF) -> !Objects.equals(
                     oldF.getEstimation() != null ? oldF.getEstimation() : null,
-                    newF.getEstimation() != null ? oldF.getEstimation() : null
+                    newF.getEstimation() != null ? newF.getEstimation() : null
             ),
             "CODE", (oldF, newF) -> !Objects.equals(oldF.getCode(), newF.getCode())
+    );
+
+    private static final Map<String, BiFunction<TaskModel, TaskModel, Boolean>> compareStatus = Map.of(
+            "STATUS", (oldF, newF) -> !Objects.equals(oldF.getStatus(), newF.getStatus())
     );
 
     @Override
@@ -51,13 +56,24 @@ public class TaskChangeDetector implements EntityChangeDetector<TaskModel> {
             if (changedCheck.apply(oldEntity, newEntity)) {
                 String oldVal = getFieldValueAsString(oldEntity, field);
                 String newVal = getFieldValueAsString(newEntity, field);
-                changes.add(historyFactory.of(newEntity.getId(), field, oldVal, newVal));
+                changes.add(historyFactory.createTaskHistory(newEntity.getId(), field, oldVal, newVal));
             }
         });
-
         return changes;
     }
 
+    public List<TaskHistory> detectStatusChange(TaskModel oldEntity, TaskModel newEntity) {
+        List<TaskHistory> changes = new ArrayList<>();
+
+        compareStatus.forEach((field, changedCheck) -> {
+            if (changedCheck.apply(oldEntity, newEntity)) {
+                String oldVal = getFieldValueAsString(oldEntity, field);
+                String newVal = getFieldValueAsString(newEntity, field);
+                changes.add(historyFactory.createTaskHistory(newEntity.getId(), field, oldVal, newVal));
+            }
+        });
+        return changes;
+    }
 
     private String getFieldValueAsString(TaskModel task, String field) {
         switch (field) {
@@ -77,6 +93,8 @@ public class TaskChangeDetector implements EntityChangeDetector<TaskModel> {
                 return task.getEstimation() != null ? task.getEstimation().toString() : null;
             case "CODE":
                 return task.getCode();
+            case "STATUS":
+                return task.getStatus();
             default:
                 return null;
         }

@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
-import ru.worktechlab.work_task.interfaces.TrackableEntity;
-import ru.worktechlab.work_task.listeners.TrackableEntityListener;
 
 import java.sql.Timestamp;
 
@@ -15,10 +13,10 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "task_model")
-@EntityListeners(TrackableEntityListener.class)
-public class TaskModel implements TrackableEntity<TaskModel> {
+public class TaskModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @NotBlank
@@ -66,45 +64,29 @@ public class TaskModel implements TrackableEntity<TaskModel> {
     @Column
     private String code;
 
-    @Transient
-    private TaskModel previousState;
-
-    @PostLoad
-    public void captureState() {
-        this.previousState = this.clone();
-    }
-
-    @Override
-    public TaskModel clone() {
-        TaskModel copy = new TaskModel();
-        copy.setId(this.id);
-        copy.setTitle(this.title);
-        copy.setDescription(this.description);
-        copy.setPriority(this.priority);
-        copy.setAssignee(this.assignee);
-        copy.setCreator(this.creator);
-        copy.setSprintId(this.sprintId);
-        copy.setProjectId(this.projectId);
-        copy.setTaskType(this.taskType);
-        copy.setEstimation(this.estimation);
-        copy.setStatus(this.status);
-        copy.setCode(this.code);
-        // ... только нужные поля для сравнения
-        return copy;
-    }
-
-
-
-    @Override
-    public void setPreviousState(TaskModel previous) {
-        this.previousState = previous;
-    }
-
-    @Override
-    public TaskModel getPreviousState() {
-        return this.previousState;
-    }
-
     public TaskModel() {
+    }
+
+    public TaskModel(String title, String description, String priority, String assignee,
+                     String projectId, String sprintId, String taskType,
+                     Integer estimation, String status, String code) {
+
+        this.title = title;
+        this.priority = priority;
+        this.assignee = assignee;
+        this.description = description;
+        this.projectId = projectId;
+        this.sprintId = sprintId;
+        this.taskType = taskType;
+        this.estimation = estimation;
+        this.status = status;
+        this.code = code;
+    }
+
+    public static TaskModel copyOf(TaskModel task) {
+        return new TaskModel(task.getTitle(), task.getDescription(), task.getPriority(),
+                task.getAssignee(), task.getProjectId(), task.getSprintId(),
+                task.getTaskType(), task.getEstimation(), task.getStatus(),
+                task.getCode());
     }
 }

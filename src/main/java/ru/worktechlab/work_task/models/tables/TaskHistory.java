@@ -3,7 +3,7 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -19,7 +19,7 @@ public class TaskHistory {
     private String initialValue;
     private String newValue;
     private String userId;
-    private LocalDateTime dateTime;
+    private Timestamp dateTime;
 
     public TaskHistory() {
     }
