@@ -16,5 +16,7 @@ public interface UserMapper {
     @Mapping(target = "role_id", source = "role.id")
     @Mapping(target = "lastProjectId", ignore = true)
     @Mapping(target = "projects", ignore = true)
+    @Mapping(target = "confirmationToken", ignore = true)
+    @Mapping(target = "confirmedAt", ignore = true)
     User registerDtoToUser(RegisterDTO dto, RoleModel role);
 }

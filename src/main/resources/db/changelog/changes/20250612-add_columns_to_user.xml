@@ -1,0 +1,13 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="add_columns_to_user-20250612" author="mastanov-mv">
+        <addColumn tableName="user">
+            <column name="confirmed_at" type="timestamp"/>
+        </addColumn>
+        <addColumn tableName="user">
+            <column name="confirmation_token" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

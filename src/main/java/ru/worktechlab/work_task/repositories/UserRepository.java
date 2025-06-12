@@ -30,4 +30,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u.active FROM User u WHERE u.id = :id")
     Boolean isUserActive(@Param("id") String id);
+
+    @Query("from User where confirmationToken = :token")
+    Optional<User> findExistUserByConfirmationToken(String token);
 }
