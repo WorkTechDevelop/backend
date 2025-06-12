@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import ru.worktechlab.work_task.models.enums.Gender;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,12 @@ public class User {
 
     @Column(name = "last_project_id")
     private String lastProjectId;
+
+    @Column
+    private String confirmationToken;
+
+    @Column
+    private LocalDateTime confirmedAt;
 
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "users_projects",
