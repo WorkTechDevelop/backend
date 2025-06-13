@@ -3,9 +3,10 @@ package ru.worktechlab.work_task.services;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.mappers.TaskHistoryMapper;
 import ru.worktechlab.work_task.models.tables.TaskHistory;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -60,5 +61,10 @@ public class TaskHistoryService {
     private List<TaskHistoryDto> createTaskStatusHistory(TaskModel oldEntity, UpdateStatusRequestDTO dto) {
         oldEntity.setStatusHistory(oldEntity.getStatus(), dto.getStatus());
         return oldEntity.getChanges();
+    }
+
+    public List<TaskHistoryResponseDto> getTaskHistoryById(String taskId) {
+        List<TaskHistory> taskHistories = repository.findAllByTaskIdOrderByDateTimeDesc(taskId);
+        return taskHistoryMapper.toDto(taskHistories);
     }
 }
