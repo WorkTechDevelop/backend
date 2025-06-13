@@ -10,6 +10,7 @@ import ru.worktechlab.work_task.models.tables.Project;
 import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
@@ -33,5 +34,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT p.taskCounter FROM Project p WHERE p.id = :id")
     Integer getCountById(@Param("id") String id);
 
-
+    @Query(nativeQuery = true,
+        value = "select * from project where id = :projectId for update skip locked")
+    Optional<Project> findProjectByForUpdate(String projectId);
 }

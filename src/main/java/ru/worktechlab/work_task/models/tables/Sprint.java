@@ -3,7 +3,7 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -12,26 +12,18 @@ public class Sprint {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
     @Column
     private String name;
-
     @Column
-    private Date startDate;
-
+    private LocalDate startDate;
     @Column
-    private Date endDate;
-
+    private LocalDate endDate;
     @Column(name = "is_active")
     private boolean active;
-
-    @Column
-    private String creator;
-
-    @Column
-    private String finisher;
-
-    @Column(name = "project_id")
-    private String projectId;
-
+    @OneToOne
+    private User creator;
+    @OneToOne
+    private User finisher;
+    @ManyToOne
+    private Project project;
 }
