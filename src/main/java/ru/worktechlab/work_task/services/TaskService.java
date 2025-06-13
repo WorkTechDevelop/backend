@@ -45,15 +45,14 @@ public class TaskService {
     private final UserService userService;
     private final TaskModelConverter taskModelConverter;
     private final UserContext userContext;
-    private final TaskHistorySaverService taskHistorySaverService;
+    private final TaskHistoryService taskHistorySaverService;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
         log.debug("Processing update-task with model: {}", dto);
         TaskModel existingTask = findTaskByCodeOrThrow(dto.getCode());
-        TaskModel oldTask = TaskModel.copyOf(existingTask);
+        taskHistorySaverService.saveTaskModelChanges(existingTask, dto);
         taskModelMapper.updateTaskFromDto(dto, existingTask);
-        taskHistorySaverService.saveTaskModelChanges(oldTask, existingTask);
 
         taskRepository.save(existingTask);
 
@@ -161,9 +160,8 @@ public class TaskService {
     public TaskModel updateTaskStatus(UpdateStatusRequestDTO requestDto) {
         log.debug("Обновить статус задачи");
         TaskModel task = findTaskByCodeOrThrow(requestDto.getCode());
-        TaskModel oldTask = TaskModel.copyOf(task);
         task.setStatus(requestDto.getStatus());
-        taskHistorySaverService.saveTaskModelStatusChanges(oldTask, task);
+        taskHistorySaverService.saveTaskModelChanges(task, requestDto);
 
         return taskRepository.save(task);
     }

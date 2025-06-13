@@ -12,7 +12,7 @@
             <column name="task_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="field_id" type="VARCHAR(255)">
+            <column name="field_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="initial_value" type="VARCHAR(255)">

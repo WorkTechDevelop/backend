@@ -20,6 +20,8 @@ public interface TaskModelMapper {
     @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "sprintId", expression = "java(normalizeSprintId(dto.getSprintId()))")
+    @Mapping(target = "taskChangeDetector", ignore = true)
+    @Mapping(target = "changes", ignore = true)
     TaskModel toEntity(TaskModelDTO dto);
 
     default TaskModel toEntity(TaskModelDTO dto, String creatorGuid, String code) {
@@ -39,6 +41,8 @@ public interface TaskModelMapper {
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
     @Mapping(target = "code", ignore = true)
+    @Mapping(target = "taskChangeDetector", ignore = true)
+    @Mapping(target = "changes", ignore = true)
     void updateTaskFromDto(UpdateTaskModelDTO dto, @MappingTarget TaskModel task);
 
     TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task);

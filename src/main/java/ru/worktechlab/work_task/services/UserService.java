@@ -48,7 +48,7 @@ public class UserService {
     public User findUserById(String userId) {
         return userRepository.findById(userId)
                 .filter(User::isActive)
-                .orElseThrow(() -> new InvalidUserException(
+                .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь с ID %s не найден или не активен", userId)));
     }
 

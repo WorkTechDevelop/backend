@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -14,11 +15,17 @@ public class TaskHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
+    @Column(name = "task_id", nullable = false)
     private String taskId;
-    private String fieldId;
+    @Column(name = "field_name", nullable = false)
+    private String fieldName;
+
     private String initialValue;
+
     private String newValue;
-    private String userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
     private Timestamp dateTime;
 
     public TaskHistory() {

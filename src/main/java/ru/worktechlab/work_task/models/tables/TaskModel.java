@@ -6,8 +6,11 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
+import ru.worktechlab.work_task.utils.TaskChangeDetector;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @AllArgsConstructor
 @Data
@@ -64,6 +67,49 @@ public class TaskModel {
     @Column
     private String code;
 
+    @Transient
+    private TaskChangeDetector taskChangeDetector = new TaskChangeDetector();
+
+    public List<TaskHistoryDto> getChanges() {
+        return taskChangeDetector.getTaskHistories();
+    }
+
+    public void setCodeHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Код задачи", oldValue, newValue);
+    }
+
+    public void setTitleHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Заголовок", oldValue, newValue);
+    }
+
+    public void setPriorityHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Приоритет", oldValue, newValue);
+    }
+
+    public void setAssigneeHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Исполнитель", oldValue, newValue);
+    }
+
+    public void setDescriptionHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Описание", oldValue, newValue);
+    }
+
+    public void setSprintIdHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Идентификатор спринта", oldValue, newValue);
+    }
+
+    public void setTaskTypeHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Тип задачи", oldValue, newValue);
+    }
+
+    public void setEstimationHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Оценка задачи", oldValue, newValue);
+    }
+
+    public void setStatusHistory(String oldValue, String newValue) {
+        taskChangeDetector.add("Статус задачи", oldValue, newValue);
+    }
+
     public TaskModel() {
     }
 
@@ -81,12 +127,5 @@ public class TaskModel {
         this.estimation = estimation;
         this.status = status;
         this.code = code;
-    }
-
-    public static TaskModel copyOf(TaskModel task) {
-        return new TaskModel(task.getTitle(), task.getDescription(), task.getPriority(),
-                task.getAssignee(), task.getProjectId(), task.getSprintId(),
-                task.getTaskType(), task.getEstimation(), task.getStatus(),
-                task.getCode());
     }
 }
