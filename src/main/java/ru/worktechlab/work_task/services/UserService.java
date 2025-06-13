@@ -7,7 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
-import ru.worktechlab.work_task.exceptions.InvalidUserException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.tables.RoleModel;
