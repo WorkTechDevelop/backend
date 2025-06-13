@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
+import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.config.params.MailParams;
 import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
@@ -14,9 +16,11 @@ import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +31,22 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UsersProjectsRepository usersProjectsRepository;
     private final TokenService tokenService;
+    private final NotificationService notificationService;
+    private final MailParams mailParams;
 
     @Transactional
     public void registerUser(RegisterDTO registerDto) {
         RoleModel defaultRole = roleService.getDefaultRole();
         User user = userMapper.registerDtoToUser(registerDto, defaultRole);
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-        userRepository.save(user);
+        if (mailParams.isEnable()) {
+            user.setConfirmationToken(UUID.randomUUID().toString());
+            userRepository.save(user);
+            notificationService.sendConfirmationToken(user);
+        } else {
+            user.setConfirmedAt(LocalDateTime.now());
+            userRepository.save(user);
+        }
     }
 
     public List<String> getProjectUserIds(User user) {
@@ -72,5 +85,20 @@ public class UserService {
             throw new NotFoundException(
                     String.format("Вам не доступен проект с ИД - %s", projectId)
             );
+    }
+
+    @TransactionRequired
+    public boolean emailConfirmation(String token) {
+        User user = findUserByConfirmationToken(token);
+        user.setConfirmationToken(null);
+        user.setConfirmedAt(LocalDateTime.now());
+        return true;
+    }
+
+    @TransactionMandatory
+    public User findUserByConfirmationToken(String token) {
+        return userRepository.findExistUserByConfirmationToken(token)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "Пользователь с токеном подтверждения %s не найден" + token));
     }
 }

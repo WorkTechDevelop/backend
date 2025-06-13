@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,7 +33,7 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] AUTH_URLS = {"/work-task/v1/auth/login", "/work-task/v1/registration/registry", "/work-task/v1/auth/refresh"};
+    private static final String[] AUTH_URLS = {"/work-task/v1/auth/login", "/work-task/v1/registration/registry", "/work-task/v1/auth/refresh", "/work-task/v1/auth/confirm-email"};
     private static final String[] SWAGGER_URLS = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"};
 
     @Value("${spring.cors.allowed.origins}")
@@ -66,7 +67,7 @@ public class SecurityConfig {
                 authorizeRequests
                         .requestMatchers(AUTH_URLS).permitAll()
                         .requestMatchers(SWAGGER_URLS).permitAll()
-                        .anyRequest().authenticated()); /// .permitAll())
+                        .anyRequest().authenticated());
         http.sessionManagement(
                 session ->
                         session.sessionCreationPolicy(

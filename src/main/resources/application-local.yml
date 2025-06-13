@@ -1,25 +1,3 @@
-spring:
-  app:
-    jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
-    jwtExpirationMs: 1800000
-    refreshExpiration: 86400000
-# Добавить настройки вашей локальной бд
-  datasource:
-    url: jdbc:mysql://localhost:3306/mydb?allowPublicKeyRetrieval=true&useSSL=false
-    username: myuser
-    password: mypassword
-
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-# Добавить настройки вашего локального фронта пример: http://localhost:3080
-  cors:
-    allowed:
-      origins: http://91.211.249.37:30080
-      local: http://localhost:3000
-# Локальное приложение будет работать на url http://localhost:8080/local
 server:
-  port: 8080
   servlet:
-    context-path: /local
+    context-path:

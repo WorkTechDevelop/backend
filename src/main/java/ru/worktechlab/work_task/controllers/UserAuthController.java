@@ -1,18 +1,17 @@
 package ru.worktechlab.work_task.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.dto.response_dto.LoginResponseDTO;
 import ru.worktechlab.work_task.services.AuthService;
+import ru.worktechlab.work_task.services.UserService;
 
 @RestController
 @RequestMapping("/work-task/v1/auth")
@@ -21,6 +20,7 @@ import ru.worktechlab.work_task.services.AuthService;
 public class UserAuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/login")
     @Operation(summary = "Войти в учетную запись")
@@ -39,6 +39,13 @@ public class UserAuthController {
     @PostMapping("/refresh")
     public LoginResponseDTO refreshToken(@RequestBody TokenRefreshRequestDTO request) {
         return authService.refreshAccessToken(request);
+    }
+
+    @Operation(summary = "Подтверждение почты пользователем")
+    @GetMapping(value = "/confirm-email")
+    public Boolean confirmEmail(@Parameter(description = "Токен подтверждения", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                @RequestParam String token) {
+        return userService.emailConfirmation(token);
     }
 }
 
