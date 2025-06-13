@@ -88,6 +88,17 @@ public class UserService {
             );
     }
 
+    @TransactionMandatory
+    public void checkHasProjectForUser(User user,
+                                       String projectId) throws NotFoundException {
+        boolean hasProject = user.getProjects().stream()
+                .anyMatch(pr -> Objects.equals(projectId, pr.getId()));
+        if (!hasProject)
+            throw new NotFoundException(
+                    String.format("Вам не доступен проект с ИД - %s", projectId)
+            );
+    }
+
     @TransactionRequired
     public boolean emailConfirmation(String token) {
         User user = findUserByConfirmationToken(token);

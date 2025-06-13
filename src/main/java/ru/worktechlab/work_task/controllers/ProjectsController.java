@@ -2,14 +2,14 @@ package ru.worktechlab.work_task.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.worktechlab.work_task.dto.projects.ProjectDto;
 import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
-import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
-import ru.worktechlab.work_task.models.tables.TaskModel;
+import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.services.ProjectsService;
 
 import java.util.List;
@@ -23,28 +23,8 @@ public class ProjectsController {
 
     @GetMapping("/all-user-project")
     @Operation(summary = "Вывести список проектов пользователя")
-    public List<UsersProjectsDTO> getAllUserProjects() {
+    public List<ShortProjectDataDto> getAllUserProjects() {
         return projectsService.getAllUserProjects();
-    }
-
-    @PostMapping("/set-project/{id}")
-    @Operation(summary = "Устанавливает выбранный по ID проект - основным проектом пользователя")
-    public List<TaskModel> setMainProject(
-            @Parameter(
-                    name = "id",
-                    description = "id проекта",
-                    required = true,
-                    example = "507f1f77bcf86cd799439011",
-                    schema = @Schema(type = "string", format = "uuid")
-            )
-            @PathVariable String id) {
-        return projectsService.setMainProject(id);
-    }
-
-    @GetMapping("/users-projects")
-    @Operation(summary = "Вывести список всех проектов пользователя")
-    public List<UsersProjectsDTO> getProjectByUser() {
-        return projectsService.getUserProject();
     }
 
     @GetMapping("/active-project")
@@ -55,9 +35,36 @@ public class ProjectsController {
 
     @PostMapping("/create-project")
     @Operation(summary = "Создание проекта")
-    public String createProject(
+    public ProjectDto createProject(
             @RequestBody @Valid ProjectRequestDto data
     ) {
         return projectsService.createProject(data);
+    }
+
+    @GetMapping("/{projectId}")
+    @Operation(summary = "Получение данных проекта по ИД")
+    public ProjectDto getProjectData(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId
+    ) throws NotFoundException {
+        return projectsService.getProjectData(projectId);
+    }
+
+    @PutMapping("/finish-project/{projectId}")
+    @Operation(summary = "Завершение проекта по ИД")
+    public ProjectDto finishProject(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId
+    ) throws NotFoundException {
+        return projectsService.finishProject(projectId);
+    }
+
+    @PutMapping("/start-project/{projectId}")
+    @Operation(summary = "Запуск проекта по ИД")
+    public ProjectDto startProject(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId
+    ) throws NotFoundException {
+        return projectsService.startProject(projectId);
     }
 }

@@ -7,7 +7,7 @@
     <changeSet author="a1234 (generated)" id="1747312572093-6">
         <createTable tableName="task_model">
             <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="assignee" type="VARCHAR(255)"/>
             <column name="creation_date" type="datetime"/>
