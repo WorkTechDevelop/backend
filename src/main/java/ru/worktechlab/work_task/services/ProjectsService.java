@@ -6,6 +6,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.OkResponse;
+import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.projects.ProjectDto;
 import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
 import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
@@ -24,6 +26,7 @@ import ru.worktechlab.work_task.utils.UserContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +43,7 @@ public class ProjectsService {
     public List<ShortProjectDataDto> getAllUserProjects() {
         log.debug("Вывод всех проектов пользователя");
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         if (CollectionUtils.isEmpty(user.getProjects()))
             return Collections.emptyList();
         return projectMapper.toShortDataDto(user.getProjects());
@@ -50,7 +53,7 @@ public class ProjectsService {
     public String getLastProjectId() {
         log.debug("Получить id активного проекта");
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         return user.getLastProjectId();
     }
 
@@ -71,7 +74,7 @@ public class ProjectsService {
     @TransactionRequired
     public ProjectDto createProject(ProjectRequestDto data) {
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         Project project = new Project(data.getName(), user, data.getDescription(), data.isActive(), user, data.getCode());
         projectRepository.saveAndFlush(project);
         createDefaultStatuses(project);
@@ -92,7 +95,7 @@ public class ProjectsService {
     public ProjectDto getProjectData(String projectId) throws NotFoundException {
         Project project = findProjectById(projectId);
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         userService.checkHasProjectForUser(user, projectId);
         user.setLastProjectId(projectId);
         return projectMapper.toProjectDto(project);
@@ -102,7 +105,7 @@ public class ProjectsService {
     public ProjectDto finishProject(String projectId) throws NotFoundException {
         Project project = findProjectByIdForUpdate(projectId);
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         userService.checkHasProjectForUser(user, projectId);
         project.finishProject(user);
         projectRepository.flush();
@@ -114,11 +117,31 @@ public class ProjectsService {
     public ProjectDto startProject(String projectId) throws NotFoundException {
         Project project = findProjectByIdForUpdate(projectId);
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         userService.checkHasProjectForUser(user, projectId);
         project.startProject();
         projectRepository.flush();
         project = findProjectById(projectId);
         return projectMapper.toProjectDto(project);
+    }
+
+    private boolean hasProject(User user, String projectId) {
+        return user.getProjects().stream()
+                .anyMatch(project -> Objects.equals(project.getId(), projectId));
+    }
+
+    @TransactionRequired
+    public OkResponse addProjectForUsers(String projectId,
+                                         StringIdsDto data) throws NotFoundException {
+        OkResponse response = new OkResponse();
+        if (data == null || org.springframework.util.CollectionUtils.isEmpty(data.getIds()))
+            return response;
+        Project project = findProjectByIdForUpdate(projectId);
+        List<User> users = userService.findAndCheckUsers(data.getIds());
+        usersProjectsRepository.saveAllAndFlush(users.stream()
+                .filter(user -> !hasProject(user, project.getId()))
+                .map(user -> new UsersProject(user.getId(), project.getId()))
+                .toList());
+        return response;
     }
 }

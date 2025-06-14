@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.statuses.ProjectStatusDto;
 import ru.worktechlab.work_task.dto.statuses.ProjectStatusRequestDto;
@@ -14,7 +14,7 @@ import ru.worktechlab.work_task.services.ProjectStatusService;
 
 @RestController
 @RequestMapping("work-task/v1/status")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Status", description = "Управление статусами")
 public class ProjectStatusController {
 

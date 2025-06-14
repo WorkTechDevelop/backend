@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.TokenRefreshRequestDTO;
@@ -15,7 +15,7 @@ import ru.worktechlab.work_task.services.UserService;
 
 @RestController
 @RequestMapping("/work-task/v1/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Authenticate", description = "Аутентификация пользователей")
 public class UserAuthController {
 

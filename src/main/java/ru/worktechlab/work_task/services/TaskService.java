@@ -5,11 +5,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.worktechlab.work_task.annotations.TransactionMandatory;
+import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
-import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.mappers.TaskModelMapper;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -18,18 +19,11 @@ import ru.worktechlab.work_task.repositories.ProjectRepository;
 import ru.worktechlab.work_task.repositories.TaskRepository;
 import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
-import ru.worktechlab.work_task.utils.TaskModelConverter;
 import ru.worktechlab.work_task.utils.UserContext;
-import ru.worktechlab.work_task.validators.ProjectValidator;
-import ru.worktechlab.work_task.validators.TaskValidator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -37,13 +31,9 @@ import java.util.stream.Stream;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskModelMapper taskModelMapper;
-    private final TaskValidator taskValidator;
-    private final ProjectValidator projectValidator;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
-    private final UserService userService;
-    private final TaskModelConverter taskModelConverter;
     private final UserContext userContext;
 
     @Transactional
@@ -57,41 +47,7 @@ public class TaskService {
         return new TaskResponse(existingTask.getId());
     }
 
-    public List<TaskModel> getTasksByProjectId(String projectId) {
-        return taskRepository.findByProjectId(projectId);
-    }
-
-    public List<TaskModel> getTasksByProjectIdOrThrow(String projectId) {
-        projectValidator.validateProjectExist(projectId);
-        List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
-        taskValidator.validateTasksExist(tasks, projectId);
-
-        return tasks;
-    }
-
-    public List<TaskModeResponselDTO> getTasksModelResponseByProjectIdOrThrow(String projectId) {
-        validateProjectAndTasks(projectId);
-        List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
-        Map<String, User> usersById = preloadUsers(tasks);
-        return taskModelConverter.convertTasks(tasks, usersById);
-    }
-
-    private void validateProjectAndTasks(String projectId) {
-        projectValidator.validateProjectExist(projectId);
-        List<TaskModel> tasks = taskRepository.findByProjectId(projectId);
-        taskValidator.validateTasksExist(tasks, projectId);
-    }
-
-    private Map<String, User> preloadUsers(List<TaskModel> tasks) {
-        Set<String> userIds = tasks.stream()
-                .flatMap(task -> Stream.of(task.getCreator(), task.getAssignee()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        return userService.findAllByIds(userIds).stream()
-                .collect(Collectors.toMap(User::getId, Function.identity()));
-    }
-
+    @TransactionRequired
     public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid() {
         log.debug("Вывод всех задач проекта отсартированных по пользователям");
         String userId = userContext.getUserData().getUserId();
@@ -113,25 +69,7 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    private List<UsersTasksInProjectDTO> fetchUserTasks(List<String> userIds) {
-        return taskRepository.findUserTasksByUserIds(userIds);
-    }
-
-    private List<UsersTasksInProjectDTO> groupTasksByUser(List<UsersTasksInProjectDTO> userTasks) {
-        Map<String, List<TaskModel>> tasksByUser = userTasks.stream()
-                .collect(Collectors.groupingBy(
-                        UsersTasksInProjectDTO::getUserName,
-                        Collectors.flatMapping(
-                                dto -> dto.getTasks().stream(),
-                                Collectors.toList()
-                        )
-                ));
-
-        return tasksByUser.entrySet().stream()
-                .map(entry -> new UsersTasksInProjectDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
-
+    @TransactionRequired
     public TaskResponse createTask(TaskModelDTO taskDTO) {
         log.debug("Processing create-task with model: {}", taskDTO);
         TaskModel task = taskModelMapper.toEntity(taskDTO, userContext.getUserData().getUserId(),
@@ -140,6 +78,7 @@ public class TaskService {
         return new TaskResponse(task.getId());
     }
 
+    @TransactionMandatory
     public String getTaskCode(String projectId) {
         String code = projectRepository.getCodeById(projectId);
         projectRepository.incrementCount(projectId);
@@ -153,7 +92,7 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с кодом: %s не найдена", taskCode)));
     }
 
-    @Transactional
+    @TransactionRequired
     public TaskModel updateTaskStatus(UpdateStatusRequestDTO requestDto) {
         log.debug("Обновить статус задачи");
         TaskModel task = findTaskByCodeOrThrow(requestDto.getCode());

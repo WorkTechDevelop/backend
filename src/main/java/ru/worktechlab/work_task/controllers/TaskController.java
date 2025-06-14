@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("work-task/v1/task")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Task", description = "Управление задачами")
 public class TaskController {
     private final TaskService taskService;
