@@ -9,13 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
-    @Query("FROM User u WHERE u.email = :email AND active")
+    @Query("FROM User WHERE email = :email AND active")
     Optional<User> findExistUserByEmail(String email);
 
     @Query("SELECT u.role_id FROM User u WHERE u.email = :email")
@@ -33,4 +36,16 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("from User where confirmationToken = :token")
     Optional<User> findExistUserByConfirmationToken(String token);
+
+    @Query("from User where email = :email and active and confirmedAt is not null")
+    Optional<User> findActiveUserByEmail(String email);
+
+    @Query("from User where id = :id and active and confirmedAt is not null")
+    Optional<User> findActiveUserById(String id);
+
+    @Query("from User where confirmedAt is not null")
+    List<User> getUsers();
+
+    @Query("from User where id in :userIds and confirmedAt is not null")
+    Stream<User> findUsersByIdsIn(Collection<String> userIds);
 }

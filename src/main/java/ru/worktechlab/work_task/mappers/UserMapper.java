@@ -8,6 +8,8 @@ import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
 
+import java.util.List;
+
 @Mapper(config = MapStructConfiguration.class)
 public interface UserMapper {
 
@@ -22,4 +24,6 @@ public interface UserMapper {
     User registerDtoToUser(RegisterDTO dto, RoleModel role);
 
     UserShortDataDto toShortDataDto(User user);
+
+    List<UserShortDataDto> toShortDataList(List<User> users);
 }

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import ru.worktechlab.work_task.services.UserService;
 
 @RestController
 @RequestMapping("/work-task/v1/registration")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Registration", description = "Регистрация пользователя")
 public class AccountController {
 

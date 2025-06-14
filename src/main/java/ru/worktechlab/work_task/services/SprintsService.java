@@ -27,7 +27,7 @@ public class SprintsService {
     public SprintInfoDTO getActiveSprint() throws NotFoundException {
         log.debug("Вывод информации о спринте");
         String userId = userContext.getUserData().getUserId();
-        User user = userService.findUserById(userId);
+        User user = userService.findActiveUserById(userId);
         if (user.getLastProjectId() == null)
             throw new NotFoundException("Не найден активный проект");
         Project project = projectsService.findProjectById(user.getLastProjectId());

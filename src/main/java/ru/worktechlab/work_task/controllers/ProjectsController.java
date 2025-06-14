@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.worktechlab.work_task.dto.OkResponse;
+import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.projects.ProjectDto;
 import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
 import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
@@ -16,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("work-task/v1/projects")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Project", description = "Управление проектами")
 public class ProjectsController {
     private final ProjectsService projectsService;
@@ -66,5 +68,16 @@ public class ProjectsController {
             @PathVariable String projectId
     ) throws NotFoundException {
         return projectsService.startProject(projectId);
+    }
+
+    @PutMapping("/{projectId}/add-project")
+    @Operation(summary = "Добавление проекта пользователям")
+    public OkResponse addProjectForUsers(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId,
+            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
+            @RequestBody StringIdsDto data
+    ) throws NotFoundException {
+        return projectsService.addProjectForUsers(projectId, data);
     }
 }
