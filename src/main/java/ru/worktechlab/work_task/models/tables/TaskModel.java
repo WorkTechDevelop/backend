@@ -9,7 +9,7 @@ import lombok.NonNull;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.utils.TaskChangeDetector;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -59,10 +59,10 @@ public class TaskModel {
     private String status;
 
     @Column
-    private Timestamp creationDate;
+    private LocalDateTime creationDate;
 
     @Column
-    private Timestamp updateDate;
+    private LocalDateTime updateDate;
 
     @Column
     private String code;
@@ -74,40 +74,40 @@ public class TaskModel {
         return taskChangeDetector.getTaskHistories();
     }
 
-    public void setCodeHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Код задачи", oldValue, newValue);
+    public void setCodeHistory(String newValue) {
+        taskChangeDetector.add("Код задачи", this.code, newValue);
     }
 
-    public void setTitleHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Заголовок", oldValue, newValue);
+    public void setTitleHistory(String newValue) {
+        taskChangeDetector.add("Заголовок", this.title, newValue);
     }
 
-    public void setPriorityHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Приоритет", oldValue, newValue);
+    public void setPriorityHistory(String newValue) {
+        taskChangeDetector.add("Приоритет", this.priority, newValue);
     }
 
-    public void setAssigneeHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Исполнитель", oldValue, newValue);
+    public void setAssigneeHistory(String newValue) {
+        taskChangeDetector.add("Исполнитель", this.assignee, newValue);
     }
 
-    public void setDescriptionHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Описание", oldValue, newValue);
+    public void setDescriptionHistory(String newValue) {
+        taskChangeDetector.add("Описание", this.description, newValue);
     }
 
-    public void setSprintIdHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Идентификатор спринта", oldValue, newValue);
+    public void setSprintIdHistory(String newValue) {
+        taskChangeDetector.add("Идентификатор спринта", this.sprintId, newValue);
     }
 
-    public void setTaskTypeHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Тип задачи", oldValue, newValue);
+    public void setTaskTypeHistory(String newValue) {
+        taskChangeDetector.add("Тип задачи", this.taskType, newValue);
     }
 
-    public void setEstimationHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Оценка задачи", oldValue, newValue);
+    public void setEstimationHistory(String newValue) {
+        taskChangeDetector.add("Оценка задачи", String.valueOf(this.estimation), newValue);
     }
 
-    public void setStatusHistory(String oldValue, String newValue) {
-        taskChangeDetector.add("Статус задачи", oldValue, newValue);
+    public void setStatusHistory(String newValue) {
+        taskChangeDetector.add("Статус задачи", this.status, newValue);
     }
 
     public TaskModel() {

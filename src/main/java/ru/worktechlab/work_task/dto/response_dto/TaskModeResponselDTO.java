@@ -2,7 +2,7 @@ package ru.worktechlab.work_task.dto.response_dto;
 
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 public class TaskModeResponselDTO {
@@ -29,9 +29,9 @@ public class TaskModeResponselDTO {
 
     private String status;
 
-    private Timestamp creationDate;
+    private LocalDateTime creationDate;
 
-    private Timestamp updateDate;
+    private LocalDateTime updateDate;
 
     private String code;
 }

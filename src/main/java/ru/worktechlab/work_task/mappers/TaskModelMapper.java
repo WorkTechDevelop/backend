@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.worktechlab.work_task.config.MapStructConfiguration;
-import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -12,24 +11,6 @@ import ru.worktechlab.work_task.models.tables.User;
 
 @Mapper(config = MapStructConfiguration.class)
 public interface TaskModelMapper {
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", constant = "TODO")
-    @Mapping(target = "creator", ignore = true)
-    @Mapping(target = "creationDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
-    @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
-    @Mapping(target = "code", ignore = true)
-    @Mapping(target = "sprintId", expression = "java(normalizeSprintId(dto.getSprintId()))")
-    @Mapping(target = "taskChangeDetector", ignore = true)
-    @Mapping(target = "changes", ignore = true)
-    TaskModel toEntity(TaskModelDTO dto);
-
-    default TaskModel toEntity(TaskModelDTO dto, String creatorGuid, String code) {
-        TaskModel task = toEntity(dto);
-        task.setCreator(creatorGuid);
-        task.setCode(code);
-        return task;
-    }
 
     default String normalizeSprintId(String sprintId) {
         return (sprintId == null || sprintId.isBlank()) ? null : sprintId;
@@ -39,10 +20,19 @@ public interface TaskModelMapper {
     @Mapping(target = "creator", ignore = true)
     @Mapping(target = "status", source = "status")
     @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "updateDate", expression = "java(new java.sql.Timestamp(System.currentTimeMillis()))")
+    @Mapping(target = "updateDate", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "taskChangeDetector", ignore = true)
     @Mapping(target = "changes", ignore = true)
+    @Mapping(target = "codeHistory", ignore = true)
+    @Mapping(target = "titleHistory", ignore = true)
+    @Mapping(target = "priorityHistory", ignore = true)
+    @Mapping(target = "assigneeHistory", ignore = true)
+    @Mapping(target = "descriptionHistory", ignore = true)
+    @Mapping(target = "sprintIdHistory", ignore = true)
+    @Mapping(target = "taskTypeHistory", ignore = true)
+    @Mapping(target = "estimationHistory", ignore = true)
+    @Mapping(target = "statusHistory", ignore = true)
     void updateTaskFromDto(UpdateTaskModelDTO dto, @MappingTarget TaskModel task);
 
     TaskModeResponselDTO taskModelResponseFromEntity(TaskModel task);

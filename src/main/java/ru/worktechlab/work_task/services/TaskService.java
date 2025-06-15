@@ -12,6 +12,7 @@ import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.TaskModeResponselDTO;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.mappers.TaskModelMapper;
+import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.ProjectRepository;
@@ -23,6 +24,7 @@ import ru.worktechlab.work_task.utils.UserContext;
 import ru.worktechlab.work_task.validators.ProjectValidator;
 import ru.worktechlab.work_task.validators.TaskValidator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,7 +52,7 @@ public class TaskService {
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
         log.debug("Processing update-task with model: {}", dto);
-        TaskModel existingTask = findTaskByCodeOrThrow(dto.getCode());
+        TaskModel existingTask = findTaskByIdOrThrow(dto.getId());
         taskHistorySaverService.saveTaskModelChanges(existingTask, dto);
         taskModelMapper.updateTaskFromDto(dto, existingTask);
 
@@ -137,10 +139,26 @@ public class TaskService {
 
     public TaskResponse createTask(TaskModelDTO taskDTO) {
         log.debug("Processing create-task with model: {}", taskDTO);
-        TaskModel task = taskModelMapper.toEntity(taskDTO, userContext.getUserData().getUserId(),
-                getTaskCode(taskDTO.getProjectId()));
+        TaskModel task = convertToEntity(taskDTO, userContext);
         taskRepository.save(task);
         return new TaskResponse(task.getId());
+    }
+
+    private TaskModel convertToEntity(TaskModelDTO taskDTO, UserContext userContext) {
+        TaskModel taskModel = new TaskModel();
+        taskModel.setTitle(taskDTO.getTitle());
+        taskModel.setDescription(taskDTO.getDescription());
+        taskModel.setPriority(taskDTO.getPriority());
+        taskModel.setAssignee(taskDTO.getAssignee());
+        taskModel.setProjectId(taskDTO.getProjectId());
+        taskModel.setSprintId(taskDTO.getSprintId());
+        taskModel.setTaskType(taskDTO.getTaskType());
+        taskModel.setEstimation(taskDTO.getEstimation());
+        taskModel.setCreator(userContext.getUserData().getUserId());
+        taskModel.setCode(getTaskCode(taskDTO.getProjectId()));
+        taskModel.setCreationDate(LocalDateTime.now());
+        taskModel.setStatus(StatusName.TODO.toString());
+        return taskModel;
     }
 
     public String getTaskCode(String projectId) {
@@ -154,6 +172,12 @@ public class TaskService {
         log.debug("Получение задачи по коду: {}", taskCode);
         return taskRepository.findByCode(taskCode)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с кодом: %s не найдена", taskCode)));
+    }
+
+    public TaskModel findTaskByIdOrThrow(String id) {
+        log.debug("Получение задачи по id: {}", id);
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с id: %s не найдена", id)));
     }
 
     @Transactional
