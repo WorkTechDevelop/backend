@@ -9,6 +9,7 @@ import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.config.params.MailParams;
 import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
+import ru.worktechlab.work_task.exceptions.InvalidUserException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.tables.RoleModel;
@@ -17,7 +18,10 @@ import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +30,10 @@ public class UserService {
     private final RoleService roleService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final UsersProjectsRepository usersProjectsRepository;
-    private final TokenService tokenService;
     private final NotificationService notificationService;
     private final MailParams mailParams;
 
-    @Transactional
+    @TransactionRequired
     public void registerUser(RegisterDTO registerDto) {
         RoleModel defaultRole = roleService.getDefaultRole();
         User user = userMapper.registerDtoToUser(registerDto, defaultRole);
@@ -46,28 +48,16 @@ public class UserService {
         }
     }
 
-    public List<String> getProjectUserIds(User user) {
-        return usersProjectsRepository.findUserByProjectId(user.getLastProjectId());
-    }
-
-    public String extractUserId(String jwtToken) {
-        return tokenService.getUserGuidFromJwtToken(jwtToken);
-    }
-
-    public User findUserById(String userId) {
-        return userRepository.findById(userId)
-                .filter(User::isActive)
-                .orElseThrow(() -> new UsernameNotFoundException(
+    @TransactionMandatory
+    public User findActiveUserById(String userId) {
+        return userRepository.findActiveUserById(userId)
+                .orElseThrow(() -> new InvalidUserException(
                         String.format("Пользователь с ID %s не найден или не активен", userId)));
     }
 
-    public List<User> findAllByIds(Collection<String> ids) {
-        return userRepository.findAllById(ids);
-    }
-
     @TransactionMandatory
-    public User findUserByEmail(String email) {
-        return userRepository.findExistUserByEmail(email)
+    public User findActiveUserByEmail(String email) {
+        return userRepository.findActiveUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Пользователь с email %s не найден или не активен" + email));
     }
@@ -75,7 +65,18 @@ public class UserService {
     @TransactionMandatory
     public void checkHasProjectForUser(String userId,
                                        String projectId) throws NotFoundException {
-        User user = findUserById(userId);
+        User user = findActiveUserById(userId);
+        boolean hasProject = user.getProjects().stream()
+                .anyMatch(pr -> Objects.equals(projectId, pr.getId()));
+        if (!hasProject)
+            throw new NotFoundException(
+                    String.format("Вам не доступен проект с ИД - %s", projectId)
+            );
+    }
+
+    @TransactionMandatory
+    public void checkHasProjectForUser(User user,
+                                       String projectId) throws NotFoundException {
         boolean hasProject = user.getProjects().stream()
                 .anyMatch(pr -> Objects.equals(projectId, pr.getId()));
         if (!hasProject)
@@ -97,5 +98,58 @@ public class UserService {
         return userRepository.findExistUserByConfirmationToken(token)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Пользователь с токеном подтверждения %s не найден" + token));
+    }
+
+    @TransactionRequired
+    public List<UserShortDataDto> getAllUsers() {
+        List<User> users = getUsers();
+        if (CollectionUtils.isEmpty(users))
+            return Collections.emptyList();
+        return userMapper.toShortDataList(users);
+    }
+
+    @TransactionMandatory
+    public List<User> getUsers() {
+        return userRepository.getUsers().stream()
+                .sorted(Comparator.comparing(User::getLastName)
+                        .thenComparing(User::getFirstName))
+                .collect(Collectors.toList());
+    }
+
+    @TransactionRequired
+    public List<UserShortDataDto> findUsersByIdsIn(StringIdsDto data) throws NotFoundException {
+        if (data == null || CollectionUtils.isEmpty(data.getIds()))
+            return Collections.emptyList();
+        List<User> users = findAndCheckUsers(data.getIds());
+        if (CollectionUtils.isEmpty(users))
+            return Collections.emptyList();
+        return userMapper.toShortDataList(users);
+    }
+
+    @TransactionMandatory
+    List<User> findAndCheckUsers(List<String> userIds) throws NotFoundException {
+        if (CollectionUtils.isEmpty(userIds))
+            return Collections.emptyList();
+        Map<String, User> userById = userRepository.findUsersByIdsIn(userIds)
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+        for (String userId : userIds) {
+            if (!userById.containsKey(userId))
+                throw new NotFoundException(String.format("Пользователь с ID %s не найден или не активен", userId));
+        }
+        return userById.values().stream()
+                .sorted(Comparator.comparing(User::getLastName)
+                .thenComparing(User::getFirstName))
+                .toList();
+    }
+
+    @TransactionRequired
+    public OkResponse activateUsers(StringIdsDto data) throws NotFoundException {
+        OkResponse response = new OkResponse();
+        if (data == null || CollectionUtils.isEmpty(data.getIds()))
+            return response;
+        List<User> users = findAndCheckUsers(data.getIds());
+        users.forEach(user -> user.setActive(true));
+        userRepository.flush();
+        return response;
     }
 }

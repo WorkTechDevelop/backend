@@ -19,8 +19,8 @@ public class Project {
     private String id;
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
-    private String owner;
+    @OneToOne
+    private User owner;
     @Column(nullable = false)
     private LocalDate creationDate;
     @Column
@@ -33,18 +33,25 @@ public class Project {
     private String description;
     @Column(name = "is_active")
     private boolean active;
-    @Column
-    private String creator;
-    @Column
-    private String finisher;
+    @OneToOne
+    private User creator;
+    @OneToOne
+    private User finisher;
     @Column(nullable = false)
     private String code;
     @Column
     private Integer taskCounter;
     @OneToMany(mappedBy = "project")
-    private List<ProjectStatus> statuses = new ArrayList<>();
+    private final List<ProjectStatus> statuses = new ArrayList<>();
+    @OneToMany(mappedBy = "project")
+    private final List<Sprint> sprints = new ArrayList<>();
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "users_projects",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private final List<User> users = new ArrayList<>();
 
-    public Project(String name, String owner, String description, boolean active, String creator, String code) {
+    public Project(String name, User owner, String description, boolean active, User creator, String code) {
         this.name = name;
         this.owner = owner;
         this.description = description;
@@ -56,6 +63,23 @@ public class Project {
         this.updateDate = date;
         this.taskCounter = 0;
         if (active)
+            this.startDate = date;
+    }
+
+    public void finishProject(User user) {
+        this.finisher = user;
+        LocalDate date = LocalDate.now();
+        this.updateDate = date;
+        this.finishDate = date;
+    }
+
+    public void startProject() {
+        this.active = true;
+        this.finishDate = null;
+        this.finisher = null;
+        LocalDate date = LocalDate.now();
+        this.updateDate = date;
+        if (this.startDate == null)
             this.startDate = date;
     }
 }

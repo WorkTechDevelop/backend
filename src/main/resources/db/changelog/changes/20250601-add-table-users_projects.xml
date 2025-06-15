@@ -6,11 +6,13 @@
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <changeSet author="a1234 (generated)" id="1747312572093-8">
         <createTable tableName="users_projects">
-            <column name="user_id" type="VARCHAR(255)"/>
+            <column name="user_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="project_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column autoIncrement="true" name="id" type="INT">
+            <column name="id" type="bigserial">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
         </createTable>

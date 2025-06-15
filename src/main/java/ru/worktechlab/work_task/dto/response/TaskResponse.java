@@ -3,7 +3,7 @@ package ru.worktechlab.work_task.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.dto.response_dto.SprintInfoDTO;
+import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
 import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 

@@ -6,8 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.worktechlab.work_task.dto.statuses.ProjectStatusDto;
+import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,17 +24,17 @@ public class ProjectDto {
     private String name;
     @NotNull
     @Schema(description = "Владелец проекта")
-    private String owner;
+    private UserShortDataDto owner;
     @NotNull
     @Schema(description = "Дата создания проекта")
-    private Date creationDate;
+    private LocalDate creationDate;
     @Schema(description = "Дата закрытия проекта")
-    private Date finishDate;
+    private LocalDate finishDate;
     @NotNull
     @Schema(description = "Дата начала проекта")
-    private Date startDate;
+    private LocalDate startDate;
     @Schema(description = "Дата обновления проекта")
-    private Date updateDate;
+    private LocalDate updateDate;
     @Schema(description = "Комментарий к проекту")
     private String description;
     @NotNull
@@ -41,12 +42,14 @@ public class ProjectDto {
     private boolean active;
     @NotNull
     @Schema(description = "Создатель проекта")
-    private String creator;
+    private UserShortDataDto creator;
     @Schema(description = "Пользователь, закрывший проект")
-    private String finisher;
+    private UserShortDataDto finisher;
     @NotNull
     @Schema(description = "Код проекта")
     private String code;
     @Schema(description = "Статусы проекта")
     private List<ProjectStatusDto> statuses = new ArrayList<>();
+    @Schema(description = "Пользователи проекта")
+    private List<UserShortDataDto> users = new ArrayList<>();
 }

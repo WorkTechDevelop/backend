@@ -7,8 +7,8 @@
 
     <changeSet id="2025-05-20-add-refresh-token" author="your-name">
         <createTable tableName="refresh_token">
-            <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
+            <column name="id" type="bigserial">
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="token" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
