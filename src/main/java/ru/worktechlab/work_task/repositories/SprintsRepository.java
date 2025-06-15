@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import ru.worktechlab.work_task.models.tables.Project;
 import ru.worktechlab.work_task.models.tables.Sprint;
 
+import java.util.Optional;
+
 @Repository
 public interface SprintsRepository extends JpaRepository<Sprint, String> {
 
@@ -15,4 +17,12 @@ public interface SprintsRepository extends JpaRepository<Sprint, String> {
 
     @Query("SELECT s.active FROM Sprint s WHERE s.id = :id")
     Boolean isSprintActive(@Param("id") String id);
+
+    @Query(nativeQuery = true,
+            value = "select * from sprint where id = :sprintId for update skip locked")
+    Optional<Sprint> findSprintByIdForUpdate(String sprintId);
+
+    @Query(nativeQuery = true,
+    value = "select exists (select * from sprint s where s.project_id = :projectId and s.is_active")
+    boolean hasActiveSprint(String projectId);
 }

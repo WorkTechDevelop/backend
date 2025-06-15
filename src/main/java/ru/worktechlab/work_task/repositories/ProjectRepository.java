@@ -36,5 +36,5 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     @Query(nativeQuery = true,
         value = "select * from project where id = :projectId for update skip locked")
-    Optional<Project> findProjectByForUpdate(String projectId);
+    Optional<Project> findProjectByIdForUpdate(String projectId);
 }

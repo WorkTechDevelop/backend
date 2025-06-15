@@ -66,7 +66,7 @@ public class ProjectsService {
 
     @TransactionMandatory
     public Project findProjectByIdForUpdate(String projectId) throws NotFoundException {
-        return projectRepository.findProjectByForUpdate(projectId).orElseThrow(
+        return projectRepository.findProjectByIdForUpdate(projectId).orElseThrow(
                 () -> new NotFoundException(String.format("Не найден проект с ИД - %s", projectId))
         );
     }

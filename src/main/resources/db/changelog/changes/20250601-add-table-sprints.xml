@@ -9,13 +9,24 @@
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="is_active" type="BOOL"/>
-            <column name="creator" type="VARCHAR(255)"/>
+            <column name="is_active" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creator" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="end_date" type="date"/>
+            <column name="created_at" type="date">
+                <constraints nullable="false"/>
+            </column>
             <column name="finisher" type="VARCHAR(255)"/>
-            <column name="name" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="start_date" type="date"/>
-            <column name="project_id" type="VARCHAR(255)"/>
+            <column name="project_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="sprint" constraintName="sprints_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <addForeignKeyConstraint baseColumnNames="finisher" baseTableName="sprint" constraintName="sprint_finisher_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
