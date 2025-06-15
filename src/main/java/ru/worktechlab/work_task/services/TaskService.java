@@ -20,10 +20,7 @@ import ru.worktechlab.work_task.repositories.ProjectRepository;
 import ru.worktechlab.work_task.repositories.TaskRepository;
 import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
-import ru.worktechlab.work_task.utils.TaskModelConverter;
 import ru.worktechlab.work_task.utils.UserContext;
-import ru.worktechlab.work_task.validators.ProjectValidator;
-import ru.worktechlab.work_task.validators.TaskValidator;
 
 import java.time.LocalDateTime;
 import java.util.List;

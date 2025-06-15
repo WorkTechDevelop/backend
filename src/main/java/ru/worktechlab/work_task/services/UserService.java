@@ -1,27 +1,27 @@
 package ru.worktechlab.work_task.services;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.config.params.MailParams;
+import ru.worktechlab.work_task.dto.OkResponse;
+import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
-import ru.worktechlab.work_task.exceptions.InvalidUserException;
+import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.UserRepository;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class UserService {
     @TransactionMandatory
     public User findActiveUserById(String userId) {
         return userRepository.findActiveUserById(userId)
-                .orElseThrow(() -> new InvalidUserException(
+                .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь с ID %s не найден или не активен", userId)));
     }
 
@@ -138,7 +138,7 @@ public class UserService {
         }
         return userById.values().stream()
                 .sorted(Comparator.comparing(User::getLastName)
-                .thenComparing(User::getFirstName))
+                        .thenComparing(User::getFirstName))
                 .toList();
     }
 

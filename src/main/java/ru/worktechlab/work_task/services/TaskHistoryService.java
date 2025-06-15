@@ -38,7 +38,7 @@ public class TaskHistoryService {
 
     private void saveHistory(List<TaskHistoryDto> dto, String taskId) {
         if (CollectionUtils.isEmpty(dto)) return;
-        User user = userService.findUserById(userContext.getUserData().getUserId());
+        User user = userService.findActiveUserById(userContext.getUserData().getUserId());
         List<TaskHistory> histories = convertToEntity(dto, user, taskId);
         saveAll(histories);
     }
@@ -97,7 +97,7 @@ public class TaskHistoryService {
 
     private String resolveValue(String fieldName, String value) {
         if ("Исполнитель".equals(fieldName) && StringUtils.hasText(value)) {
-            User user = userService.findUserById(value);
+            User user = userService.findActiveUserById(value);
             return getFullName(user);
         }
         return value;
