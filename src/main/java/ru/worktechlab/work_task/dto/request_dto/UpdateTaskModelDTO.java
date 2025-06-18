@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.validators.*;
 
 @Schema(description = "Модель обновления задачи")
