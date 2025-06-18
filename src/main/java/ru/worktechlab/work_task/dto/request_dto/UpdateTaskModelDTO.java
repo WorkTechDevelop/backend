@@ -57,8 +57,4 @@ public class UpdateTaskModelDTO {
     @Schema(description = "Оценка задачи", example = "3")
     @ValidEstimation
     private Integer estimation;
-
-    @Schema(description = "Код задачи", example = "TCP-123")
-    @NotNull(message = "Поле CODE не может быть пустым")
-    private String code;
 }

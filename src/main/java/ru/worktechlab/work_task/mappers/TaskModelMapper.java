@@ -24,7 +24,6 @@ public interface TaskModelMapper {
     @Mapping(target = "code", ignore = true)
     @Mapping(target = "taskChangeDetector", ignore = true)
     @Mapping(target = "changes", ignore = true)
-    @Mapping(target = "codeHistory", ignore = true)
     @Mapping(target = "titleHistory", ignore = true)
     @Mapping(target = "priorityHistory", ignore = true)
     @Mapping(target = "assigneeHistory", ignore = true)

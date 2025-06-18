@@ -12,7 +12,6 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.mappers.TaskModelMapper;
 import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final TaskModelMapper taskModelMapper;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
@@ -44,8 +42,6 @@ public class TaskService {
         log.debug("Processing update-task with model: {}", dto);
         TaskModel existingTask = findTaskByIdOrThrow(dto.getId());
         taskHistorySaverService.saveTaskModelChanges(existingTask, dto);
-        taskModelMapper.updateTaskFromDto(dto, existingTask);
-
         taskRepository.save(existingTask);
 
         log.info("Задача обновлена: id={}, title={}", existingTask.getId(), existingTask.getTitle());
