@@ -9,8 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ProjectStatusDto {
-    @NotNull
+public class TaskStatusRequestDto {
     @Schema(description = "ИД статуса")
     private long id;
     @NotNull
@@ -21,10 +20,9 @@ public class ProjectStatusDto {
     private String code;
     @Schema(description = "Описание статуса")
     private String description;
+    @Schema(description = "Признак отображения")
+    private Boolean viewed;
     @NotNull
     @Schema(description = "Признак отображения")
-    private boolean viewed;
-    @NotNull
-    @Schema(description = "ИД проекта")
-    private String projectId;
+    private Boolean defaultTaskStatus;
 }

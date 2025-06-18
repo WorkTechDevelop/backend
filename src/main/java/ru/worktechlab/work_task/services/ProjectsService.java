@@ -14,12 +14,10 @@ import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.ProjectMapper;
 import ru.worktechlab.work_task.models.enums.StatusName;
-import ru.worktechlab.work_task.models.tables.Project;
-import ru.worktechlab.work_task.models.tables.ProjectStatus;
-import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.models.tables.UsersProject;
+import ru.worktechlab.work_task.models.tables.*;
 import ru.worktechlab.work_task.repositories.ProjectRepository;
-import ru.worktechlab.work_task.repositories.ProjectStatusRepository;
+import ru.worktechlab.work_task.repositories.SprintsRepository;
+import ru.worktechlab.work_task.repositories.TaskStatusRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 import ru.worktechlab.work_task.utils.UserContext;
 
@@ -32,12 +30,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class ProjectsService {
+
+    private static final String DEFAULT_SPRINT_NAME = "Список задач";
+
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final UserContext userContext;
-    private final ProjectStatusRepository projectStatusRepository;
+    private final TaskStatusRepository taskStatusRepository;
     private final ProjectMapper projectMapper;
+    private final SprintsRepository sprintsRepository;
 
     @TransactionRequired
     public List<ShortProjectDataDto> getAllUserProjects() {
@@ -78,15 +80,22 @@ public class ProjectsService {
         Project project = new Project(data.getName(), user, data.getDescription(), data.isActive(), user, data.getCode());
         projectRepository.saveAndFlush(project);
         createDefaultStatuses(project);
+        createDefaultSprint(user, project);
         usersProjectsRepository.saveAndFlush(new UsersProject(userId, project.getId()));
         return projectMapper.toProjectDto(project);
     }
 
     @TransactionMandatory
+    public void createDefaultSprint(User user,
+                                    Project project) {
+        sprintsRepository.saveAndFlush(new Sprint(DEFAULT_SPRINT_NAME, user, project));
+    }
+
+    @TransactionMandatory
     public void createDefaultStatuses(Project project) {
-        projectStatusRepository.saveAllAndFlush(Arrays.stream(StatusName.values())
-                .map(status -> new ProjectStatus(
-                        status.getPriority(), status.name(), status.getDescription(), status.isViewed(), project)
+        taskStatusRepository.saveAllAndFlush(Arrays.stream(StatusName.values())
+                .map(status -> new TaskStatus(
+                        status.getPriority(), status.name(), status.getDescription(), status.isViewed(), status.isDefaultTaskStatus(), project)
                 )
                 .toList());
     }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class ProjectStatus {
+public class TaskStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -19,15 +19,23 @@ public class ProjectStatus {
     private String description;
     @Column(nullable = false)
     private boolean viewed;
+    @Column(nullable = false)
+    private boolean defaultTaskStatus;
     @ManyToOne
     @JoinColumn(nullable = false)
     private Project project;
 
-    public ProjectStatus(int priority, String code, String description, boolean viewed, Project project) {
+    public TaskStatus(int priority,
+                      String code,
+                      String description,
+                      boolean viewed,
+                      boolean defaultTaskStatus,
+                      Project project) {
         this.priority = priority;
         this.code = code;
         this.description = description;
         this.viewed = viewed;
+        this.defaultTaskStatus = defaultTaskStatus;
         this.project = project;
     }
 
@@ -45,5 +53,9 @@ public class ProjectStatus {
 
     public void setViewed(boolean viewed) {
         this.viewed = viewed;
+    }
+
+    public void setDefaultTaskStatus(boolean defaultTaskStatus) {
+        this.defaultTaskStatus = defaultTaskStatus;
     }
 }

@@ -15,7 +15,7 @@ public class StatusListResponseDto {
     @Schema(description = "ИД проекта")
     private String projectId;
     @Schema(description = "Список доступных статусов")
-    private List<ProjectStatusDto> statuses = new ArrayList<>();
+    private List<TaskStatusDto> statuses = new ArrayList<>();
 
     public StatusListResponseDto(String projectId) {
         this.projectId = projectId;
