@@ -26,6 +26,8 @@ public class Sprint {
     private LocalDate createdAt;
     @Column(name = "is_active")
     private boolean active;
+    @Column
+    private boolean defaultSprint;
     @OneToOne
     private User creator;
     @OneToOne
@@ -40,6 +42,16 @@ public class Sprint {
         this.creator = creator;
         this.project = project;
         this.active = false;
+        this.createdAt = LocalDate.now();
+        this.defaultSprint = false;
+    }
+
+    public Sprint(String name, User creator, Project project) {
+        this.name = name;
+        this.creator = creator;
+        this.project = project;
+        this.active = false;
+        this.defaultSprint = true;
         this.createdAt = LocalDate.now();
     }
 }

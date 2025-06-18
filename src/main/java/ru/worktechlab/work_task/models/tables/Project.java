@@ -42,7 +42,7 @@ public class Project {
     @Column
     private Integer taskCounter;
     @OneToMany(mappedBy = "project")
-    private final List<ProjectStatus> statuses = new ArrayList<>();
+    private final List<TaskStatus> statuses = new ArrayList<>();
     @OneToMany(mappedBy = "project")
     private final List<Sprint> sprints = new ArrayList<>();
     @ManyToMany(cascade = CascadeType.MERGE)

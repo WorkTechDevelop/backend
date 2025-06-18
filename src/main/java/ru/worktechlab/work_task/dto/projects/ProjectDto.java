@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.worktechlab.work_task.dto.statuses.ProjectStatusDto;
+import ru.worktechlab.work_task.dto.statuses.TaskStatusDto;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 
 import java.time.LocalDate;
@@ -49,7 +49,7 @@ public class ProjectDto {
     @Schema(description = "Код проекта")
     private String code;
     @Schema(description = "Статусы проекта")
-    private List<ProjectStatusDto> statuses = new ArrayList<>();
+    private List<TaskStatusDto> statuses = new ArrayList<>();
     @Schema(description = "Пользователи проекта")
     private List<UserShortDataDto> users = new ArrayList<>();
 }
