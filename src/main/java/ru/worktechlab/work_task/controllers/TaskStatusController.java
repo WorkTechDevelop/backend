@@ -6,19 +6,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.statuses.ProjectStatusDto;
-import ru.worktechlab.work_task.dto.statuses.ProjectStatusRequestDto;
+import ru.worktechlab.work_task.dto.statuses.TaskStatusDto;
+import ru.worktechlab.work_task.dto.statuses.TaskStatusRequestDto;
 import ru.worktechlab.work_task.dto.statuses.StatusListResponseDto;
+import ru.worktechlab.work_task.dto.statuses.UpdateRequestStatusesDto;
+import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
-import ru.worktechlab.work_task.services.ProjectStatusService;
+import ru.worktechlab.work_task.services.TaskStatusService;
 
 @RestController
 @RequestMapping("work-task/v1/status")
 @RequiredArgsConstructor
 @Tag(name = "Status", description = "Управление статусами")
-public class ProjectStatusController {
+public class TaskStatusController {
 
-    private final ProjectStatusService projectStatusService;
+    private final TaskStatusService taskStatusService;
 
     @GetMapping("/project/{projectId}/statuses")
     @Operation(summary = "Список статусов проекта")
@@ -26,28 +28,27 @@ public class ProjectStatusController {
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId
     ) throws NotFoundException {
-        return projectStatusService.getStatuses(projectId);
+        return taskStatusService.getStatuses(projectId);
     }
 
     @PostMapping("/project/{projectId}/create-status")
     @Operation(summary = "Создание статуса")
-    public ProjectStatusDto createStatus(
+    public TaskStatusDto createStatus(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId,
-            @RequestBody @Valid ProjectStatusRequestDto data
+            @RequestBody @Valid TaskStatusRequestDto data
     ) throws NotFoundException {
-        return projectStatusService.createStatus(projectId, data);
+        return taskStatusService.createStatus(projectId, data);
     }
 
-    @PutMapping("/project/{projectId}/status/{statusId}/update-status")
-    @Operation(summary = "Обновление данных статуса")
-    public ProjectStatusDto updateStatus(
+    @PutMapping("/project/{projectId}/update-statuses")
+    @Operation(summary = "Обновление данных статусов")
+    public StatusListResponseDto updateStatuses(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId,
-            @Parameter(description = "ИД статуса", example = "123", required = true)
-            @PathVariable long statusId,
-            @RequestBody @Valid ProjectStatusRequestDto data
-    ) throws NotFoundException {
-        return projectStatusService.updateStatus(projectId, statusId, data);
+            @Parameter(description = "Информация по статусам", required = true)
+            @RequestBody @Valid UpdateRequestStatusesDto data
+    ) throws NotFoundException, BadRequestException {
+        return taskStatusService.updateStatuses(projectId, data);
     }
 }

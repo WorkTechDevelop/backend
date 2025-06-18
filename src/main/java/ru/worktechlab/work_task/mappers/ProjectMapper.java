@@ -8,7 +8,7 @@ import ru.worktechlab.work_task.models.tables.Project;
 
 import java.util.List;
 
-@Mapper(config = MapStructConfiguration.class, uses = {UserMapper.class, ProjectStatusMapper.class})
+@Mapper(config = MapStructConfiguration.class, uses = {UserMapper.class, TaskStatusMapper.class})
 public interface ProjectMapper {
 
     List<ShortProjectDataDto> toShortDataDto(List<Project> projects);

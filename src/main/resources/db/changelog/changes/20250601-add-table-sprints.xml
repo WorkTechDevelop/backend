@@ -12,6 +12,9 @@
             <column name="is_active" type="BOOL">
                 <constraints nullable="false"/>
             </column>
+            <column name="default_sprint" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
             <column name="creator" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

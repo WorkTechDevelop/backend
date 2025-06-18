@@ -30,4 +30,7 @@ public class SprintInfoDTO {
     @NotNull
     @Schema(description = "Флаг, показывающий активен ли спринт")
     private boolean active;
+    @NotNull
+    @Schema(description = "Флаг, показывающий дефолтный спринт")
+    private boolean defaultSprint;
 }

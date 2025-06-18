@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet id="add-status-20250606" author="mastanov-mv">
-        <createTable tableName="project_status">
+        <createTable tableName="task_status">
             <column name="id" type="bigserial">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -17,23 +17,26 @@
             <column name="viewed" type="bool" defaultValue="true">
                 <constraints nullable="false"/>
             </column>
+            <column name="default_task_status" type="bool" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
             <column name="project_id" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <addForeignKeyConstraint
                 baseColumnNames="project_id"
-                baseTableName="project_status"
-                constraintName="fk_project_status_on_project"
+                baseTableName="task_status"
+                constraintName="fk_task_status_on_project"
                 referencedColumnNames="id"
                 referencedTableName="project"/>
         <addUniqueConstraint
                 columnNames="code, project_id"
                 constraintName="unique_code_project"
-                tableName="project_status"/>
+                tableName="task_status"/>
         <addUniqueConstraint
                 columnNames="priority, project_id"
                 constraintName="unique_priority_project"
-                tableName="project_status"/>
+                tableName="task_status"/>
     </changeSet>
 </databaseChangeLog>
