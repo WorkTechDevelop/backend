@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
@@ -79,7 +80,7 @@ public class TaskHistoryService {
                 .toList();
     }
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @TransactionRequired
     public List<TaskHistoryResponseDto> getTaskHistoryById(String taskId, String projectId) throws NotFoundException {
         User user = userService.findActiveUserById(userContext.getUserData().getUserId());
         userService.checkHasProjectForUser(user, projectId);
