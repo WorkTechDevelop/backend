@@ -14,6 +14,7 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.services.TaskHistoryService;
 import ru.worktechlab.work_task.services.TaskService;
@@ -92,15 +93,17 @@ public class TaskController {
     }
 
 
-    @GetMapping("/history/{taskId}")
+    @GetMapping("/history/{taskId}/{projectId}")
     @Operation(summary = "Получить историю изминения задачи по id {taskId}")
     public List<TaskHistoryResponseDto> getTaskHistory(
-            @Parameter(
-                    name = "taskId",
-                    description = "Уникальный идентификатор задачи",
-                    example = "96cd710c-bd28-40b7-903e-4b8033892612"
-            )
-            @PathVariable String taskId) {
-        return taskHistoryService.getTaskHistoryById(taskId);
+            @Parameter(description = "Уникальный идентификатор задачи",
+                    example = "96cd710c-bd28-40b7-903e-4b8033892612",
+                    required = true)
+            @PathVariable("taskId") String taskId,
+            @Parameter(description = "ИД проекта",
+                    example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
+                    required = true)
+            @PathVariable("projectId") String projectId) throws NotFoundException {
+        return taskHistoryService.getTaskHistoryById(taskId, projectId);
     }
 }

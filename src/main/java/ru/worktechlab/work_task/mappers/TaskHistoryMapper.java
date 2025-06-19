@@ -1,6 +1,7 @@
 package ru.worktechlab.work_task.mappers;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.interfaces.HistoryFieldMapper;
@@ -16,7 +17,7 @@ public class TaskHistoryMapper {
     private final List<HistoryFieldMapper> strategies;
 
     public List<TaskHistoryResponseDto> convertToDto(List<TaskHistory> entities) {
-        if (entities == null || entities.isEmpty()) {
+        if (CollectionUtils.isEmpty(entities)) {
             return Collections.emptyList();
         }
         return entities.stream()

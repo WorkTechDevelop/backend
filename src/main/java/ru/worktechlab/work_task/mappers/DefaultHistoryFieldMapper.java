@@ -1,5 +1,6 @@
 package ru.worktechlab.work_task.mappers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
@@ -7,13 +8,10 @@ import ru.worktechlab.work_task.interfaces.HistoryFieldMapper;
 import ru.worktechlab.work_task.models.tables.TaskHistory;
 
 @Component
+@RequiredArgsConstructor
 public class DefaultHistoryFieldMapper implements HistoryFieldMapper {
     private static final String ASSIGNEE_FIELD = "Исполнитель";
     private final UserMapper userMapper;
-
-    public DefaultHistoryFieldMapper(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
 
     @Override
     public boolean supports(String fieldName) {
@@ -21,14 +19,14 @@ public class DefaultHistoryFieldMapper implements HistoryFieldMapper {
     }
 
     @Override
-    public TaskHistoryResponseDto map(TaskHistory h) {
-        UserShortDataDto userDto = userMapper.toShortDataDto(h.getUser());
+    public TaskHistoryResponseDto map(TaskHistory entity) {
+        UserShortDataDto userDto = userMapper.toShortDataDto(entity.getUser());
         return TaskHistoryResponseDto.builder()
                 .user(userDto)
-                .fieldName(h.getFieldName())
-                .initialValue(h.getInitialValue())
-                .newValue(h.getNewValue())
-                .createdAt(h.getCreatedAt())
+                .fieldName(entity.getFieldName())
+                .initialValue(entity.getInitialValue())
+                .newValue(entity.getNewValue())
+                .createdAt(entity.getCreatedAt())
                 .build();
     }
 }

@@ -8,6 +8,7 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.TaskHistoryMapper;
 import ru.worktechlab.work_task.models.tables.TaskHistory;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -78,7 +79,10 @@ public class TaskHistoryService {
                 .toList();
     }
 
-    public List<TaskHistoryResponseDto> getTaskHistoryById(String taskId) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<TaskHistoryResponseDto> getTaskHistoryById(String taskId, String projectId) throws NotFoundException {
+        User user = userService.findActiveUserById(userContext.getUserData().getUserId());
+        userService.checkHasProjectForUser(user, projectId);
         List<TaskHistory> taskHistories = repository.findAllByTaskIdOrderByCreatedAtDesc(taskId);
         return taskHistoryMapper.convertToDto(taskHistories);
     }

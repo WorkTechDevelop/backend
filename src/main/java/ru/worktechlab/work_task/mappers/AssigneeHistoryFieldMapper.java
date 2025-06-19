@@ -1,5 +1,6 @@
 package ru.worktechlab.work_task.mappers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
@@ -11,16 +12,11 @@ import ru.worktechlab.work_task.repositories.UserRepository;
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class AssigneeHistoryFieldMapper implements HistoryFieldMapper {
     private static final String ASSIGNEE_FIELD = "Исполнитель";
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
-    public AssigneeHistoryFieldMapper(UserRepository userRepository,
-                                      UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public boolean supports(String fieldName) {
