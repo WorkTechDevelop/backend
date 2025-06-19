@@ -1,24 +1,27 @@
 package ru.worktechlab.work_task.models.tables;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
+import ru.worktechlab.work_task.utils.TaskChangeDetector;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "task_model")
 public class TaskModel {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @NotBlank
@@ -58,14 +61,77 @@ public class TaskModel {
     private String status;
 
     @Column
-    private Timestamp creationDate;
+    private LocalDateTime creationDate;
 
     @Column
-    private Timestamp updateDate;
+    private LocalDateTime updateDate;
 
     @Column
     private String code;
 
+    @Transient
+    private TaskChangeDetector taskChangeDetector = new TaskChangeDetector();
+
+    public List<TaskHistoryDto> getChanges() {
+        return taskChangeDetector.getTaskHistories();
+    }
+
+    public void setTitleHistory(String newValue) {
+        taskChangeDetector.add("Заголовок", this.title, newValue);
+        this.title = newValue;
+    }
+
+    public void setPriorityHistory(String newValue) {
+        taskChangeDetector.add("Приоритет", this.priority, newValue);
+        this.priority = newValue;
+    }
+
+    public void setAssigneeHistory(String newValue) {
+        taskChangeDetector.add("Исполнитель", this.assignee, newValue);
+        this.assignee = newValue;
+    }
+
+    public void setDescriptionHistory(String newValue) {
+        taskChangeDetector.add("Описание", this.description, newValue);
+        this.description = newValue;
+    }
+
+    public void setSprintIdHistory(String newValue) {
+        taskChangeDetector.add("Идентификатор спринта", this.sprintId, newValue);
+        this.sprintId = newValue;
+    }
+
+    public void setTaskTypeHistory(String newValue) {
+        taskChangeDetector.add("Тип задачи", this.taskType, newValue);
+        this.taskType = newValue;
+    }
+
+    public void setEstimationHistory(String newValue) {
+        taskChangeDetector.add("Оценка задачи", String.valueOf(this.estimation), newValue);
+        this.estimation = Integer.parseInt(newValue);
+    }
+
+    public void setStatusHistory(String newValue) {
+        taskChangeDetector.add("Статус задачи", this.status, newValue);
+        this.status = newValue;
+    }
+
     public TaskModel() {
+    }
+
+    public TaskModel(String title, String description, String priority, String assignee,
+                     String projectId, String sprintId, String taskType,
+                     Integer estimation, String status, String code) {
+
+        this.title = title;
+        this.priority = priority;
+        this.assignee = assignee;
+        this.description = description;
+        this.projectId = projectId;
+        this.sprintId = sprintId;
+        this.taskType = taskType;
+        this.estimation = estimation;
+        this.status = status;
+        this.code = code;
     }
 }

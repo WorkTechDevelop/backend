@@ -1,10 +1,10 @@
 package ru.worktechlab.work_task.services;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.config.params.MailParams;
@@ -12,7 +12,6 @@ import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
-import ru.worktechlab.work_task.exceptions.InvalidUserException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.tables.RoleModel;
@@ -52,7 +51,7 @@ public class UserService {
     @TransactionMandatory
     public User findActiveUserById(String userId) {
         return userRepository.findActiveUserById(userId)
-                .orElseThrow(() -> new InvalidUserException(
+                .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь с ID %s не найден или не активен", userId)));
     }
 
@@ -139,7 +138,7 @@ public class UserService {
         }
         return userById.values().stream()
                 .sorted(Comparator.comparing(User::getLastName)
-                .thenComparing(User::getFirstName))
+                        .thenComparing(User::getFirstName))
                 .toList();
     }
 

@@ -13,7 +13,10 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.models.tables.TaskModel;
+import ru.worktechlab.work_task.services.TaskHistoryService;
 import ru.worktechlab.work_task.services.TaskService;
 
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.List;
 @Tag(name = "Task", description = "Управление задачами")
 public class TaskController {
     private final TaskService taskService;
+    private final TaskHistoryService taskHistoryService;
 
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
@@ -84,7 +88,22 @@ public class TaskController {
 
     @GetMapping("/tasks-in-project")
     @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
-    public List<UsersTasksInProjectDTO>getTasksInProject() {
+    public List<UsersTasksInProjectDTO> getTasksInProject() {
         return taskService.getProjectTaskByUserGuid();
+    }
+
+
+    @GetMapping("/history/{taskId}/{projectId}")
+    @Operation(summary = "Получить историю изминения задачи по id {taskId}")
+    public List<TaskHistoryResponseDto> getTaskHistory(
+            @Parameter(description = "Уникальный идентификатор задачи",
+                    example = "96cd710c-bd28-40b7-903e-4b8033892612",
+                    required = true)
+            @PathVariable("taskId") String taskId,
+            @Parameter(description = "ИД проекта",
+                    example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
+                    required = true)
+            @PathVariable("projectId") String projectId) throws NotFoundException {
+        return taskHistoryService.getTaskHistoryById(taskId, projectId);
     }
 }

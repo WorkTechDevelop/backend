@@ -12,7 +12,7 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.mappers.TaskModelMapper;
+import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.ProjectRepository;
@@ -21,6 +21,7 @@ import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 import ru.worktechlab.work_task.utils.UserContext;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,17 +31,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final TaskModelMapper taskModelMapper;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
     private final UserContext userContext;
+    private final TaskHistoryService taskHistorySaverService;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
         log.debug("Processing update-task with model: {}", dto);
-        TaskModel existingTask = findTaskByCodeOrThrow(dto.getCode());
-        taskModelMapper.updateTaskFromDto(dto, existingTask);
+        TaskModel existingTask = findTaskByIdOrThrow(dto.getId());
+        taskHistorySaverService.saveTaskModelChanges(existingTask, dto);
         taskRepository.save(existingTask);
 
         log.info("Задача обновлена: id={}, title={}", existingTask.getId(), existingTask.getTitle());
@@ -72,10 +73,26 @@ public class TaskService {
     @TransactionRequired
     public TaskResponse createTask(TaskModelDTO taskDTO) {
         log.debug("Processing create-task with model: {}", taskDTO);
-        TaskModel task = taskModelMapper.toEntity(taskDTO, userContext.getUserData().getUserId(),
-                getTaskCode(taskDTO.getProjectId()));
+        TaskModel task = convertToEntity(taskDTO, userContext);
         taskRepository.save(task);
         return new TaskResponse(task.getId());
+    }
+
+    private TaskModel convertToEntity(TaskModelDTO taskDTO, UserContext userContext) {
+        TaskModel taskModel = new TaskModel();
+        taskModel.setTitle(taskDTO.getTitle());
+        taskModel.setDescription(taskDTO.getDescription());
+        taskModel.setPriority(taskDTO.getPriority());
+        taskModel.setAssignee(taskDTO.getAssignee());
+        taskModel.setProjectId(taskDTO.getProjectId());
+        taskModel.setSprintId(taskDTO.getSprintId());
+        taskModel.setTaskType(taskDTO.getTaskType());
+        taskModel.setEstimation(taskDTO.getEstimation());
+        taskModel.setCreator(userContext.getUserData().getUserId());
+        taskModel.setCode(getTaskCode(taskDTO.getProjectId()));
+        taskModel.setCreationDate(LocalDateTime.now());
+        taskModel.setStatus(StatusName.TODO.toString());
+        return taskModel;
     }
 
     @TransactionMandatory
@@ -92,11 +109,19 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с кодом: %s не найдена", taskCode)));
     }
 
+    public TaskModel findTaskByIdOrThrow(String id) {
+        log.debug("Получение задачи по id: {}", id);
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с id: %s не найдена", id)));
+    }
+
     @TransactionRequired
     public TaskModel updateTaskStatus(UpdateStatusRequestDTO requestDto) {
         log.debug("Обновить статус задачи");
         TaskModel task = findTaskByCodeOrThrow(requestDto.getCode());
         task.setStatus(requestDto.getStatus());
+        taskHistorySaverService.saveTaskModelChanges(task, requestDto);
+
         return taskRepository.save(task);
     }
 }

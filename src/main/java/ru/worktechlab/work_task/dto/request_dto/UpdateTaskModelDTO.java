@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.validators.*;
 
 @Schema(description = "Модель обновления задачи")
@@ -57,8 +56,4 @@ public class UpdateTaskModelDTO {
     @Schema(description = "Оценка задачи", example = "3")
     @ValidEstimation
     private Integer estimation;
-
-    @Schema(description = "Код задачи", example = "TCP-123")
-    @NotNull(message = "Поле CODE не может быть пустым")
-    private String code;
 }
