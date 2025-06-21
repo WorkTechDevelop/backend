@@ -1,17 +1,13 @@
-package ru.worktechlab.work_task.dto.response;
+package ru.worktechlab.work_task.dto.tasks;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
 import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
+import ru.worktechlab.work_task.models.tables.TaskModel;
 
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Data
-public class TaskResponse {
+public class OldTaskResponse {
     private TaskModel task;
     private String taskId;
     private List<String> errors;
@@ -22,19 +18,19 @@ public class TaskResponse {
     private List<UsersTasksInProjectDTO> userTasks;
 
 
-    public TaskResponse(String taskId) {
+    public OldTaskResponse(String taskId) {
         this.taskId = taskId;
     }
 
-    public TaskResponse(List<String> errors) {
+    public OldTaskResponse(List<String> errors) {
         this.errors = errors;
     }
 
-    public TaskResponse(TaskModel task) {
+    public OldTaskResponse(TaskModel task) {
         this.task = task;
     }
 
-    public TaskResponse(List<UsersTasksInProjectDTO> userTasks, SprintInfoDTO sprintInfo, List<UsersProjectsDTO> projects, String activeProject) {
+    public OldTaskResponse(List<UsersTasksInProjectDTO> userTasks, SprintInfoDTO sprintInfo, List<UsersProjectsDTO> projects, String activeProject) {
         this.userTasks = userTasks;
         this.sprintInfo = sprintInfo;
         this.projects = projects;

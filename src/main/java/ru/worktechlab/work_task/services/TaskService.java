@@ -7,21 +7,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
-import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
-import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
-import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.dto.response.TaskResponse;
+import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.models.enums.StatusName;
-import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.repositories.ProjectRepository;
+import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
+import ru.worktechlab.work_task.dto.tasks.TaskResponse;
+import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
+import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
+import ru.worktechlab.work_task.mappers.TaskMapper;
+import ru.worktechlab.work_task.models.tables.*;
 import ru.worktechlab.work_task.repositories.TaskRepository;
 import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.utils.CheckerUtil;
 import ru.worktechlab.work_task.utils.UserContext;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,24 +33,26 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
-    private final ProjectRepository projectRepository;
     private final UserContext userContext;
     private final TaskHistoryService taskHistorySaverService;
+    private final SprintsService sprintsService;
+    private final TaskMapper taskMapper;
+    private final CheckerUtil checkerUtil;
 
     @Transactional
-    public TaskResponse updateTask(UpdateTaskModelDTO dto) {
+    public TaskResponse updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
         log.debug("Processing update-task with model: {}", dto);
-        TaskModel existingTask = findTaskByIdOrThrow(dto.getId());
-        taskHistorySaverService.saveTaskModelChanges(existingTask, dto);
-        taskRepository.save(existingTask);
-
-        log.info("Задача обновлена: id={}, title={}", existingTask.getId(), existingTask.getTitle());
-        return new TaskResponse(existingTask.getId());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        TaskModel existingTask = findTaskByIdAndProjectForUpdate(dto.getId(), data.getProject());
+        taskHistorySaverService.saveTaskModelChanges(existingTask, dto, data.getProject(), data.getUser());
+        taskRepository.flush();
+        log.debug("Задача обновлена: id={}, title={}", existingTask.getId(), existingTask.getTitle());
+        return taskMapper.toDo(findTaskByIdOrThrow(existingTask.getId()));
     }
 
     @TransactionRequired
     public List<UsersTasksInProjectDTO> getProjectTaskByUserGuid() {
-        log.debug("Вывод всех задач проекта отсартированных по пользователям");
+        log.debug("Вывод всех задач проекта отсортированных по пользователям");
         String userId = userContext.getUserData().getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(String.format("Пользователь не найден по id: %s ", userId)));
@@ -67,46 +69,40 @@ public class TaskService {
 
         return tasksByUser.entrySet().stream()
                 .map(entry -> new UsersTasksInProjectDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @TransactionRequired
-    public TaskResponse createTask(TaskModelDTO taskDTO) {
+    public TaskResponse createTask(TaskModelDTO taskDTO) throws NotFoundException {
         log.debug("Processing create-task with model: {}", taskDTO);
-        TaskModel task = convertToEntity(taskDTO, userContext);
-        taskRepository.save(task);
-        return new TaskResponse(task.getId());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(taskDTO.getProjectId(), false, false);
+        TaskModel task = convertToEntity(taskDTO, data.getUser(), data.getProject());
+        taskRepository.saveAndFlush(task);
+        return taskMapper.toDo(task);
     }
 
-    private TaskModel convertToEntity(TaskModelDTO taskDTO, UserContext userContext) {
-        TaskModel taskModel = new TaskModel();
-        taskModel.setTitle(taskDTO.getTitle());
-        taskModel.setDescription(taskDTO.getDescription());
-        taskModel.setPriority(taskDTO.getPriority());
-        taskModel.setAssignee(taskDTO.getAssignee());
-        taskModel.setProjectId(taskDTO.getProjectId());
-        taskModel.setSprintId(taskDTO.getSprintId());
-        taskModel.setTaskType(taskDTO.getTaskType());
-        taskModel.setEstimation(taskDTO.getEstimation());
-        taskModel.setCreator(userContext.getUserData().getUserId());
-        taskModel.setCode(getTaskCode(taskDTO.getProjectId()));
-        taskModel.setCreationDate(LocalDateTime.now());
-        taskModel.setStatus(StatusName.TODO.toString());
-        return taskModel;
+    private TaskModel convertToEntity(TaskModelDTO taskDTO,
+                                      User user,
+                                      Project project) throws NotFoundException {
+        User assignee = null;
+        if (taskDTO.getAssignee() != null)
+            assignee = checkerUtil.findAndCheckActiveUser(taskDTO.getAssignee(), project);
+        Sprint sprint = sprintsService.findSprintByIdAndProject(taskDTO.getSprintId(), project);
+        TaskStatus status = findDefaultStatus(project);
+        return new TaskModel(taskDTO.getTitle(), taskDTO.getDescription(), taskDTO.getPriority(), user, assignee, project,
+                sprint, taskDTO.getTaskType(), taskDTO.getEstimation(), status, getTaskCode(project));
     }
 
-    @TransactionMandatory
-    public String getTaskCode(String projectId) {
-        String code = projectRepository.getCodeById(projectId);
-        projectRepository.incrementCount(projectId);
-        Integer count = projectRepository.getCountById(projectId);
-        return code + "-" + count;
+    private TaskStatus findDefaultStatus(Project project) throws NotFoundException {
+        return project.getStatuses().stream()
+                .filter(TaskStatus::isDefaultTaskStatus)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(String.format("Не найден дефолтный статус для проекта %s", project.getName())));
     }
 
-    public TaskModel findTaskByCodeOrThrow(String taskCode) {
-        log.debug("Получение задачи по коду: {}", taskCode);
-        return taskRepository.findByCode(taskCode)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с кодом: %s не найдена", taskCode)));
+    private String getTaskCode(Project project) {
+        project.incrementCounter();
+        return project.getCode() + "-" + project.getTaskCounter();
     }
 
     public TaskModel findTaskByIdOrThrow(String id) {
@@ -115,13 +111,27 @@ public class TaskService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Задача с id: %s не найдена", id)));
     }
 
-    @TransactionRequired
-    public TaskModel updateTaskStatus(UpdateStatusRequestDTO requestDto) {
-        log.debug("Обновить статус задачи");
-        TaskModel task = findTaskByCodeOrThrow(requestDto.getCode());
-        task.setStatus(requestDto.getStatus());
-        taskHistorySaverService.saveTaskModelChanges(task, requestDto);
+    @TransactionMandatory
+    public TaskModel findTaskByIdAndProject(String taskId,
+                                            Project project) throws NotFoundException {
+        return taskRepository.findTaskModelByIdAndProject(taskId, project)
+                .orElseThrow(() -> new NotFoundException(String.format("Для проекта %s не найдена задача с ид - %s", project.getName(), taskId)));
+    }
 
-        return taskRepository.save(task);
+    @TransactionMandatory
+    public TaskModel findTaskByIdAndProjectForUpdate(String taskId,
+                                                     Project project) throws NotFoundException {
+        return taskRepository.findTaskModelByIdAndProjectForUpdate(taskId, project.getId())
+                .orElseThrow(() -> new NotFoundException(String.format("Для проекта %s не найдена задача с ид - %s", project.getName(), taskId)));
+    }
+
+    @TransactionRequired
+    public TaskResponse updateTaskStatus(UpdateStatusRequestDTO requestDto) throws NotFoundException {
+        log.debug("Обновить статус задачи");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(requestDto.getProjectId(), false, false);
+        TaskModel task = findTaskByIdAndProjectForUpdate(requestDto.getId(), data.getProject());
+        taskHistorySaverService.saveTaskModelChanges(task, requestDto, data.getProject(), data.getUser());
+        taskRepository.flush();
+        return taskMapper.toDo(findTaskByIdOrThrow(task.getId()));
     }
 }

@@ -18,8 +18,6 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Component
 public class ValidateTask {
-    private SprintsRepository sprintsRepository;
-    private ProjectRepository projectRepository;
 
     private static final String ERROR_TITLE_FORMAT = "Некорректный формат поля TITLE";
     private static final String ERROR_DESCRIPTION_FORMAT = "Некорректный формат поля DESCRIPTION";
@@ -45,18 +43,13 @@ public class ValidateTask {
     }
 
     private void validateProjectId(TaskModel taskModel) {
-        if (taskModel.getSprintId() != null) {
-            Project projects = findProjectById(taskModel.getProjectId());
-            if (!projects.isActive()) {
+        if (taskModel.getSprint() != null) {
+            if (!taskModel.getProject().isActive()) {
                 errors.add(ERROR_PROJECT_ID_VALUE);
             }
         } else  {
             errors.add(ERROR_PROJECT_ID_VALUE);
         }
-    }
-
-    private Project findProjectById(String projectId) {
-        return projectRepository.findById(projectId).orElse(null);
     }
 
     private void validateTitle(TaskModel taskModel) {
@@ -74,17 +67,14 @@ public class ValidateTask {
     }
 
     private void validateSprintId(TaskModel taskModel) {
-        if (taskModel.getSprintId() != null) {
-            Sprint sprint = findSprintById(taskModel.getSprintId());
+        if (taskModel.getSprint() != null) {
+            Sprint sprint = taskModel.getSprint();
             if (sprint == null || !sprint.isActive()) {
                 errors.add(ERROR_SPRINT_NOT_FOUND_OR_CLOSED);
             }
         }
     }
 
-    private Sprint findSprintById(String sprintId) {
-        return sprintsRepository.findById(sprintId).orElse(null);
-    }
 
     private void validateEstimation(TaskModel taskModel) {
         if (taskModel.getEstimation() == null) {

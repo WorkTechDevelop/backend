@@ -17,11 +17,16 @@ public interface TaskStatusRepository extends JpaRepository<TaskStatus, Long> {
     List<TaskStatus> findStatusesByProject(Project project);
 
     @Query(nativeQuery = true,
-            value = "from task_status ts where ts.project_id = :projectId and ts.id = :statusId for update skip locked")
-    Optional<TaskStatus> findStatusesByProjectAndIdForUpdate(String projectId, long statusId);
+            value = "select * from task_status ts where ts.project_id = :projectId and ts.id = :statusId for update skip locked")
+    Optional<TaskStatus> findStatusByProjectAndIdForUpdate(String projectId, long statusId);
 
     @Query(
             "from TaskStatus where project = :project and id not in :taskStatusIds"
     )
     List<TaskStatus> findByProjectAndIdsNotIn(Project project, Collection<Long> taskStatusIds);
+
+    @Query(
+            "from TaskStatus where project = :project and id = :statusId"
+    )
+    Optional<TaskStatus> findStatusByProjectAndId(Project project, long statusId);
 }

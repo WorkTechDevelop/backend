@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.sprints.ActivateSprintDtoRequest;
 import ru.worktechlab.work_task.dto.sprints.SprintDtoRequest;
 import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
@@ -13,28 +14,22 @@ import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.SprintMapper;
 import ru.worktechlab.work_task.models.tables.Project;
 import ru.worktechlab.work_task.models.tables.Sprint;
-import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.SprintsRepository;
-import ru.worktechlab.work_task.utils.UserContext;
+import ru.worktechlab.work_task.utils.CheckerUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SprintsService {
     private final SprintsRepository sprintsRepository;
-    private final UserService userService;
-    private final UserContext userContext;
-    private final ProjectsService projectsService;
     private final SprintMapper sprintMapper;
+    private final CheckerUtil checkerUtil;
 
     @TransactionRequired
-    public SprintInfoDTO getActiveSprint() throws NotFoundException {
+    public SprintInfoDTO getActiveSprint(String projectId) throws NotFoundException {
         log.debug("Вывод информации о спринте");
-        String userId = userContext.getUserData().getUserId();
-        User user = userService.findActiveUserById(userId);
-        if (user.getLastProjectId() == null)
-            throw new NotFoundException("Не найден активный проект");
-        Project project = projectsService.findProjectById(user.getLastProjectId());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Project project = data.getProject();
         Sprint sprint = sprintsRepository.getSprintInfoByProjectId(project);
         if (sprint == null)
             throw new NotFoundException(String.format(
@@ -45,13 +40,10 @@ public class SprintsService {
 
     @TransactionRequired
     public SprintInfoDTO createSprint(String projectId,
-                                      SprintDtoRequest data) throws NotFoundException {
-        Project project = projectsService.findProjectById(projectId);
-        String userId = userContext.getUserData().getUserId();
-        User user = userService.findActiveUserById(userId);
-        userService.checkHasProjectForUser(user, projectId);
+                                      SprintDtoRequest request) throws NotFoundException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         Sprint sprint = sprintsRepository.saveAndFlush(new Sprint(
-                data.getName(), data.getStartDate(), data.getEndDate(), user, project
+                request.getName(), request.getStartDate(), request.getEndDate(), data.getUser(), data.getProject()
         ));
         Sprint dbSprint = findSprintById(sprint.getId());
         return sprintMapper.toSprintInfoDto(dbSprint);
@@ -68,8 +60,7 @@ public class SprintsService {
     public SprintInfoDTO activateSprint(String sprintId,
                                         ActivateSprintDtoRequest data) throws NotFoundException, BadRequestException {
         Sprint sprint = findSprintByIdForUpdate(sprintId);
-        String userId = userContext.getUserData().getUserId();
-        userService.checkHasProjectForUser(userId, sprint.getProject().getId());
+        checkerUtil.checkHasProjectForUser(sprint.getProject());
         checkHasActiveSprint(sprint, data.isActivate());
         sprint.setActive(data.isActivate());
         sprintsRepository.flush();
@@ -91,6 +82,14 @@ public class SprintsService {
     public Sprint findSprintByIdForUpdate(String sprintId) throws NotFoundException {
         return sprintsRepository.findSprintByIdForUpdate(sprintId).orElseThrow(
                 () -> new NotFoundException(String.format("Не найден спринт с ИД - %s", sprintId))
+        );
+    }
+
+    @TransactionMandatory
+    public Sprint findSprintByIdAndProject(String sprintId,
+                                           Project project) throws NotFoundException {
+        return sprintsRepository.findSprintByIdAndProject(sprintId, project).orElseThrow(
+                () -> new NotFoundException(String.format("Для проекта %s не найден спринт с ИД - %s", project.getName(), sprintId))
         );
     }
 }

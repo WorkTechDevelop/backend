@@ -15,14 +15,14 @@
             <column name="default_sprint" type="BOOL">
                 <constraints nullable="false"/>
             </column>
-            <column name="creator" type="VARCHAR(255)">
+            <column name="creator_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="end_date" type="date"/>
             <column name="created_at" type="date">
                 <constraints nullable="false"/>
             </column>
-            <column name="finisher" type="VARCHAR(255)"/>
+            <column name="finisher_id" type="VARCHAR(255)"/>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
@@ -32,7 +32,7 @@
             </column>
         </createTable>
         <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="sprint" constraintName="sprints_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="finisher" baseTableName="sprint" constraintName="sprint_finisher_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="sprint" constraintName="sprint_creator_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="sprint" constraintName="sprint_finisher_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="sprint" constraintName="sprint_creator_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
     </changeSet>
 </databaseChangeLog>

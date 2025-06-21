@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import ru.worktechlab.work_task.config.MapStructConfiguration;
-import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
+import ru.worktechlab.work_task.dto.auth.LoginRequestDTO;
 
 @Mapper(config = MapStructConfiguration.class)
 public interface AuthMapper {
