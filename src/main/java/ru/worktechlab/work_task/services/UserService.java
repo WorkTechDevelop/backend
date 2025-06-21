@@ -10,7 +10,7 @@ import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.config.params.MailParams;
 import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
-import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
+import ru.worktechlab.work_task.dto.users.RegisterDTO;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
@@ -63,18 +63,6 @@ public class UserService {
     }
 
     @TransactionMandatory
-    public void checkHasProjectForUser(String userId,
-                                       String projectId) throws NotFoundException {
-        User user = findActiveUserById(userId);
-        boolean hasProject = user.getProjects().stream()
-                .anyMatch(pr -> Objects.equals(projectId, pr.getId()));
-        if (!hasProject)
-            throw new NotFoundException(
-                    String.format("Вам не доступен проект с ИД - %s", projectId)
-            );
-    }
-
-    @TransactionMandatory
     public void checkHasProjectForUser(User user,
                                        String projectId) throws NotFoundException {
         boolean hasProject = user.getProjects().stream()
@@ -113,7 +101,7 @@ public class UserService {
         return userRepository.getUsers().stream()
                 .sorted(Comparator.comparing(User::getLastName)
                         .thenComparing(User::getFirstName))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @TransactionRequired

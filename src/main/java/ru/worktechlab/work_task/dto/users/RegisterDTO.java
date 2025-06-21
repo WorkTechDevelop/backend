@@ -1,4 +1,4 @@
-package ru.worktechlab.work_task.dto.request_dto;
+package ru.worktechlab.work_task.dto.users;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
