@@ -51,4 +51,7 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = null;
     }
+
+    public Comment() {
+    }
 }

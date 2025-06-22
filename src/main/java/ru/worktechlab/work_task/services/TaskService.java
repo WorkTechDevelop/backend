@@ -164,7 +164,7 @@ public class TaskService {
         log.debug("Создать комментарий к задаче");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
         Comment comment = convertToEntity(dto, data.getUser());
-        commentRepository.save(comment);
+        commentRepository.saveAndFlush(comment);
         return commentMapper.toDto(comment);
     }
 
@@ -173,7 +173,6 @@ public class TaskService {
         log.debug("Обновить комментарий к задаче");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
         Comment comment = findCommentForUpdateByIdOrElseThrow(dto.getCommentId());
-
         User creator = comment.getUser();
         User modifier = data.getUser();
         if (!userService.compareUsers(creator, modifier)) {

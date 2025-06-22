@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
 import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.TaskResponse;
@@ -108,5 +109,19 @@ public class TaskController {
                                             )
                                             @RequestBody CommentDto commentDto) throws NotFoundException {
         return taskService.createComment(commentDto);
+    }
+
+    @PutMapping("/update-comment")
+    @Operation(summary = "Обноаить комментарий")
+    public CommentResponseDto updateComment(@Valid
+                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                    description = "Данные комментария",
+                                                    content = @Content(
+                                                            mediaType = "application/json",
+                                                            schema = @Schema(implementation = UpdateCommentDto.class)
+                                                    )
+                                            )
+                                            @RequestBody UpdateCommentDto dto) throws NotFoundException {
+        return taskService.updateComment(dto);
     }
 }

@@ -16,6 +16,7 @@ import ru.worktechlab.work_task.models.tables.*;
 import ru.worktechlab.work_task.repositories.TaskHistoryRepository;
 import ru.worktechlab.work_task.utils.CheckerUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -97,6 +98,7 @@ public class TaskHistoryService {
 
     private List<TaskHistoryDto> createTaskCommentHistory(Comment comment, UpdateCommentDto dto) {
         comment.setComment(dto.getComment());
+        comment.setUpdatedAt(LocalDateTime.now());
         return comment.getChanges();
     }
 
