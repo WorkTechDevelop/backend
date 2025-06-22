@@ -2,31 +2,26 @@ package ru.worktechlab.work_task.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
-import ru.worktechlab.work_task.dto.projects.ProjectDto;
-import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
-import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
+import ru.worktechlab.work_task.dto.projects.*;
+import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.ProjectMapper;
+import ru.worktechlab.work_task.mappers.TaskMapper;
 import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.models.tables.*;
-import ru.worktechlab.work_task.repositories.ProjectRepository;
-import ru.worktechlab.work_task.repositories.SprintsRepository;
-import ru.worktechlab.work_task.repositories.TaskStatusRepository;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.repositories.*;
 import ru.worktechlab.work_task.utils.CheckerUtil;
 import ru.worktechlab.work_task.utils.UserContext;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +38,9 @@ public class ProjectsService {
     private final ProjectMapper projectMapper;
     private final SprintsRepository sprintsRepository;
     private final CheckerUtil checkerUtil;
+    private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
     @TransactionRequired
     public List<ShortProjectDataDto> getAllUserProjects() {
@@ -84,7 +82,7 @@ public class ProjectsService {
         projectRepository.saveAndFlush(project);
         createDefaultStatuses(project);
         createDefaultSprint(user, project);
-        usersProjectsRepository.saveAndFlush(new UsersProject(userId, project.getId()));
+        usersProjectsRepository.saveAndFlush(new UsersProject(user, project));
         return projectMapper.toProjectDto(project);
     }
 
@@ -141,12 +139,52 @@ public class ProjectsService {
         OkResponse response = new OkResponse();
         if (data == null || org.springframework.util.CollectionUtils.isEmpty(data.getIds()))
             return response;
-        Project project = findProjectByIdForUpdate(projectId);
+        Project project = findProjectById(projectId);
         List<User> users = userService.findAndCheckUsers(data.getIds());
         usersProjectsRepository.saveAllAndFlush(users.stream()
                 .filter(user -> !hasProject(user, project.getId()))
-                .map(user -> new UsersProject(user.getId(), project.getId()))
+                .map(user -> new UsersProject(user, project))
                 .toList());
         return response;
+    }
+
+    @TransactionRequired
+    public OkResponse deleteProjectForUsers(String projectId,
+                                            StringIdsDto data) throws NotFoundException {
+        OkResponse response = new OkResponse();
+        if (data == null || CollectionUtils.isEmpty(data.getIds()))
+            return response;
+        findProjectById(projectId);
+        userService.findAndCheckUsers(data.getIds());
+        usersProjectsRepository.deleteProjectForUsers(projectId, data.getIds());
+        usersProjectsRepository.flush();
+        return response;
+    }
+
+    @TransactionRequired
+    public ProjectDataDto getProjectDataByFilter(String projectId,
+                                     ProjectDataFilterDto filter) throws NotFoundException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, true);
+        User user = data.getUser();
+        user.setLastProjectId(projectId);
+        projectRepository.flush();
+        List<User> users = userRepository.findProjectUsers(filter.getUserIds(), data.getProject());
+        Map<String, List<TaskModel>> tasksByUserId = taskRepository.findTaskByUsers(data.getProject(), users, filter.getStatusIds()).stream()
+                .collect(Collectors.groupingBy(task -> task.getAssignee().getId()));
+        List<UserWithTasksDto> userData = users.stream()
+                .map(u -> toUserWithTasks(u, tasksByUserId.get(u.getId())))
+                .toList();
+        ProjectDataDto response = new ProjectDataDto();
+        response.setUsers(userData);
+        return response;
+    }
+
+    private UserWithTasksDto toUserWithTasks(User user,
+                                             List<TaskModel> dbTasks) {
+        List<TaskDataDto> tasks = CollectionUtils.isEmpty(dbTasks) ? Collections.emptyList()
+                : dbTasks.stream()
+                .map(taskMapper::toDo)
+                .toList();
+        return new UserWithTasksDto(user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getGender().name(), tasks);
     }
 }

@@ -16,14 +16,14 @@ public class UsersProject {
     @Column(name = "id", nullable = false, unique = true)
     private Integer id;
 
-    @Column(name = "user_id")
-    private String userId;
+    @ManyToOne
+    private User user;
 
-    @Column(name = "project_id")
-    private String projectId;
+    @ManyToOne
+    private Project project;
 
-    public UsersProject(String userId, String projectId) {
-        this.userId = userId;
-        this.projectId = projectId;
+    public UsersProject(User user, Project project) {
+        this.user = user;
+        this.project = project;
     }
 }

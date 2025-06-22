@@ -133,12 +133,13 @@ public class UserService {
     }
 
     @TransactionRequired
-    public OkResponse activateUsers(StringIdsDto data) throws NotFoundException {
+    public OkResponse activateUsers(StringIdsDto data,
+                                    boolean activate) throws NotFoundException {
         OkResponse response = new OkResponse();
         if (data == null || CollectionUtils.isEmpty(data.getIds()))
             return response;
         List<User> users = findAndCheckUsers(data.getIds());
-        users.forEach(user -> user.setActive(true));
+        users.forEach(user -> user.setActive(activate));
         userRepository.flush();
         return response;
     }

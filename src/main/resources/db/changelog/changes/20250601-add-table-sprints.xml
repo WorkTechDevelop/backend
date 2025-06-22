@@ -27,6 +27,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="start_date" type="date"/>
+            <column name="finished_at" type="date"/>
             <column name="project_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

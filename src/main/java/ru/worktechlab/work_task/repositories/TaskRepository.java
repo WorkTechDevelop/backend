@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TaskRepository extends JpaRepository<TaskModel, String> {
-    List<TaskModel> findByProjectId(String projectId);
-
-    Optional<TaskModel> findByCode(String code);
+public interface TaskRepository extends JpaRepository<TaskModel, String>, TaskFilter {
 
     @Query("SELECT NEW ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO(CONCAT(u.firstName, ' ', u.lastName), t) " +
             "FROM User u JOIN TaskModel t ON u = t.assignee " +

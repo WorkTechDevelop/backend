@@ -7,20 +7,14 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
-import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
 import ru.worktechlab.work_task.dto.statuses.TaskStatusShortDto;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
-import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.validators.*;
-
-import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Setter
-public class TaskResponse {
+public class TaskDataDto {
     @Schema(description = "id задачи")
     @NotBlank(message = "Поле ID не может быть пустым")
     @ValidTaskId
