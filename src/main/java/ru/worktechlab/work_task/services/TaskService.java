@@ -12,13 +12,13 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.task_comment.CommentDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
 import ru.worktechlab.work_task.models.enums.StatusName;
+import ru.worktechlab.work_task.models.tables.Comment;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.repositories.ProjectRepository;
-import ru.worktechlab.work_task.repositories.TaskRepository;
-import ru.worktechlab.work_task.repositories.UserRepository;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.repositories.*;
 import ru.worktechlab.work_task.utils.UserContext;
 
 import java.time.LocalDateTime;
@@ -36,6 +36,8 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final UserContext userContext;
     private final TaskHistoryService taskHistorySaverService;
+    private final UserService userService;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) {
@@ -123,5 +125,21 @@ public class TaskService {
         taskHistorySaverService.saveTaskModelChanges(task, requestDto);
 
         return taskRepository.save(task);
+    }
+
+    private Comment convertToEntity(CommentDto dto, User user) {
+        return new Comment(
+                dto.getTaskId(),
+                user,
+                dto.getComment()
+        );
+    }
+
+    @TransactionRequired
+    public CommentResponseDto createComment(CommentDto dto) {
+        User user = userService.findActiveUserById(userContext.getUserData().getUserId());
+        Comment comment = convertToEntity(dto, user);
+        commentRepository.save(comment);
+        return new CommentResponseDto(comment.getId());
     }
 }

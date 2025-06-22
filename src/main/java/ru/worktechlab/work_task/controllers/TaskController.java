@@ -13,6 +13,8 @@ import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.task_comment.CommentDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.models.tables.TaskModel;
@@ -105,5 +107,19 @@ public class TaskController {
                     required = true)
             @PathVariable("projectId") String projectId) throws NotFoundException {
         return taskHistoryService.getTaskHistoryById(taskId, projectId);
+    }
+
+    @PostMapping("/create-comment")
+    @Operation(summary = "Создать комментарий")
+    public CommentResponseDto createComment(@Valid
+                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                    description = "Данные комментария",
+                                                    content = @Content(
+                                                            mediaType = "application/json",
+                                                            schema = @Schema(implementation = CommentDto.class)
+                                                    )
+                                            )
+                                            @RequestBody CommentDto commentDto) {
+        return taskService.createComment(commentDto);
     }
 }
