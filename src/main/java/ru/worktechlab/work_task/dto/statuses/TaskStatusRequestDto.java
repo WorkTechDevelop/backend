@@ -22,7 +22,6 @@ public class TaskStatusRequestDto {
     private String description;
     @Schema(description = "Признак отображения")
     private Boolean viewed;
-    @NotNull
     @Schema(description = "Признак отображения")
-    private Boolean defaultTaskStatus;
+    private boolean defaultTaskStatus;
 }

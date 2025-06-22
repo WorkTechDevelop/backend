@@ -1,12 +1,14 @@
 package ru.worktechlab.work_task.models.tables;
 
-import ru.worktechlab.work_task.models.enums.Roles;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import ru.worktechlab.work_task.models.enums.Roles;
 
-@Data
 @Entity
 @Table(name = "role")
+@NoArgsConstructor
+@Getter
 public class RoleModel {
 
     @Id
@@ -18,4 +20,8 @@ public class RoleModel {
 
     @Enumerated(EnumType.STRING)
     private Roles name;
+
+    public String getRoleName() {
+        return name.name();
+    }
 }

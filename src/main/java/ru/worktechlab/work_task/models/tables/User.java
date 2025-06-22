@@ -2,15 +2,18 @@ package ru.worktechlab.work_task.models.tables;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ru.worktechlab.work_task.models.enums.Gender;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Entity
 @Table(name = "user")
+@NoArgsConstructor
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,8 +35,9 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "role_id")
-    private String role_id;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "role_id")
+    private RoleModel role;
 
     @Column(name = "birth_date")
     private String birthDate;
@@ -62,4 +66,40 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private final List<Project> projects = new ArrayList<>();
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setLastProjectId(String lastProjectId) {
+        this.lastProjectId = lastProjectId;
+    }
+
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
+    }
+
+    public void setConfirmedAt(LocalDateTime confirmedAt) {
+        this.confirmedAt = confirmedAt;
+    }
+
+    public User(String lastName,
+                String firstName,
+                String middleName,
+                String email,
+                String phone,
+                RoleModel role,
+                String birthDate,
+                Gender gender,
+                String password) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.email = email;
+        this.phone = phone;
+        this.role = role;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.password = password;
+    }
 }

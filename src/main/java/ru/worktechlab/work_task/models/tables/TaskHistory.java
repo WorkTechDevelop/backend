@@ -2,14 +2,15 @@ package ru.worktechlab.work_task.models.tables;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "task_history")
+@NoArgsConstructor
+@Getter
 public class TaskHistory {
 
     @Id
@@ -32,9 +33,6 @@ public class TaskHistory {
     private String newValue;
 
     private LocalDateTime createdAt;
-
-    public TaskHistory() {
-    }
 
     public TaskHistory(String taskId, String fieldName, String initialValue, String newValue, User user) {
         this.taskId = taskId;
