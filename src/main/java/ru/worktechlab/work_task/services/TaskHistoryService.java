@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
@@ -40,6 +41,14 @@ public class TaskHistoryService {
                                      Project project,
                                      User user) throws NotFoundException {
         saveHistory(createTaskStatusHistory(oldTask, dto, project), oldTask.getId(), user);
+    }
+
+    public void saveTaskCommentChanges(Comment comment,
+                                       UpdateCommentDto dto,
+                                       User user
+    ) {
+        saveHistory(createTaskCommentHistory(comment, dto), comment.getTaskId(), user);
+
     }
 
     private void saveHistory(List<TaskHistoryDto> dto,
@@ -84,6 +93,11 @@ public class TaskHistoryService {
         TaskStatus status = taskStatusService.findStatusByIdAndProject(dto.getStatus(), project);
         oldTask.setStatus(status);
         return oldTask.getChanges();
+    }
+
+    private List<TaskHistoryDto> createTaskCommentHistory(Comment comment, UpdateCommentDto dto) {
+        comment.setComment(dto.getComment());
+        return comment.getChanges();
     }
 
     private List<TaskHistory> convertToEntity(List<TaskHistoryDto> dtos, User user, String taskId) {

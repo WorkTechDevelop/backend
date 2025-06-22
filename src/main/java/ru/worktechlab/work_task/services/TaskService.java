@@ -9,28 +9,23 @@ import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.task_comment.CommentDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.TaskResponse;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
+import ru.worktechlab.work_task.exceptions.PermissionDeniedException;
+import ru.worktechlab.work_task.mappers.CommentMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
 import ru.worktechlab.work_task.models.tables.*;
+import ru.worktechlab.work_task.repositories.CommentRepository;
 import ru.worktechlab.work_task.repositories.TaskRepository;
 import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
 import ru.worktechlab.work_task.utils.CheckerUtil;
-import ru.worktechlab.work_task.dto.task_comment.CommentDto;
-import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
-import ru.worktechlab.work_task.models.enums.StatusName;
-import ru.worktechlab.work_task.models.tables.Comment;
-import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.repositories.*;
-import ru.worktechlab.work_task.models.tables.Comment;
-import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.repositories.*;
 import ru.worktechlab.work_task.utils.UserContext;
 
 import java.util.List;
@@ -44,7 +39,6 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final UsersProjectsRepository usersProjectsRepository;
-    private final ProjectRepository projectRepository;
     private final UserContext userContext;
     private final TaskHistoryService taskHistorySaverService;
     private final SprintsService sprintsService;
@@ -52,6 +46,7 @@ public class TaskService {
     private final CheckerUtil checkerUtil;
     private final UserService userService;
     private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
 
     @Transactional
     public TaskResponse updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
@@ -157,11 +152,37 @@ public class TaskService {
         );
     }
 
+    public Comment findCommentForUpdateByIdOrElseThrow(String id) {
+        return commentRepository.findCommentByIdForUpdate(id).orElseThrow(
+                () -> new EntityNotFoundException(
+                        String.format("Не найден комментарий с таким id - %s", id)
+                ));
+    }
+
     @TransactionRequired
-    public CommentResponseDto createComment(CommentDto dto) {
-        User user = userService.findActiveUserById(userContext.getUserData().getUserId());
-        Comment comment = convertToEntity(dto, user);
+    public CommentResponseDto createComment(CommentDto dto) throws NotFoundException {
+        log.debug("Создать комментарий к задаче");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        Comment comment = convertToEntity(dto, data.getUser());
         commentRepository.save(comment);
-        return new CommentResponseDto(comment.getId());
+        return commentMapper.toDto(comment);
+    }
+
+    @TransactionRequired
+    public CommentResponseDto updateComment(UpdateCommentDto dto) throws NotFoundException {
+        log.debug("Обновить комментарий к задаче");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        Comment comment = findCommentForUpdateByIdOrElseThrow(dto.getCommentId());
+
+        User creator = comment.getUser();
+        User modifier = data.getUser();
+        if (!userService.compareUsers(creator, modifier)) {
+            throw new PermissionDeniedException(
+                    "Только создатель комментария имеет право редактирования");
+        }
+        taskHistorySaverService.saveTaskCommentChanges(comment, dto, modifier);
+        commentRepository.flush();
+        log.debug("Комментарий обновлен: id={}", comment.getId());
+        return commentMapper.toDto(comment);
     }
 }

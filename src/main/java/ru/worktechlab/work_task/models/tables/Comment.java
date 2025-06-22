@@ -3,9 +3,11 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.utils.TaskChangeDetector;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -33,7 +35,11 @@ public class Comment {
     @Transient
     private TaskChangeDetector taskChangeDetector = new TaskChangeDetector();
 
-    public void setCommentHistory(String newValue) {
+    public List<TaskHistoryDto> getChanges() {
+        return taskChangeDetector.getTaskHistories();
+    }
+
+    public void setComment(String newValue) {
         taskChangeDetector.add(this.comment, newValue);
         this.comment = newValue;
     }

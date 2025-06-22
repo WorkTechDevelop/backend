@@ -140,4 +140,8 @@ public class UserService {
         userRepository.flush();
         return response;
     }
+
+    public boolean compareUsers(User creator, User modifier) {
+        return creator == modifier;
+    }
 }

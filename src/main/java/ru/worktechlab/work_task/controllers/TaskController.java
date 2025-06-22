@@ -8,16 +8,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
-import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
-import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.dto.tasks.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
 import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
+import ru.worktechlab.work_task.dto.tasks.TaskResponse;
+import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
+import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
-import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.services.TaskHistoryService;
 import ru.worktechlab.work_task.services.TaskService;
 
@@ -107,7 +106,7 @@ public class TaskController {
                                                             schema = @Schema(implementation = CommentDto.class)
                                                     )
                                             )
-                                            @RequestBody CommentDto commentDto) {
+                                            @RequestBody CommentDto commentDto) throws NotFoundException {
         return taskService.createComment(commentDto);
     }
 }
