@@ -36,10 +36,18 @@ public class UserController {
     }
 
     @Operation(summary = "Активировать пользователей по существующим ИД")
-    @PutMapping()
+    @PutMapping("/activate")
     public OkResponse activateUsers(
             @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
             @RequestBody StringIdsDto data) throws NotFoundException {
-        return userService.activateUsers(data);
+        return userService.activateUsers(data, true);
+    }
+
+    @Operation(summary = "Заблокировать пользователей по существующим ИД")
+    @PutMapping("/block")
+    public OkResponse blockUsers(
+            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
+            @RequestBody StringIdsDto data) throws NotFoundException {
+        return userService.activateUsers(data, false);
     }
 }

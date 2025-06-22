@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
-import ru.worktechlab.work_task.dto.sprints.ActivateSprintDtoRequest;
 import ru.worktechlab.work_task.dto.sprints.SprintDtoRequest;
 import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
 import ru.worktechlab.work_task.exceptions.BadRequestException;
@@ -58,20 +57,30 @@ public class SprintsService {
 
     @TransactionRequired
     public SprintInfoDTO activateSprint(String sprintId,
-                                        ActivateSprintDtoRequest data) throws NotFoundException, BadRequestException {
-        Sprint sprint = findSprintByIdForUpdate(sprintId);
-        checkerUtil.checkHasProjectForUser(sprint.getProject());
-        checkHasActiveSprint(sprint, data.isActivate());
-        sprint.setActive(data.isActivate());
+                                        String projectId) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Sprint sprint = findSprintByIdForUpdate(sprintId, data.getProject());
+        checkHasActiveSprint(sprint);
+        sprint.activate();
+        sprintsRepository.flush();
+        Sprint dbSprint = findSprintById(sprint.getId());
+        return sprintMapper.toSprintInfoDto(dbSprint);
+    }
+
+    @TransactionRequired
+    public SprintInfoDTO finishSprint(String sprintId,
+                                      String projectId) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Sprint sprint = findSprintByIdForUpdate(sprintId, data.getProject());
+        sprint.finish(data.getUser());
         sprintsRepository.flush();
         Sprint dbSprint = findSprintById(sprint.getId());
         return sprintMapper.toSprintInfoDto(dbSprint);
     }
 
     @TransactionMandatory
-    public void checkHasActiveSprint(Sprint sprint,
-                                     boolean active) throws BadRequestException {
-        if (!active || sprint.isActive())
+    public void checkHasActiveSprint(Sprint sprint) throws BadRequestException {
+        if (sprint.isActive())
             return;
         boolean hasActiveSprint = sprintsRepository.hasActiveSprint(sprint.getProject().getId());
         if (hasActiveSprint)
@@ -79,9 +88,10 @@ public class SprintsService {
     }
 
     @TransactionMandatory
-    public Sprint findSprintByIdForUpdate(String sprintId) throws NotFoundException {
-        return sprintsRepository.findSprintByIdForUpdate(sprintId).orElseThrow(
-                () -> new NotFoundException(String.format("Не найден спринт с ИД - %s", sprintId))
+    public Sprint findSprintByIdForUpdate(String sprintId,
+                                          Project project) throws NotFoundException {
+        return sprintsRepository.findSprintByIdForUpdate(sprintId, project.getId()).orElseThrow(
+                () -> new NotFoundException(String.format("Для проекта %s не найден спринт с ИД - %s", project.getName(), sprintId))
         );
     }
 
@@ -91,5 +101,19 @@ public class SprintsService {
         return sprintsRepository.findSprintByIdAndProject(sprintId, project).orElseThrow(
                 () -> new NotFoundException(String.format("Для проекта %s не найден спринт с ИД - %s", project.getName(), sprintId))
         );
+    }
+
+    @TransactionRequired
+    public SprintInfoDTO updateSprint(String sprintId,
+                                      String projectId,
+                                      SprintDtoRequest requestData) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Sprint sprint = findSprintByIdForUpdate(sprintId, data.getProject());
+        sprint.setName(requestData.getName());
+        sprint.setStartDate(requestData.getStartDate());
+        sprint.setEndDate(requestData.getEndDate());
+        sprintsRepository.flush();
+        Sprint dbSprint = findSprintById(sprint.getId());
+        return sprintMapper.toSprintInfoDto(dbSprint);
     }
 }

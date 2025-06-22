@@ -23,6 +23,8 @@ public class Sprint {
     private LocalDate endDate;
     @Column
     private LocalDate createdAt;
+    @Column
+    private LocalDate finishedAt;
     @Column(name = "is_active")
     private boolean active;
     @Column
@@ -66,15 +68,14 @@ public class Sprint {
         this.endDate = endDate;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void activate() {
+        this.active = true;
+        this.finisher = null;
+        this.finishedAt = null;
     }
 
-    public void setDefaultSprint(boolean defaultSprint) {
-        this.defaultSprint = defaultSprint;
-    }
-
-    public void setFinisher(User finisher) {
+    public void finish(User finisher) {
         this.finisher = finisher;
+        this.finishedAt = LocalDate.now();
     }
 }
