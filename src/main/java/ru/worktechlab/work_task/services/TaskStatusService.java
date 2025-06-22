@@ -48,7 +48,7 @@ public class TaskStatusService {
                                       TaskStatusRequestDto requestData) throws NotFoundException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         TaskStatus status = taskStatusRepository.saveAndFlush(new TaskStatus(
-                requestData.getPriority(), requestData.getCode(), requestData.getDescription(), requestData.getViewed(), requestData.getDefaultTaskStatus(), data.getProject()
+                requestData.getPriority(), requestData.getCode(), requestData.getDescription(), requestData.getViewed(), requestData.isDefaultTaskStatus(), data.getProject()
         ));
         return taskStatusMapper.todo(status);
     }
@@ -67,7 +67,7 @@ public class TaskStatusService {
             dbStatus.setDescription(status.getDescription());
             dbStatus.setCode(status.getCode());
             dbStatus.setViewed(status.getViewed());
-            dbStatus.setDefaultTaskStatus(status.getDefaultTaskStatus());
+            dbStatus.setDefaultTaskStatus(status.isDefaultTaskStatus());
         }
         taskStatusRepository.flush();
         StatusListResponseDto response = new StatusListResponseDto(projectId);
@@ -87,7 +87,7 @@ public class TaskStatusService {
                 .collect(Collectors.toSet());
         List<TaskStatus> dbStatuses = taskStatusRepository.findByProjectAndIdsNotIn(project, taskStatusIds);
         long countDefaultStatus = Stream.concat(
-                statuses.stream().filter(TaskStatusRequestDto::getDefaultTaskStatus).map(TaskStatusRequestDto::getDefaultTaskStatus),
+                statuses.stream().filter(TaskStatusRequestDto::isDefaultTaskStatus).map(TaskStatusRequestDto::isDefaultTaskStatus),
                 dbStatuses.stream().filter(TaskStatus::isDefaultTaskStatus).map(TaskStatus::isDefaultTaskStatus)
         ).count();
         if (countDefaultStatus == 0)
