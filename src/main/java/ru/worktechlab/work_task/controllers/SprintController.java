@@ -19,10 +19,11 @@ import ru.worktechlab.work_task.services.SprintsService;
 public class SprintController {
     private final SprintsService sprintsService;
 
-    @GetMapping("/sprint-info")
+    @GetMapping("/project/{projectId}/sprint-info")
     @Operation(summary = "Вывести информацию об активном спринте")
-    public SprintInfoDTO getSprintInfo() throws NotFoundException {
-        return sprintsService.getActiveSprint();
+    public SprintInfoDTO getSprintInfo(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                       @PathVariable String projectId) throws NotFoundException {
+        return sprintsService.getActiveSprint(projectId);
     }
 
     @PostMapping("/project/{projectId}/create")

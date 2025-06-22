@@ -82,4 +82,8 @@ public class Project {
         if (this.startDate == null)
             this.startDate = date;
     }
+
+    public void incrementCounter() {
+        this.taskCounter = this.taskCounter == null ? 1 : this.taskCounter + 1;
+    }
 }

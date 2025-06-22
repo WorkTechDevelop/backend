@@ -1,16 +1,26 @@
-package ru.worktechlab.work_task.dto.request_dto;
+package ru.worktechlab.work_task.dto.tasks;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.worktechlab.work_task.dto.response_dto.UsersProjectsDTO;
+import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
+import ru.worktechlab.work_task.dto.statuses.TaskStatusShortDto;
+import ru.worktechlab.work_task.dto.users.UserShortDataDto;
+import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.validators.*;
 
-@Schema(description = "Модель обновления задачи")
-@Data
-public class UpdateTaskModelDTO {
+import java.util.List;
 
+@NoArgsConstructor
+@Getter
+@Setter
+public class TaskResponse {
     @Schema(description = "id задачи")
     @NotBlank(message = "Поле ID не может быть пустым")
     @ValidTaskId
@@ -30,17 +40,18 @@ public class UpdateTaskModelDTO {
     @ValidPriority
     private String priority;
 
-    @Schema(description = "Исполнитель задачи", example = "id пользователя")
-    @ValidAssignee
-    @NotBlank(message = "ASSIGNEE не может быть пустым")
-    private String assignee;
+    @Schema(description = "Исполнитель задачи")
+    private UserShortDataDto assignee;
+
+    @Schema(description = "Создатель задачи")
+    private UserShortDataDto creator;
 
     @Schema(description = "Проект задачи", example = "id проекта")
     @NotNull(message = "Поле PROJECT_ID не может быть пустым")
     @ValidProjectId
     private String projectId;
 
-    @Schema(description = "Спринт", example = "id спринта")
+    @Schema(description = "ИД спринта")
     @ValidSprintId
     private String sprintId;
 
@@ -49,9 +60,8 @@ public class UpdateTaskModelDTO {
     @ValidTaskType
     private String taskType;
 
-    @NotBlank(message = "Поле STATUS не может быть пустым")
-    @ValidTaskStatus
-    private String status;
+    @Schema(description = "Статус задачи")
+    private TaskStatusShortDto status;
 
     @Schema(description = "Оценка задачи", example = "3")
     @ValidEstimation

@@ -8,6 +8,7 @@ import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
+import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.projects.ProjectDto;
 import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
 import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
@@ -19,6 +20,7 @@ import ru.worktechlab.work_task.repositories.ProjectRepository;
 import ru.worktechlab.work_task.repositories.SprintsRepository;
 import ru.worktechlab.work_task.repositories.TaskStatusRepository;
 import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.utils.CheckerUtil;
 import ru.worktechlab.work_task.utils.UserContext;
 
 import java.util.Arrays;
@@ -40,6 +42,7 @@ public class ProjectsService {
     private final TaskStatusRepository taskStatusRepository;
     private final ProjectMapper projectMapper;
     private final SprintsRepository sprintsRepository;
+    private final CheckerUtil checkerUtil;
 
     @TransactionRequired
     public List<ShortProjectDataDto> getAllUserProjects() {
@@ -102,35 +105,28 @@ public class ProjectsService {
 
     @TransactionRequired
     public ProjectDto getProjectData(String projectId) throws NotFoundException {
-        Project project = findProjectById(projectId);
-        String userId = userContext.getUserData().getUserId();
-        User user = userService.findActiveUserById(userId);
-        userService.checkHasProjectForUser(user, projectId);
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, true);
+        User user = data.getUser();
         user.setLastProjectId(projectId);
-        return projectMapper.toProjectDto(project);
+        projectRepository.flush();
+        return projectMapper.toProjectDto(data.getProject());
     }
 
     @TransactionRequired
     public ProjectDto finishProject(String projectId) throws NotFoundException {
-        Project project = findProjectByIdForUpdate(projectId);
-        String userId = userContext.getUserData().getUserId();
-        User user = userService.findActiveUserById(userId);
-        userService.checkHasProjectForUser(user, projectId);
-        project.finishProject(user);
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, true, false);
+        data.getProject().finishProject(data.getUser());
         projectRepository.flush();
-        project = findProjectById(projectId);
+        Project project = findProjectById(projectId);
         return projectMapper.toProjectDto(project);
     }
 
     @TransactionRequired
     public ProjectDto startProject(String projectId) throws NotFoundException {
-        Project project = findProjectByIdForUpdate(projectId);
-        String userId = userContext.getUserData().getUserId();
-        User user = userService.findActiveUserById(userId);
-        userService.checkHasProjectForUser(user, projectId);
-        project.startProject();
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, true, false);
+        data.getProject().startProject();
         projectRepository.flush();
-        project = findProjectById(projectId);
+        Project project = findProjectById(projectId);
         return projectMapper.toProjectDto(project);
     }
 

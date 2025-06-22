@@ -6,7 +6,7 @@ import ru.worktechlab.work_task.config.MapStructConfiguration;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
-import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
+import ru.worktechlab.work_task.dto.users.RegisterDTO;
 
 import java.util.List;
 

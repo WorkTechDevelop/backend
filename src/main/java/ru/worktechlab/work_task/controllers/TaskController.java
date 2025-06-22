@@ -8,10 +8,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
-import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
-import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.dto.response.TaskResponse;
+import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
+import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
+import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.dto.tasks.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
 import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
@@ -42,7 +42,7 @@ public class TaskController {
                             schema = @Schema(implementation = TaskModelDTO.class)
                     )
             )
-            @RequestBody TaskModelDTO taskModelDTO) {
+            @RequestBody TaskModelDTO taskModelDTO) throws NotFoundException {
         return taskService.createTask(taskModelDTO);
     }
 
@@ -57,13 +57,13 @@ public class TaskController {
                             schema = @Schema(implementation = UpdateTaskModelDTO.class)
                     )
             )
-            @RequestBody UpdateTaskModelDTO updateTaskModelDTO) {
+            @RequestBody UpdateTaskModelDTO updateTaskModelDTO) throws NotFoundException {
         return taskService.updateTask(updateTaskModelDTO);
     }
 
     @PutMapping("/update-status")
     @Operation(summary = "Обновить статус задачи")
-    public TaskModel updateTask(
+    public TaskResponse updateTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для обновления статуса задачи",
@@ -72,20 +72,8 @@ public class TaskController {
                             schema = @Schema(implementation = UpdateStatusRequestDTO.class)
                     )
             )
-            @RequestBody UpdateStatusRequestDTO requestDto) {
+            @RequestBody UpdateStatusRequestDTO requestDto) throws NotFoundException {
         return taskService.updateTaskStatus(requestDto);
-    }
-
-    @GetMapping("/{code}")
-    @Operation(summary = "Получить задачу по коду {code}")
-    public TaskResponse getTaskByCode(
-            @Parameter(
-                    name = "code",
-                    description = "Уникальный код задачи",
-                    example = "TPO-0001"
-            )
-            @PathVariable String code) {
-        return new TaskResponse(taskService.findTaskByCodeOrThrow(code));
     }
 
     @GetMapping("/tasks-in-project")
@@ -96,7 +84,7 @@ public class TaskController {
 
 
     @GetMapping("/history/{taskId}/{projectId}")
-    @Operation(summary = "Получить историю изминения задачи по id {taskId}")
+    @Operation(summary = "Получить историю изменения задачи по id {taskId}")
     public List<TaskHistoryResponseDto> getTaskHistory(
             @Parameter(description = "Уникальный идентификатор задачи",
                     example = "96cd710c-bd28-40b7-903e-4b8033892612",

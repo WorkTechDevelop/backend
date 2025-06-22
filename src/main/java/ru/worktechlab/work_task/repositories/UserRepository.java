@@ -48,4 +48,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("from User where id in :userIds and confirmedAt is not null")
     Stream<User> findUsersByIdsIn(Collection<String> userIds);
+
+    @Query(nativeQuery = true,
+            value = "select * from user where id = :id and active and confirmed_at is not null for update scip locked")
+    Optional<User> findActiveUserByIdForUpdate(String id);
 }
