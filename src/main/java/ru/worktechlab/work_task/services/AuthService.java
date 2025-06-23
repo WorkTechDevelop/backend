@@ -31,7 +31,7 @@ public class AuthService {
                 authMapper.toAuthenticationToken(loginRequestDTO)
         );
 
-        User user = userService.findActiveUserByEmail(loginRequestDTO.getUsername());
+        User user = userService.findActiveUserByEmail(loginRequestDTO.getEmail());
         String accessToken = tokenService.generateToken(user);
         RefreshToken refreshToken = tokenService.createRefreshToken(user);
 

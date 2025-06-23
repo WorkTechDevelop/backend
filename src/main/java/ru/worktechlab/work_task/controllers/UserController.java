@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.OkResponse;
@@ -13,6 +14,8 @@ import ru.worktechlab.work_task.services.UserService;
 
 import java.util.List;
 
+import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
+
 @RestController
 @RequestMapping("/work-task/v1/user")
 @RequiredArgsConstructor
@@ -21,12 +24,14 @@ public class UserController {
 
     private final UserService userService;
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @Operation(summary = "Список всех пользователей")
     @GetMapping
     public List<UserShortDataDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @Operation(summary = "Список всех пользователей по существующим ИД")
     @PostMapping()
     public List<UserShortDataDto> findUsersByIdsIn(
@@ -35,6 +40,7 @@ public class UserController {
         return userService.findUsersByIdsIn(data);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @Operation(summary = "Активировать пользователей по существующим ИД")
     @PutMapping()
     public OkResponse activateUsers(

@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("FROM User WHERE email = :email AND active")
     Optional<User> findExistUserByEmail(String email);
 
-    @Query("SELECT u.role_id FROM User u WHERE u.email = :email")
+    @Query("SELECT u.role FROM User u WHERE u.email = :email")
     Optional<RoleModel> findRoleByEmail(@Param("email") String email);
 
     @Modifying

@@ -1,14 +1,19 @@
 package ru.worktechlab.work_task.models.tables;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.worktechlab.work_task.models.enums.Gender;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "user")
 public class User {
@@ -32,11 +37,12 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "role_id")
-    private String role_id;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private RoleModel role;
 
     @Column(name = "birth_date")
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "is_active", nullable = false)
     private boolean active;
@@ -62,4 +68,23 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private final List<Project> projects = new ArrayList<>();
+
+    public User(String lastName,
+                String firstName,
+                String middleName,
+                String email,
+                RoleModel role,
+                String phone,
+                LocalDate birthDate,
+                Gender gender) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.email = email;
+        this.role = role;
+        this.phone = phone;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.active = false;
+    }
 }

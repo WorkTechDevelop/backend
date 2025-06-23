@@ -11,6 +11,7 @@ import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.TaskHistoryMapper;
+import ru.worktechlab.work_task.models.enums.Roles;
 import ru.worktechlab.work_task.models.tables.TaskHistory;
 import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.models.tables.User;

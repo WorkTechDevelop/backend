@@ -14,6 +14,7 @@ import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
+import ru.worktechlab.work_task.models.enums.Gender;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.UserRepository;
@@ -36,7 +37,9 @@ public class UserService {
     @TransactionRequired
     public void registerUser(RegisterDTO registerDto) {
         RoleModel defaultRole = roleService.getDefaultRole();
-        User user = userMapper.registerDtoToUser(registerDto, defaultRole);
+        User user = new User(registerDto.getLastName(), registerDto.getFirstName(), registerDto.getMiddleName(),
+                registerDto.getEmail(), defaultRole, registerDto.getPhone(), registerDto.getBirthDate(),
+                Gender.valueOf(registerDto.getGender()));
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         if (mailParams.isEnable()) {
             user.setConfirmationToken(UUID.randomUUID().toString());

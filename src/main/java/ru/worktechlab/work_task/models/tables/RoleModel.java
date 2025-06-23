@@ -18,4 +18,8 @@ public class RoleModel {
 
     @Enumerated(EnumType.STRING)
     private Roles name;
+
+    public String getRoleName() {
+        return name.name();
+    }
 }

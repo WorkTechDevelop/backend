@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="extend-role-enum-20250623" author="deffris">
+    <modifyDataType
+            tableName="role"
+            columnName="name"
+            newDataType="ENUM('ADMIN', 'PROJECT_MEMBER', 'PROJECT_OWNER', 'POWER_USER')"/>
+    </changeSet>
+    <changeSet id="add-new-role-20250623" author="deffris">
+        <insert tableName="role">
+            <column name="id" value="3a986fe6-7231-44ad-8bb9-4b7364ff0c3d"/>
+            <column name="is_active" value="1"/>
+            <column name="name" value="POWER_USER"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
