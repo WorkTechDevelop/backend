@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.worktechlab.work_task.models.tables.Comment;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,6 @@ public interface CommentRepository extends JpaRepository<Comment, String> {
     @Query(nativeQuery = true,
             value = "delete from comment where id = :id")
     void deleteCommentById(String id);
+
+    List<Comment> findAllByTaskIdOrderByCreatedAtAsc(String taskId);
 }

@@ -10,9 +10,7 @@ import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.dto.task_comment.CommentDto;
-import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
-import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
+import ru.worktechlab.work_task.dto.task_comment.*;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
@@ -205,5 +203,14 @@ public class TaskService {
         ApiResponse apiResponse = new ApiResponse("Комментарий успешно удалён");
         log.info("Пользователь {} удалил комментарий {}", data.getUser().getFirstName() + data.getUser().getLastName(), commentId);
         return apiResponse;
+    }
+
+    @TransactionRequired
+    public List<GetAllTasksCommentsResponseDto> getAllTasksComments(GetAllTasksCommentsDto dto) throws NotFoundException {
+        log.debug("Получить все комментарии к задаче");
+        findTaskByIdOrThrow(dto.getTaskId());
+        checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        List<Comment> comments = commentRepository.findAllByTaskIdOrderByCreatedAtAsc(dto.getTaskId());
+        return commentMapper.toGetAllDtoList(comments);
     }
 }

@@ -119,7 +119,7 @@ public class TaskHistoryService {
     @TransactionRequired
     public List<TaskHistoryResponseDto> getTaskHistoryById(String taskId, String projectId) throws NotFoundException {
         checkerUtil.findAndCheckProjectUserData(projectId, false, false);
-        List<TaskHistory> taskHistories = repository.findAllByTaskIdOrderByCreatedAtDesc(taskId);
+        List<TaskHistory> taskHistories = repository.findAllByTaskIdOrderByCreatedAtAsc(taskId);
         return taskHistoryMapper.convertToDto(taskHistories);
     }
 }

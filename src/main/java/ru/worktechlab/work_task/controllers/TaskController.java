@@ -10,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.dto.task_comment.CommentDto;
-import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
-import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
+import ru.worktechlab.work_task.dto.task_comment.*;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
@@ -133,5 +131,18 @@ public class TaskController {
             @PathVariable String commentId
     ) throws NotFoundException {
         return taskService.deleteCommentById(commentId);
+    }
+
+    @PostMapping("/all-comments")
+    @Operation(summary = "Получить все комментарии к задаче")
+    public List<GetAllTasksCommentsResponseDto> getAllTasksComments(@Valid
+                                                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                                            description = "id задачи и проекта",
+                                                                            content = @Content(
+                                                                                    mediaType = "application/json", schema = @Schema(implementation = GetAllTasksCommentsDto.class)
+                                                                            )
+                                                                    )
+                                                                    @RequestBody GetAllTasksCommentsDto dto) throws NotFoundException {
+        return taskService.getAllTasksComments(dto);
     }
 }
