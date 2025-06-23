@@ -8,19 +8,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
-import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
+import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
 import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
 import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
-import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.services.TaskHistoryService;
 import ru.worktechlab.work_task.services.TaskService;
 
@@ -126,5 +124,14 @@ public class TaskController {
                                             )
                                             @RequestBody UpdateCommentDto dto) throws NotFoundException {
         return taskService.updateComment(dto);
+    }
+
+    @DeleteMapping("/delete-comment/{commentId}")
+    @Operation(summary = "Удаление комментария")
+    public ApiResponse deleteComment(
+            @Parameter(description = "ИД комментария", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String commentId
+    ) throws NotFoundException {
+        return taskService.deleteCommentById(commentId);
     }
 }

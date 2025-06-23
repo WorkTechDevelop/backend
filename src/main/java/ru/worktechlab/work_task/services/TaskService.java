@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
@@ -159,6 +160,13 @@ public class TaskService {
                 ));
     }
 
+    public Comment findCommentByIdOrElseThrow(String id) {
+        return commentRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(
+                        String.format("Не найден комментарий с таким id - %s", id)
+                ));
+    }
+
     @TransactionRequired
     public CommentResponseDto createComment(CommentDto dto) throws NotFoundException {
         log.debug("Создать комментарий к задаче");
@@ -183,5 +191,19 @@ public class TaskService {
         commentRepository.flush();
         log.debug("Комментарий обновлен: id={}", comment.getId());
         return commentMapper.toDto(comment);
+    }
+
+    @TransactionRequired
+    public ApiResponse deleteCommentById(String commentId) throws NotFoundException {
+        log.debug("Удалить комментарий к задаче");
+        Comment comment = findCommentByIdOrElseThrow(commentId);
+        TaskModel task = findTaskByIdOrThrow(comment.getTaskId());
+        String projectId = task.getProject().getId();
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        commentRepository.deleteCommentById(commentId);
+        commentRepository.flush();
+        ApiResponse apiResponse = new ApiResponse("Комментарий успешно удалён");
+        log.info("Пользователь {} удалил комментарий {}", data.getUser().getFirstName() + data.getUser().getLastName(), commentId);
+        return apiResponse;
     }
 }
