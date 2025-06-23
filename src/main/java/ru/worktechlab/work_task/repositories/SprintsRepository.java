@@ -19,10 +19,13 @@ public interface SprintsRepository extends JpaRepository<Sprint, String> {
     Boolean isSprintActive(@Param("id") String id);
 
     @Query(nativeQuery = true,
-            value = "select * from sprint where id = :sprintId for update skip locked")
-    Optional<Sprint> findSprintByIdForUpdate(String sprintId);
+            value = "select * from sprint where id = :sprintId and project_id = :projectId for update skip locked")
+    Optional<Sprint> findSprintByIdForUpdate(String sprintId, String projectId);
 
     @Query(nativeQuery = true,
             value = "select exists (select * from sprint s where s.project_id = :projectId and s.is_active")
     boolean hasActiveSprint(String projectId);
+
+    @Query("from Sprint where id = :sprintId and project = :project")
+    Optional<Sprint> findSprintByIdAndProject(String sprintId, Project project);
 }

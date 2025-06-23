@@ -1,21 +1,19 @@
 package ru.worktechlab.work_task.models.tables;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.worktechlab.work_task.models.enums.Gender;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
-@Getter
-@NoArgsConstructor
 @Entity
 @Table(name = "user")
+@NoArgsConstructor
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -38,11 +36,11 @@ public class User {
     private String phone;
 
     @ManyToOne
-    @JoinColumn(name = "role_id")
+    @JoinColumn(nullable = false, name = "role_id")
     private RoleModel role;
 
     @Column(name = "birth_date")
-    private LocalDate birthDate;
+    private String birthDate;
 
     @Column(name = "is_active", nullable = false)
     private boolean active;
@@ -69,22 +67,39 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private final List<Project> projects = new ArrayList<>();
 
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setLastProjectId(String lastProjectId) {
+        this.lastProjectId = lastProjectId;
+    }
+
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
+    }
+
+    public void setConfirmedAt(LocalDateTime confirmedAt) {
+        this.confirmedAt = confirmedAt;
+    }
+
     public User(String lastName,
                 String firstName,
                 String middleName,
                 String email,
-                RoleModel role,
                 String phone,
-                LocalDate birthDate,
-                Gender gender) {
+                RoleModel role,
+                String birthDate,
+                Gender gender,
+                String password) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.middleName = middleName;
         this.email = email;
-        this.role = role;
         this.phone = phone;
+        this.role = role;
         this.birthDate = birthDate;
         this.gender = gender;
-        this.active = false;
+        this.password = password;
     }
 }

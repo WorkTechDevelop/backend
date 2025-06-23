@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "sprint")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Sprint {
     @Id
@@ -24,6 +23,8 @@ public class Sprint {
     private LocalDate endDate;
     @Column
     private LocalDate createdAt;
+    @Column
+    private LocalDate finishedAt;
     @Column(name = "is_active")
     private boolean active;
     @Column
@@ -53,5 +54,28 @@ public class Sprint {
         this.active = false;
         this.defaultSprint = true;
         this.createdAt = LocalDate.now();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void activate() {
+        this.active = true;
+        this.finisher = null;
+        this.finishedAt = null;
+    }
+
+    public void finish(User finisher) {
+        this.finisher = finisher;
+        this.finishedAt = LocalDate.now();
     }
 }

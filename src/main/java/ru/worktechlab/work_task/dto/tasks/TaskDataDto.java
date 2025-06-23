@@ -1,13 +1,24 @@
-package ru.worktechlab.work_task.dto.request_dto;
+package ru.worktechlab.work_task.dto.tasks;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.worktechlab.work_task.dto.statuses.TaskStatusShortDto;
+import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 import ru.worktechlab.work_task.validators.*;
 
-@Schema(description = "Модель создания задачи")
-@Data
-public class TaskModelDTO {
+@NoArgsConstructor
+@Getter
+@Setter
+public class TaskDataDto {
+    @Schema(description = "id задачи")
+    @NotBlank(message = "Поле ID не может быть пустым")
+    @ValidTaskId
+    private String id;
 
     @Schema(description = "Заголовок", example = "Создание задачи")
     @NotBlank(message = "Поле TITLE не может быть пустым")
@@ -15,7 +26,7 @@ public class TaskModelDTO {
     private String title;
 
     @Schema(description = "Описание", example = "Создать задачу для Яна")
-    @Size(max = 4096, message = "Длина поля DESCRIPTION не может быть более 4096 символов")
+    @ValidDescription
     private String description;
 
     @Schema(description = "Приоритет", example = "MINOR")
@@ -23,17 +34,18 @@ public class TaskModelDTO {
     @ValidPriority
     private String priority;
 
-    @Schema(description = "Исполнитель задачи", example = "id пользователя")
-    @ValidAssignee
-    @NotBlank(message = "ASSIGNEE не может быть пустым")
-    private String assignee;
+    @Schema(description = "Исполнитель задачи")
+    private UserShortDataDto assignee;
+
+    @Schema(description = "Создатель задачи")
+    private UserShortDataDto creator;
 
     @Schema(description = "Проект задачи", example = "id проекта")
     @NotNull(message = "Поле PROJECT_ID не может быть пустым")
     @ValidProjectId
     private String projectId;
 
-    @Schema(description = "Спринт", example = "id спринта")
+    @Schema(description = "ИД спринта")
     @ValidSprintId
     private String sprintId;
 
@@ -42,8 +54,10 @@ public class TaskModelDTO {
     @ValidTaskType
     private String taskType;
 
+    @Schema(description = "Статус задачи")
+    private TaskStatusShortDto status;
+
     @Schema(description = "Оценка задачи", example = "3")
-    @Min(value = 0, message = "ESTIMATION должен быть не меньше 0")
-    @Max(value = 999, message = "ESTIMATION должен быть меньше 1000")
+    @ValidEstimation
     private Integer estimation;
 }

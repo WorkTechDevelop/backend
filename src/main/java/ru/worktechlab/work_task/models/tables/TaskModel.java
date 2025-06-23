@@ -3,21 +3,19 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.utils.TaskChangeDetector;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "task_model")
+@NoArgsConstructor
 public class TaskModel {
 
     @Id
@@ -37,18 +35,20 @@ public class TaskModel {
     @Column
     private String priority;
 
-    @Column
-    private String creator;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "creator_id")
+    private User creator;
 
-    @Column
-    private String assignee;
+    @ManyToOne
+    private User assignee;
 
-    @NonNull
-    @Column
-    private String projectId;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "project_id")
+    private Project project;
 
-    @Column
-    private String sprintId;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "sprint_id")
+    private Sprint sprint;
 
     @NotBlank
     @Column(name = "task_type")
@@ -57,8 +57,9 @@ public class TaskModel {
     @Column
     private Integer estimation;
 
-    @Column
-    private String status;
+    @ManyToOne
+    @JoinColumn(nullable = false, name = "status_id")
+    private TaskStatus status;
 
     @Column
     private LocalDateTime creationDate;
@@ -76,62 +77,70 @@ public class TaskModel {
         return taskChangeDetector.getTaskHistories();
     }
 
-    public void setTitleHistory(String newValue) {
+    public void setTitle(String newValue) {
         taskChangeDetector.add("Заголовок", this.title, newValue);
         this.title = newValue;
     }
 
-    public void setPriorityHistory(String newValue) {
+    public void setPriority(String newValue) {
         taskChangeDetector.add("Приоритет", this.priority, newValue);
         this.priority = newValue;
     }
 
-    public void setAssigneeHistory(String newValue) {
-        taskChangeDetector.add("Исполнитель", this.assignee, newValue);
+    public void setAssignee(User newValue) {
+        taskChangeDetector.add("Исполнитель", this.assignee.getId(), newValue.getId());
         this.assignee = newValue;
     }
 
-    public void setDescriptionHistory(String newValue) {
+    public void setDescription(String newValue) {
         taskChangeDetector.add("Описание", this.description, newValue);
         this.description = newValue;
     }
 
-    public void setSprintIdHistory(String newValue) {
-        taskChangeDetector.add("Идентификатор спринта", this.sprintId, newValue);
-        this.sprintId = newValue;
+    public void setSprint(Sprint newValue) {
+        taskChangeDetector.add("Идентификатор спринта", this.sprint.getId(), newValue.getId());
+        this.sprint = newValue;
     }
 
-    public void setTaskTypeHistory(String newValue) {
+    public void setTaskType(String newValue) {
         taskChangeDetector.add("Тип задачи", this.taskType, newValue);
         this.taskType = newValue;
     }
 
-    public void setEstimationHistory(String newValue) {
-        taskChangeDetector.add("Оценка задачи", String.valueOf(this.estimation), newValue);
-        this.estimation = Integer.parseInt(newValue);
+    public void setEstimation(Integer newValue) {
+        taskChangeDetector.add("Оценка задачи", String.valueOf(this.estimation), String.valueOf(newValue));
+        this.estimation = newValue;
     }
 
-    public void setStatusHistory(String newValue) {
-        taskChangeDetector.add("Статус задачи", this.status, newValue);
+    public void setStatus(TaskStatus newValue) {
+        taskChangeDetector.add("Статус задачи", this.status.getCode(), newValue.getCode());
         this.status = newValue;
     }
 
-    public TaskModel() {
-    }
-
-    public TaskModel(String title, String description, String priority, String assignee,
-                     String projectId, String sprintId, String taskType,
-                     Integer estimation, String status, String code) {
-
+    public TaskModel(String title,
+                     String description,
+                     String priority,
+                     User creator,
+                     User assignee,
+                     Project project,
+                     Sprint sprint,
+                     String taskType,
+                     Integer estimation,
+                     TaskStatus status,
+                     String code) {
         this.title = title;
-        this.priority = priority;
-        this.assignee = assignee;
         this.description = description;
-        this.projectId = projectId;
-        this.sprintId = sprintId;
+        this.priority = priority;
+        this.creator = creator;
+        this.assignee = assignee;
+        this.project = project;
+        this.sprint = sprint;
         this.taskType = taskType;
         this.estimation = estimation;
         this.status = status;
         this.code = code;
+        LocalDateTime date = LocalDateTime.now();
+        this.creationDate = date;
+        this.updateDate = date;
     }
 }

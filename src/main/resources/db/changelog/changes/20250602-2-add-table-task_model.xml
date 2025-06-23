@@ -9,9 +9,9 @@
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="assignee" type="VARCHAR(255)"/>
+            <column name="assignee_id" type="VARCHAR(255)"/>
             <column name="creation_date" type="datetime"/>
-            <column name="creator" type="VARCHAR(255)"/>
+            <column name="creator_id" type="VARCHAR(255)"/>
             <column name="description" type="VARCHAR(4096)"/>
             <column name="estimation" type="INT"/>
             <column name="priority" type="VARCHAR(255)"/>
@@ -19,7 +19,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="sprint_id" type="VARCHAR(255)"/>
-            <column name="status" type="VARCHAR(255)"/>
+            <column name="status_id" type="bigint"/>
             <column name="task_type" type="VARCHAR(255)"/>
             <column name="title" type="VARCHAR(255)">
                 <constraints nullable="false"/>
@@ -29,7 +29,8 @@
         </createTable>
         <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="task_model" constraintName="task_model_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <addForeignKeyConstraint baseColumnNames="sprint_id" baseTableName="task_model" constraintName="task_model_sprints_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="sprint" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="assignee" baseTableName="task_model" constraintName="task_model_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="task_model" constraintName="task_model_users_FK_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="assignee_id" baseTableName="task_model" constraintName="task_model_assignee_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="task_model" constraintName="task_model_creator_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="task_model" constraintName="task_model_status_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="task_status" validate="true"/>
     </changeSet>
 </databaseChangeLog>

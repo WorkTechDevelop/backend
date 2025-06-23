@@ -9,24 +9,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class TaskStatusDto {
+public class TaskStatusShortDto {
     @NotNull
     @Schema(description = "ИД статуса")
     private long id;
-    @NotNull
-    @Schema(description = "Приоритет расстановки на странице")
-    private int priority;
     @NotNull
     @Schema(description = "Название статуса")
     private String code;
     @Schema(description = "Описание статуса")
     private String description;
-    @NotNull
-    @Schema(description = "Признак отображения")
-    private boolean viewed;
-    @NotNull
-    @Schema(description = "ИД проекта")
-    private String projectId;
-    @Schema(description = "Признак отображения")
-    private boolean defaultTaskStatus;
 }

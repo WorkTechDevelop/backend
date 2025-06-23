@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.statuses.StatusListResponseDto;
 import ru.worktechlab.work_task.dto.statuses.TaskStatusDto;
 import ru.worktechlab.work_task.dto.statuses.TaskStatusRequestDto;
@@ -16,7 +17,7 @@ import ru.worktechlab.work_task.mappers.TaskStatusMapper;
 import ru.worktechlab.work_task.models.tables.Project;
 import ru.worktechlab.work_task.models.tables.TaskStatus;
 import ru.worktechlab.work_task.repositories.TaskStatusRepository;
-import ru.worktechlab.work_task.utils.UserContext;
+import ru.worktechlab.work_task.utils.CheckerUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -30,16 +31,13 @@ public class TaskStatusService {
 
     private final TaskStatusRepository taskStatusRepository;
     private final TaskStatusMapper taskStatusMapper;
-    private final ProjectsService projectsService;
-    private final UserContext userContext;
-    private final UserService userService;
+    private final CheckerUtil checkerUtil;
 
     @TransactionRequired
     public StatusListResponseDto getStatuses(String projectId) throws NotFoundException {
-        Project project = projectsService.findProjectById(projectId);
-        userService.checkHasProjectForUser(userContext.getUserData().getUserId(), projectId);
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         StatusListResponseDto response = new StatusListResponseDto(projectId);
-        response.setStatuses(project.getStatuses().stream()
+        response.setStatuses(data.getProject().getStatuses().stream()
                 .map(taskStatusMapper::todo)
                 .toList());
         return response;
@@ -47,30 +45,29 @@ public class TaskStatusService {
 
     @TransactionRequired
     public TaskStatusDto createStatus(String projectId,
-                                      TaskStatusRequestDto data) throws NotFoundException {
-        Project project = projectsService.findProjectById(projectId);
-        userService.checkHasProjectForUser(userContext.getUserData().getUserId(), projectId);
+                                      TaskStatusRequestDto requestData) throws NotFoundException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         TaskStatus status = taskStatusRepository.saveAndFlush(new TaskStatus(
-                data.getPriority(), data.getCode(), data.getDescription(), data.getViewed(), data.getDefaultTaskStatus(), project
+                requestData.getPriority(), requestData.getCode(), requestData.getDescription(), requestData.getViewed(), requestData.isDefaultTaskStatus(), data.getProject()
         ));
         return taskStatusMapper.todo(status);
     }
 
     @TransactionRequired
     public StatusListResponseDto updateStatuses(String projectId,
-                                              UpdateRequestStatusesDto data) throws NotFoundException, BadRequestException {
-        if (CollectionUtils.isEmpty(data.getStatuses()))
+                                                UpdateRequestStatusesDto requestStatusesDto) throws NotFoundException, BadRequestException {
+        if (CollectionUtils.isEmpty(requestStatusesDto.getStatuses()))
             return null;
-        Project project = projectsService.findProjectById(projectId);
-        userService.checkHasProjectForUser(userContext.getUserData().getUserId(), projectId);
-        checkHasDefaultValue(project, data.getStatuses());
-        for (TaskStatusRequestDto status : data.getStatuses()) {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Project project = data.getProject();
+        checkHasDefaultValue(project, requestStatusesDto.getStatuses());
+        for (TaskStatusRequestDto status : requestStatusesDto.getStatuses()) {
             TaskStatus dbStatus = findStatusByIdAndProjectForUpdate(status.getId(), project);
             dbStatus.setPriority(status.getPriority());
             dbStatus.setDescription(status.getDescription());
             dbStatus.setCode(status.getCode());
             dbStatus.setViewed(status.getViewed());
-            dbStatus.setDefaultTaskStatus(status.getDefaultTaskStatus());
+            dbStatus.setDefaultTaskStatus(status.isDefaultTaskStatus());
         }
         taskStatusRepository.flush();
         StatusListResponseDto response = new StatusListResponseDto(projectId);
@@ -90,7 +87,7 @@ public class TaskStatusService {
                 .collect(Collectors.toSet());
         List<TaskStatus> dbStatuses = taskStatusRepository.findByProjectAndIdsNotIn(project, taskStatusIds);
         long countDefaultStatus = Stream.concat(
-                statuses.stream().filter(TaskStatusRequestDto::getDefaultTaskStatus).map(TaskStatusRequestDto::getDefaultTaskStatus),
+                statuses.stream().filter(TaskStatusRequestDto::isDefaultTaskStatus).map(TaskStatusRequestDto::isDefaultTaskStatus),
                 dbStatuses.stream().filter(TaskStatus::isDefaultTaskStatus).map(TaskStatus::isDefaultTaskStatus)
         ).count();
         if (countDefaultStatus == 0)
@@ -109,7 +106,15 @@ public class TaskStatusService {
     @TransactionMandatory
     public TaskStatus findStatusByIdAndProjectForUpdate(long statusId,
                                                         Project project) throws NotFoundException {
-        return taskStatusRepository.findStatusesByProjectAndIdForUpdate(project.getId(), statusId).orElseThrow(
+        return taskStatusRepository.findStatusByProjectAndIdForUpdate(project.getId(), statusId).orElseThrow(
+                () -> new NotFoundException(String.format("Не найдена задача для проекта %s с ИД - %s", project.getName(), statusId))
+        );
+    }
+
+    @TransactionMandatory
+    public TaskStatus findStatusByIdAndProject(long statusId,
+                                               Project project) throws NotFoundException {
+        return taskStatusRepository.findStatusByProjectAndId(project, statusId).orElseThrow(
                 () -> new NotFoundException(String.format("Не найдена задача для проекта %s с ИД - %s", project.getName(), statusId))
         );
     }

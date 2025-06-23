@@ -1,4 +1,4 @@
-package ru.worktechlab.work_task.dto.response;
+package ru.worktechlab.work_task.dto.projects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

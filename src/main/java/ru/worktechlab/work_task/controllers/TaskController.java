@@ -9,15 +9,13 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.request_dto.TaskModelDTO;
-import ru.worktechlab.work_task.dto.request_dto.UpdateStatusRequestDTO;
-import ru.worktechlab.work_task.dto.request_dto.UpdateTaskModelDTO;
-import ru.worktechlab.work_task.dto.response.TaskResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
+import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
+import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
+import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
-import ru.worktechlab.work_task.models.enums.Roles;
-import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.services.TaskHistoryService;
 import ru.worktechlab.work_task.services.TaskService;
 
@@ -37,7 +35,7 @@ public class TaskController {
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
-    public TaskResponse createTask(
+    public TaskDataDto createTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для создания задачи",
@@ -46,14 +44,14 @@ public class TaskController {
                             schema = @Schema(implementation = TaskModelDTO.class)
                     )
             )
-            @RequestBody TaskModelDTO taskModelDTO) {
+            @RequestBody TaskModelDTO taskModelDTO) throws NotFoundException {
         return taskService.createTask(taskModelDTO);
     }
 
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-task")
     @Operation(summary = "Обновить задачу")
-    public TaskResponse updateTask(
+    public TaskDataDto updateTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для обновления задачи",
@@ -62,14 +60,14 @@ public class TaskController {
                             schema = @Schema(implementation = UpdateTaskModelDTO.class)
                     )
             )
-            @RequestBody UpdateTaskModelDTO updateTaskModelDTO) {
+            @RequestBody UpdateTaskModelDTO updateTaskModelDTO) throws NotFoundException {
         return taskService.updateTask(updateTaskModelDTO);
     }
 
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-status")
     @Operation(summary = "Обновить статус задачи")
-    public TaskModel updateTask(
+    public TaskDataDto updateTaskStatus(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для обновления статуса задачи",
@@ -78,24 +76,10 @@ public class TaskController {
                             schema = @Schema(implementation = UpdateStatusRequestDTO.class)
                     )
             )
-            @RequestBody UpdateStatusRequestDTO requestDto) {
+            @RequestBody UpdateStatusRequestDTO requestDto) throws NotFoundException {
         return taskService.updateTaskStatus(requestDto);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @GetMapping("/{code}")
-    @Operation(summary = "Получить задачу по коду {code}")
-    public TaskResponse getTaskByCode(
-            @Parameter(
-                    name = "code",
-                    description = "Уникальный код задачи",
-                    example = "TPO-0001"
-            )
-            @PathVariable String code) {
-        return new TaskResponse(taskService.findTaskByCodeOrThrow(code));
-    }
-
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/tasks-in-project")
     @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
     public List<UsersTasksInProjectDTO> getTasksInProject() {
@@ -104,7 +88,7 @@ public class TaskController {
 
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/history/{taskId}/{projectId}")
-    @Operation(summary = "Получить историю изминения задачи по id {taskId}")
+    @Operation(summary = "Получить историю изменения задачи по id {taskId}")
     public List<TaskHistoryResponseDto> getTaskHistory(
             @Parameter(description = "Уникальный идентификатор задачи",
                     example = "96cd710c-bd28-40b7-903e-4b8033892612",

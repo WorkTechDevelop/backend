@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.worktechlab.work_task.dto.request_dto.RegisterDTO;
+import ru.worktechlab.work_task.dto.users.RegisterDTO;
 import ru.worktechlab.work_task.services.UserService;
 
 @RestController

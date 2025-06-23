@@ -1,14 +1,17 @@
-package ru.worktechlab.work_task.dto.request_dto;
+package ru.worktechlab.work_task.dto.tasks;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.worktechlab.work_task.validators.*;
 
-@Schema(description = "Модель обновления задачи")
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 public class UpdateTaskModelDTO {
 
     @Schema(description = "id задачи")
@@ -49,9 +52,8 @@ public class UpdateTaskModelDTO {
     @ValidTaskType
     private String taskType;
 
-    @NotBlank(message = "Поле STATUS не может быть пустым")
-    @ValidTaskStatus
-    private String status;
+    @Schema(description = "ИД статуса задачи", example = "123")
+    private Long status;
 
     @Schema(description = "Оценка задачи", example = "3")
     @ValidEstimation

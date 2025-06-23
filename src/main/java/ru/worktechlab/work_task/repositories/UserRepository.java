@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, String>, UserFilter {
     Optional<User> findByEmail(String email);
 
     @Query("FROM User WHERE email = :email AND active")
@@ -48,4 +48,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("from User where id in :userIds and confirmedAt is not null")
     Stream<User> findUsersByIdsIn(Collection<String> userIds);
+
+    @Query(nativeQuery = true,
+            value = "select * from user where id = :id and is_active and confirmed_at is not null for update skip locked")
+    Optional<User> findActiveUserByIdForUpdate(String id);
 }

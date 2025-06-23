@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.request_dto.LoginRequestDTO;
-import ru.worktechlab.work_task.dto.request_dto.TokenRefreshRequestDTO;
-import ru.worktechlab.work_task.dto.response_dto.LoginResponseDTO;
+import ru.worktechlab.work_task.dto.auth.LoginRequestDTO;
+import ru.worktechlab.work_task.dto.auth.TokenRefreshRequestDTO;
+import ru.worktechlab.work_task.dto.auth.LoginResponseDTO;
 import ru.worktechlab.work_task.services.AuthService;
 import ru.worktechlab.work_task.services.UserService;
 
