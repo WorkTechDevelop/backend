@@ -18,7 +18,7 @@ public class TaskModelDTO {
     @Size(max = 4096, message = "Длина поля DESCRIPTION не может быть более 4096 символов")
     private String description;
 
-    @Schema(description = "Приоритет", example = "MINOR")
+    @Schema(description = "Приоритет", example = "MEDIUM")
     @NotBlank(message = "Поле PRIORITY не может быть пустым")
     @ValidPriority
     private String priority;

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
@@ -35,6 +36,7 @@ public class TaskController {
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskDataDto createTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
