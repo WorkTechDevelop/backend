@@ -20,6 +20,7 @@ import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 @Tag(name = "Sprint", description = "Управление спринтами")
 public class SprintController {
     private final SprintsService sprintsService;
+
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/project/{projectId}/sprint-info")
     @Operation(summary = "Вывести информацию об активном спринте")
@@ -37,8 +38,8 @@ public class SprintController {
                                       @RequestBody SprintDtoRequest data) throws NotFoundException {
         return sprintsService.createSprint(projectId, data);
     }
-    @RolesAllowed({ADMIN, PROJECT_OWNER, POWER_USER})
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER, POWER_USER})
     @PutMapping("/project/{projectId}/{sprintId}/activate")
     @Operation(summary = "Запуск спринта спринта")
     public SprintInfoDTO activateSprint(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -48,6 +49,7 @@ public class SprintController {
         return sprintsService.activateSprint(sprintId, projectId);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER, POWER_USER})
     @PutMapping("/project/{projectId}/{sprintId}/finish")
     @Operation(summary = "Завершение спринта")
     public SprintInfoDTO finishSprint(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -57,6 +59,7 @@ public class SprintController {
         return sprintsService.finishSprint(sprintId, projectId);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER, POWER_USER})
     @PutMapping("/project/{projectId}/{sprintId}/update")
     @Operation(summary = "Изменение спринта")
     public SprintInfoDTO updateSprint(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)

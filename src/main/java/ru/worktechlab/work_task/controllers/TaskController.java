@@ -80,6 +80,7 @@ public class TaskController {
         return taskService.updateTaskStatus(requestDto);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/tasks-in-project")
     @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
     public List<UsersTasksInProjectDTO> getTasksInProject() {

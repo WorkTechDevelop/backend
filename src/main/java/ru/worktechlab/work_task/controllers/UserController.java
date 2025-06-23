@@ -40,7 +40,7 @@ public class UserController {
         return userService.findUsersByIdsIn(data);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @Operation(summary = "Активировать пользователей по существующим ИД")
     @PutMapping("/activate")
     public OkResponse activateUsers(
@@ -49,6 +49,7 @@ public class UserController {
         return userService.activateUsers(data, true);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @Operation(summary = "Заблокировать пользователей по существующим ИД")
     @PutMapping("/block")
     public OkResponse blockUsers(

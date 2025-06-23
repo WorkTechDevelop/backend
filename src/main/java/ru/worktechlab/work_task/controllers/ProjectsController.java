@@ -58,6 +58,7 @@ public class ProjectsController {
         return projectsService.getProjectData(projectId);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/{projectId}")
     @Operation(summary = "Получение данных проекта по ИД и фильтру")
     public ProjectDataDto getProjectDataByFilter(
@@ -101,6 +102,7 @@ public class ProjectsController {
         return projectsService.addProjectForUsers(projectId, data);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @DeleteMapping("/{projectId}/delete-users")
     @Operation(summary = "Удаление пользователей из проекта")
     public OkResponse deleteProjectForUsers(
