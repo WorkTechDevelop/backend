@@ -78,16 +78,4 @@ public class CheckerUtil {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь с ИД %s не найден или не активен", userId)));
     }
-
-    @TransactionMandatory
-    public void checkHasProjectForUser(Project project) throws NotFoundException {
-        String userId = userContext.getUserData().getUserId();
-        User user = findActiveUser(userId);
-        boolean hasProject = user.getProjects().stream()
-                .anyMatch(pr -> Objects.equals(project.getId(), pr.getId()));
-        if (!hasProject)
-            throw new NotFoundException(
-                    String.format("Вам не доступен проект %s", project.getName())
-            );
-    }
 }

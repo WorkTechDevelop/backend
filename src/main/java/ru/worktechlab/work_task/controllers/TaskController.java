@@ -9,15 +9,18 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
+import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
 import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
 import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
-import ru.worktechlab.work_task.dto.tasks.TaskResponse;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
+import ru.worktechlab.work_task.models.tables.TaskModel;
 import ru.worktechlab.work_task.services.TaskHistoryService;
 import ru.worktechlab.work_task.services.TaskService;
 
@@ -33,7 +36,7 @@ public class TaskController {
 
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
-    public TaskResponse createTask(
+    public TaskDataDto createTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для создания задачи",
@@ -48,7 +51,7 @@ public class TaskController {
 
     @PutMapping("/update-task")
     @Operation(summary = "Обновить задачу")
-    public TaskResponse updateTask(
+    public TaskDataDto updateTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для обновления задачи",
@@ -63,7 +66,7 @@ public class TaskController {
 
     @PutMapping("/update-status")
     @Operation(summary = "Обновить статус задачи")
-    public TaskResponse updateTask(
+    public TaskDataDto updateTaskStatus(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для обновления статуса задачи",

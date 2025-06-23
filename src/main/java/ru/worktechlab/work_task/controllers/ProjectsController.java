@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
-import ru.worktechlab.work_task.dto.projects.ProjectDto;
-import ru.worktechlab.work_task.dto.projects.ProjectRequestDto;
-import ru.worktechlab.work_task.dto.projects.ShortProjectDataDto;
+import ru.worktechlab.work_task.dto.projects.*;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.services.ProjectsService;
 
@@ -52,6 +50,17 @@ public class ProjectsController {
         return projectsService.getProjectData(projectId);
     }
 
+    @PostMapping("/{projectId}")
+    @Operation(summary = "Получение данных проекта по ИД и фильтру")
+    public ProjectDataDto getProjectDataByFilter(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId,
+            @Parameter(description = "Данные фильтра")
+            @RequestBody @Valid ProjectDataFilterDto filter
+    ) throws NotFoundException {
+        return projectsService.getProjectDataByFilter(projectId, filter);
+    }
+
     @PutMapping("/finish-project/{projectId}")
     @Operation(summary = "Завершение проекта по ИД")
     public ProjectDto finishProject(
@@ -70,7 +79,7 @@ public class ProjectsController {
         return projectsService.startProject(projectId);
     }
 
-    @PutMapping("/{projectId}/add-project")
+    @PutMapping("/{projectId}/add-users")
     @Operation(summary = "Добавление проекта пользователям")
     public OkResponse addProjectForUsers(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -79,5 +88,16 @@ public class ProjectsController {
             @RequestBody StringIdsDto data
     ) throws NotFoundException {
         return projectsService.addProjectForUsers(projectId, data);
+    }
+
+    @DeleteMapping("/{projectId}/delete-users")
+    @Operation(summary = "Удаление пользователей из проекта")
+    public OkResponse deleteProjectForUsers(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId,
+            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
+            @RequestBody StringIdsDto data
+    ) throws NotFoundException {
+        return projectsService.deleteProjectForUsers(projectId, data);
     }
 }

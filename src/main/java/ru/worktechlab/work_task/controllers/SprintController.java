@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.sprints.ActivateSprintDtoRequest;
 import ru.worktechlab.work_task.dto.sprints.SprintDtoRequest;
 import ru.worktechlab.work_task.dto.sprints.SprintInfoDTO;
 import ru.worktechlab.work_task.exceptions.BadRequestException;
@@ -35,12 +34,32 @@ public class SprintController {
         return sprintsService.createSprint(projectId, data);
     }
 
-    @PutMapping("/{sprintId}/activate")
-    @Operation(summary = "Запуск/завершение спринта спринта")
-    public SprintInfoDTO activateSprint(@Parameter(description = "ИД спринта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
-                                        @PathVariable String sprintId,
-                                        @Parameter(description = "Признак запуска/завершения спринта", required = true)
-                                        @RequestBody ActivateSprintDtoRequest data) throws NotFoundException, BadRequestException {
-        return sprintsService.activateSprint(sprintId, data);
+    @PutMapping("/project/{projectId}/{sprintId}/activate")
+    @Operation(summary = "Запуск спринта спринта")
+    public SprintInfoDTO activateSprint(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                        @PathVariable String projectId,
+                                        @Parameter(description = "ИД спринта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                        @PathVariable String sprintId) throws NotFoundException, BadRequestException {
+        return sprintsService.activateSprint(sprintId, projectId);
+    }
+
+    @PutMapping("/project/{projectId}/{sprintId}/finish")
+    @Operation(summary = "Завершение спринта")
+    public SprintInfoDTO finishSprint(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                      @PathVariable String projectId,
+                                      @Parameter(description = "ИД спринта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                      @PathVariable String sprintId) throws NotFoundException, BadRequestException {
+        return sprintsService.finishSprint(sprintId, projectId);
+    }
+
+    @PutMapping("/project/{projectId}/{sprintId}/update")
+    @Operation(summary = "Изменение спринта")
+    public SprintInfoDTO updateSprint(@Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                      @PathVariable String projectId,
+                                      @Parameter(description = "ИД спринта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+                                      @PathVariable String sprintId,
+                                      @Parameter(description = "Данные спринта", required = true)
+                                      @RequestBody SprintDtoRequest data) throws NotFoundException, BadRequestException {
+        return sprintsService.updateSprint(sprintId, projectId, data);
     }
 }

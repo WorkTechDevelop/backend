@@ -27,4 +27,6 @@ public class TaskStatusDto {
     @NotNull
     @Schema(description = "ИД проекта")
     private String projectId;
+    @Schema(description = "Признак отображения")
+    private boolean defaultTaskStatus;
 }

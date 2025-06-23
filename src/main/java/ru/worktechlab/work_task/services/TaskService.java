@@ -12,8 +12,8 @@ import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.CommentDto;
 import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
 import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
+import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
-import ru.worktechlab.work_task.dto.tasks.TaskResponse;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
@@ -49,7 +49,7 @@ public class TaskService {
     private final CommentMapper commentMapper;
 
     @Transactional
-    public TaskResponse updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
+    public TaskDataDto updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
         log.debug("Processing update-task with model: {}", dto);
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
         TaskModel existingTask = findTaskByIdAndProjectForUpdate(dto.getId(), data.getProject());
@@ -82,7 +82,7 @@ public class TaskService {
     }
 
     @TransactionRequired
-    public TaskResponse createTask(TaskModelDTO taskDTO) throws NotFoundException {
+    public TaskDataDto createTask(TaskModelDTO taskDTO) throws NotFoundException {
         log.debug("Processing create-task with model: {}", taskDTO);
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(taskDTO.getProjectId(), false, false);
         TaskModel task = convertToEntity(taskDTO, data.getUser(), data.getProject());
@@ -135,7 +135,7 @@ public class TaskService {
     }
 
     @TransactionRequired
-    public TaskResponse updateTaskStatus(UpdateStatusRequestDTO requestDto) throws NotFoundException {
+    public TaskDataDto updateTaskStatus(UpdateStatusRequestDTO requestDto) throws NotFoundException {
         log.debug("Обновить статус задачи");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(requestDto.getProjectId(), false, false);
         TaskModel task = findTaskByIdAndProjectForUpdate(requestDto.getId(), data.getProject());
