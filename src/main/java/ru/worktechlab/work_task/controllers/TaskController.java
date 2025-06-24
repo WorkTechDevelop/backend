@@ -5,8 +5,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
@@ -20,6 +22,8 @@ import ru.worktechlab.work_task.services.TaskService;
 
 import java.util.List;
 
+import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
+
 @RestController
 @RequestMapping("work-task/v1/task")
 @RequiredArgsConstructor
@@ -28,8 +32,10 @@ public class TaskController {
     private final TaskService taskService;
     private final TaskHistoryService taskHistoryService;
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskDataDto createTask(
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -43,6 +49,7 @@ public class TaskController {
         return taskService.createTask(taskModelDTO);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-task")
     @Operation(summary = "Обновить задачу")
     public TaskDataDto updateTask(
@@ -58,6 +65,7 @@ public class TaskController {
         return taskService.updateTask(updateTaskModelDTO);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-status")
     @Operation(summary = "Обновить статус задачи")
     public TaskDataDto updateTaskStatus(
@@ -73,13 +81,14 @@ public class TaskController {
         return taskService.updateTaskStatus(requestDto);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/tasks-in-project")
     @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
     public List<UsersTasksInProjectDTO> getTasksInProject() {
         return taskService.getProjectTaskByUserGuid();
     }
 
-
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/history/{taskId}/{projectId}")
     @Operation(summary = "Получить историю изменения задачи по id {taskId}")
     public List<TaskHistoryResponseDto> getTaskHistory(

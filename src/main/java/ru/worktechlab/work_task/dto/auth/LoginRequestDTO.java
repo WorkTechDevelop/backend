@@ -7,7 +7,7 @@ import lombok.Data;
 @Schema(description = "Модель аутентификации пользователя")
 public class LoginRequestDTO {
     @Schema(description = "Email пользователя", example = "user@gmail.com")
-    private String username;
+    private String email;
 
     @Schema(description = "Пароль пользователя", example = "password123")
     private String password;

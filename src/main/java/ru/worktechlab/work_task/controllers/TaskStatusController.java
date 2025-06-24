@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.services.TaskStatusService;
 
+import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
+
 @RestController
 @RequestMapping("work-task/v1/status")
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class TaskStatusController {
 
     private final TaskStatusService taskStatusService;
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @GetMapping("/project/{projectId}/statuses")
     @Operation(summary = "Список статусов проекта")
     public StatusListResponseDto getStatuses(
@@ -31,6 +35,7 @@ public class TaskStatusController {
         return taskStatusService.getStatuses(projectId);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @PostMapping("/project/{projectId}/create-status")
     @Operation(summary = "Создание статуса")
     public TaskStatusDto createStatus(
@@ -41,6 +46,7 @@ public class TaskStatusController {
         return taskStatusService.createStatus(projectId, data);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @PutMapping("/project/{projectId}/update-statuses")
     @Operation(summary = "Обновление данных статусов")
     public StatusListResponseDto updateStatuses(

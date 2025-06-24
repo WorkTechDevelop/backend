@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import ru.worktechlab.work_task.services.ProjectsService;
 
 import java.util.List;
 
+import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
+
 @RestController
 @RequestMapping("work-task/v1/projects")
 @RequiredArgsConstructor
@@ -21,18 +24,21 @@ import java.util.List;
 public class ProjectsController {
     private final ProjectsService projectsService;
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/all-user-project")
     @Operation(summary = "Вывести список проектов пользователя")
     public List<ShortProjectDataDto> getAllUserProjects() {
         return projectsService.getAllUserProjects();
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/active-project")
     @Operation(summary = "Получить ID основного проекта пользователя")
     public String getActiveProject() {
         return projectsService.getLastProjectId();
     }
 
+    @RolesAllowed({PROJECT_OWNER})
     @PostMapping("/create-project")
     @Operation(summary = "Создание проекта")
     public ProjectDto createProject(
@@ -41,6 +47,7 @@ public class ProjectsController {
         return projectsService.createProject(data);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/{projectId}")
     @Operation(summary = "Получение данных проекта по ИД")
     public ProjectDto getProjectData(
@@ -50,6 +57,7 @@ public class ProjectsController {
         return projectsService.getProjectData(projectId);
     }
 
+    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/{projectId}")
     @Operation(summary = "Получение данных проекта по ИД и фильтру")
     public ProjectDataDto getProjectDataByFilter(
@@ -61,6 +69,7 @@ public class ProjectsController {
         return projectsService.getProjectDataByFilter(projectId, filter);
     }
 
+    @RolesAllowed({PROJECT_OWNER})
     @PutMapping("/finish-project/{projectId}")
     @Operation(summary = "Завершение проекта по ИД")
     public ProjectDto finishProject(
@@ -70,6 +79,7 @@ public class ProjectsController {
         return projectsService.finishProject(projectId);
     }
 
+    @RolesAllowed({PROJECT_OWNER})
     @PutMapping("/start-project/{projectId}")
     @Operation(summary = "Запуск проекта по ИД")
     public ProjectDto startProject(
@@ -80,6 +90,7 @@ public class ProjectsController {
     }
 
     @PutMapping("/{projectId}/add-users")
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @Operation(summary = "Добавление проекта пользователям")
     public OkResponse addProjectForUsers(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -90,6 +101,7 @@ public class ProjectsController {
         return projectsService.addProjectForUsers(projectId, data);
     }
 
+    @RolesAllowed({PROJECT_OWNER})
     @DeleteMapping("/{projectId}/delete-users")
     @Operation(summary = "Удаление пользователей из проекта")
     public OkResponse deleteProjectForUsers(

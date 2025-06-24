@@ -8,6 +8,8 @@ import lombok.Data;
 import ru.worktechlab.work_task.authorization.PasswordMatch;
 import ru.worktechlab.work_task.authorization.ValidGender;
 
+import java.time.LocalDate;
+
 @Schema(description = "Модель регистрации пользователя")
 @Data
 @PasswordMatch
@@ -42,7 +44,7 @@ public class RegisterDTO {
     private String phone;
 
     @Schema(description = "Дата рождения пользователя", example = "01.01.2000")
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Schema(description = "Пол пользователя", example = "MALE")
     @NotBlank(message = "Gender не может быть пустым")
