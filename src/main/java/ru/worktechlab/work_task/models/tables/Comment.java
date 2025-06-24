@@ -19,17 +19,21 @@ public class Comment {
     @Column(name = "id", nullable = false, unique = true)
     private String id;
 
-    @Column(name = "task_id", nullable = false)
-    private String taskId;
+    @OneToOne
+    @JoinColumn(name = "task_id", referencedColumnName = "id")
+    private TaskModel task;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "comment", nullable = false)
     private String comment;
 
     @Transient
@@ -44,12 +48,12 @@ public class Comment {
         this.comment = newValue;
     }
 
-    public Comment(String taskId, User user, String comment) {
-        this.taskId = taskId;
+    public Comment(TaskModel task, User user, String comment) {
+        this.task = task;
         this.user = user;
         this.comment = comment;
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = null;
+        this.updatedAt = LocalDateTime.now();;
     }
 
     public Comment() {

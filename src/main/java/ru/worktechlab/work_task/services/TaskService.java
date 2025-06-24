@@ -1,7 +1,6 @@
 package ru.worktechlab.work_task.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
-import ru.worktechlab.work_task.exceptions.PermissionDeniedException;
 import ru.worktechlab.work_task.mappers.CommentMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
 import ru.worktechlab.work_task.models.tables.*;
@@ -43,11 +41,10 @@ public class TaskService {
     private final SprintsService sprintsService;
     private final TaskMapper taskMapper;
     private final CheckerUtil checkerUtil;
-    private final UserService userService;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
-    @Transactional
+    @TransactionRequired
     public TaskDataDto updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
         log.debug("Processing update-task with model: {}", dto);
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
@@ -143,14 +140,15 @@ public class TaskService {
         return taskMapper.toDo(findTaskByIdOrThrow(task.getId()));
     }
 
-    private Comment convertToEntity(CommentDto dto, User user) {
+    private Comment convertToEntity(CommentDto dto, User user, TaskModel task) {
         return new Comment(
-                dto.getTaskId(),
+                task,
                 user,
                 dto.getComment()
         );
     }
 
+    @TransactionRequired
     public Comment findCommentForUpdateByIdOrElseThrow(String id) {
         return commentRepository.findCommentByIdForUpdate(id).orElseThrow(
                 () -> new EntityNotFoundException(
@@ -158,6 +156,7 @@ public class TaskService {
                 ));
     }
 
+    @TransactionRequired
     public Comment findCommentByIdOrElseThrow(String id) {
         return commentRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(
@@ -169,7 +168,8 @@ public class TaskService {
     public CommentResponseDto createComment(CommentDto dto) throws NotFoundException {
         log.debug("Создать комментарий к задаче");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
-        Comment comment = convertToEntity(dto, data.getUser());
+        TaskModel task = findTaskByIdOrThrow(dto.getTaskId());
+        Comment comment = convertToEntity(dto, data.getUser(), task);
         commentRepository.saveAndFlush(comment);
         return commentMapper.toDto(comment);
     }
@@ -179,24 +179,17 @@ public class TaskService {
         log.debug("Обновить комментарий к задаче");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
         Comment comment = findCommentForUpdateByIdOrElseThrow(dto.getCommentId());
-        User creator = comment.getUser();
-        User modifier = data.getUser();
-        if (!userService.compareUsers(creator, modifier)) {
-            throw new PermissionDeniedException(
-                    "Только создатель комментария имеет право редактирования");
-        }
-        taskHistorySaverService.saveTaskCommentChanges(comment, dto, modifier);
+        TaskModel task = findTaskByIdOrThrow(dto.getTaskId());
+        taskHistorySaverService.saveTaskCommentChanges(comment, dto, data.getUser(),task);
         commentRepository.flush();
         log.debug("Комментарий обновлен: id={}", comment.getId());
         return commentMapper.toDto(comment);
     }
 
     @TransactionRequired
-    public ApiResponse deleteCommentById(String commentId) throws NotFoundException {
+    public ApiResponse deleteComment(String commentId, String projectId) throws NotFoundException {
         log.debug("Удалить комментарий к задаче");
-        Comment comment = findCommentByIdOrElseThrow(commentId);
-        TaskModel task = findTaskByIdOrThrow(comment.getTaskId());
-        String projectId = task.getProject().getId();
+        findCommentByIdOrElseThrow(commentId);
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         commentRepository.deleteCommentById(commentId);
         commentRepository.flush();
@@ -206,7 +199,7 @@ public class TaskService {
     }
 
     @TransactionRequired
-    public List<GetAllTasksCommentsResponseDto> getAllTasksComments(GetAllTasksCommentsDto dto) throws NotFoundException {
+    public List<AllTasksCommentsResponseDto> allTasksComments(AllTasksCommentsDto dto) throws NotFoundException {
         log.debug("Получить все комментарии к задаче");
         findTaskByIdOrThrow(dto.getTaskId());
         checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);

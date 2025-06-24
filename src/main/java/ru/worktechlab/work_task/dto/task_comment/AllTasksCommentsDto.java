@@ -10,7 +10,7 @@ import ru.worktechlab.work_task.validators.ValidTaskId;
 @Schema(description = "Модель поучения всех комментариев к задаче")
 @Getter
 @Setter
-public class GetAllTasksCommentsDto {
+public class AllTasksCommentsDto {
     @Schema(description = "ID задачи")
     @NotBlank(message = "Поле taskId не может быть пустым")
     @ValidTaskId

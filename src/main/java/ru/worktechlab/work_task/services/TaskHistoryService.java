@@ -46,9 +46,10 @@ public class TaskHistoryService {
 
     public void saveTaskCommentChanges(Comment comment,
                                        UpdateCommentDto dto,
-                                       User user
+                                       User user,
+                                       TaskModel task
     ) {
-        saveHistory(createTaskCommentHistory(comment, dto), comment.getTaskId(), user);
+        saveHistory(createTaskCommentHistory(comment, dto), task, user);
 
     }
 
@@ -57,6 +58,14 @@ public class TaskHistoryService {
                              User user) {
         if (CollectionUtils.isEmpty(dto)) return;
         List<TaskHistory> histories = convertToEntity(dto, user, taskId);
+        saveAll(histories);
+    }
+
+    private void saveHistory(List<TaskHistoryDto> dto,
+                             TaskModel task,
+                             User user) {
+        if (CollectionUtils.isEmpty(dto)) return;
+        List<TaskHistory> histories = convertToEntity(dto, user, task.getId());
         saveAll(histories);
     }
 

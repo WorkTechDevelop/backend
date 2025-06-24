@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class GetAllTasksCommentsResponseDto {
+public class AllTasksCommentsResponseDto {
     private UserShortDataDto user;
     private String commentId;
     private String comment;

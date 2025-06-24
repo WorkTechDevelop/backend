@@ -124,25 +124,29 @@ public class TaskController {
         return taskService.updateComment(dto);
     }
 
-    @DeleteMapping("/delete-comment/{commentId}")
+    @DeleteMapping("/delete-comment/{commentId}/{projectId}")
     @Operation(summary = "Удаление комментария")
     public ApiResponse deleteComment(
             @Parameter(description = "ИД комментария", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
-            @PathVariable String commentId
+            @PathVariable String commentId,
+            @Parameter(description = "ИД проекта",
+                    example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
+                    required = true)
+            @PathVariable("projectId") String projectId
     ) throws NotFoundException {
-        return taskService.deleteCommentById(commentId);
+        return taskService.deleteComment(commentId, projectId);
     }
 
     @PostMapping("/all-comments")
     @Operation(summary = "Получить все комментарии к задаче")
-    public List<GetAllTasksCommentsResponseDto> getAllTasksComments(@Valid
+    public List<AllTasksCommentsResponseDto> allTasksComments(@Valid
                                                                     @io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                                             description = "id задачи и проекта",
                                                                             content = @Content(
-                                                                                    mediaType = "application/json", schema = @Schema(implementation = GetAllTasksCommentsDto.class)
+                                                                                    mediaType = "application/json", schema = @Schema(implementation = AllTasksCommentsDto.class)
                                                                             )
                                                                     )
-                                                                    @RequestBody GetAllTasksCommentsDto dto) throws NotFoundException {
-        return taskService.getAllTasksComments(dto);
+                                                                    @RequestBody AllTasksCommentsDto dto) throws NotFoundException {
+        return taskService.allTasksComments(dto);
     }
 }
