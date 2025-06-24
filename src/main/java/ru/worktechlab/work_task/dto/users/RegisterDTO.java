@@ -1,5 +1,6 @@
 package ru.worktechlab.work_task.dto.users;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -43,7 +44,8 @@ public class RegisterDTO {
     @Schema(description = "Номер телефона пользователя", example = "89999999999")
     private String phone;
 
-    @Schema(description = "Дата рождения пользователя", example = "01.01.2000")
+    @Schema(description = "Дата рождения пользователя", example = "2020-01-01")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
     @Schema(description = "Пол пользователя", example = "MALE")

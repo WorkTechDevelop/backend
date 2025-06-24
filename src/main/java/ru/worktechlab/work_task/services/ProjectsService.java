@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
-import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.projects.*;
@@ -134,36 +133,32 @@ public class ProjectsService {
     }
 
     @TransactionRequired
-    public OkResponse addProjectForUsers(String projectId,
-                                         StringIdsDto data) throws NotFoundException {
-        OkResponse response = new OkResponse();
+    public void addProjectForUsers(String projectId,
+                                   StringIdsDto data) throws NotFoundException {
         if (data == null || org.springframework.util.CollectionUtils.isEmpty(data.getIds()))
-            return response;
+            return;
         Project project = findProjectById(projectId);
         List<User> users = userService.findAndCheckUsers(data.getIds());
         usersProjectsRepository.saveAllAndFlush(users.stream()
                 .filter(user -> !hasProject(user, project.getId()))
                 .map(user -> new UsersProject(user, project))
                 .toList());
-        return response;
     }
 
     @TransactionRequired
-    public OkResponse deleteProjectForUsers(String projectId,
-                                            StringIdsDto data) throws NotFoundException {
-        OkResponse response = new OkResponse();
+    public void deleteProjectForUsers(String projectId,
+                                      StringIdsDto data) throws NotFoundException {
         if (data == null || CollectionUtils.isEmpty(data.getIds()))
-            return response;
+            return;
         findProjectById(projectId);
         userService.findAndCheckUsers(data.getIds());
         usersProjectsRepository.deleteProjectForUsers(projectId, data.getIds());
         usersProjectsRepository.flush();
-        return response;
     }
 
     @TransactionRequired
     public ProjectDataDto getProjectDataByFilter(String projectId,
-                                     ProjectDataFilterDto filter) throws NotFoundException {
+                                                 ProjectDataFilterDto filter) throws NotFoundException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, true);
         User user = data.getUser();
         user.setLastProjectId(projectId);
