@@ -53,7 +53,7 @@ public class Comment {
         this.user = user;
         this.comment = comment;
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Comment() {
