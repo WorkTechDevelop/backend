@@ -10,19 +10,22 @@ import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.*;
+import ru.worktechlab.work_task.dto.task_link.LinkDto;
+import ru.worktechlab.work_task.dto.task_link.LinkResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.exceptions.DuplicateLinkException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
+import ru.worktechlab.work_task.exceptions.PermissionDeniedException;
 import ru.worktechlab.work_task.mappers.CommentMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
+import ru.worktechlab.work_task.models.enums.LinkTypeName;
 import ru.worktechlab.work_task.models.tables.*;
-import ru.worktechlab.work_task.repositories.CommentRepository;
-import ru.worktechlab.work_task.repositories.TaskRepository;
-import ru.worktechlab.work_task.repositories.UserRepository;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.repositories.*;
 import ru.worktechlab.work_task.utils.CheckerUtil;
+import ru.worktechlab.work_task.utils.NormalizedLinkData;
 import ru.worktechlab.work_task.utils.UserContext;
 
 import java.util.List;
@@ -43,6 +46,8 @@ public class TaskService {
     private final CheckerUtil checkerUtil;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final LinkTypeRepository linkTypeRepository;
+    private final LinkRepository linkRepository;
 
     @TransactionRequired
     public TaskDataDto updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
@@ -148,6 +153,14 @@ public class TaskService {
         );
     }
 
+    private Link convertToEntity(NormalizedLinkData data) {
+        return new Link(
+                data.master(),
+                data.slave(),
+                data.linkType()
+        );
+    }
+
     @TransactionRequired
     public Comment findCommentForUpdateByIdOrElseThrow(String id) {
         return commentRepository.findCommentByIdForUpdate(id).orElseThrow(
@@ -162,6 +175,42 @@ public class TaskService {
                 () -> new EntityNotFoundException(
                         String.format("Не найден комментарий с таким id - %s", id)
                 ));
+    }
+
+    public LinkType findLinkTypeByIdOrElseThrow(Long id) {
+        return linkTypeRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(
+                        String.format("Не найден LinkType с таким id - %s", id)
+
+                ));
+    }
+
+    public LinkType findLinkTypeByNameOrElseThrow(LinkTypeName name) {
+        return linkTypeRepository.findByName(name).orElseThrow(
+                () -> new EntityNotFoundException(
+                        String.format("Не найден LinkType с таким названием - %s", name)
+
+                ));
+    }
+
+    public boolean isSameProjects(TaskModel first, TaskModel second) {
+        return first.getProject().getId().equals(second.getProject().getId());
+    }
+
+    private NormalizedLinkData normalizedLink(TaskModel first, TaskModel second, LinkType linkType) {
+        LinkTypeName typeName = linkType.getName();
+        if (typeName.inverseExist()) {
+            LinkType canonicalLinkType = findLinkTypeByNameOrElseThrow(typeName.getInverse());
+            return new NormalizedLinkData(second, first, canonicalLinkType);
+        }
+        return new NormalizedLinkData(first, second, linkType);
+    }
+
+    private void checkHasTasksLinkExist(NormalizedLinkData data) {
+        linkRepository.findByTasksLinkedAndType(data.master().getId(), data.slave().getId(), data.linkType().getName())
+                .ifPresent(existing -> {
+                    throw new DuplicateLinkException("Связь между задачами уже существует");
+                });
     }
 
     @TransactionRequired
@@ -205,5 +254,21 @@ public class TaskService {
         checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
         List<Comment> comments = commentRepository.findAllByTaskIdOrderByCreatedAtAsc(dto.getTaskId());
         return commentMapper.toGetAllDtoList(comments);
+    }
+
+    @TransactionRequired
+    public LinkResponseDto linkTask(LinkDto dto) throws NotFoundException {
+        checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        TaskModel taskFirst = findTaskByIdOrThrow(dto.getTaskIdFirst());
+        TaskModel taskSecond = findTaskByIdOrThrow(dto.getTaskIdSecond());
+        if (!isSameProjects(taskFirst, taskSecond)) {
+            throw new PermissionDeniedException("Нельзя связать задачи из разных пректов");
+        }
+        LinkType initialLinkType = findLinkTypeByIdOrElseThrow(dto.getLinkTypeId());
+        NormalizedLinkData linkData = normalizedLink(taskFirst, taskSecond, initialLinkType);
+        checkHasTasksLinkExist(linkData);
+        Link link = convertToEntity(linkData);
+        linkRepository.saveAndFlush(link);
+        return new LinkResponseDto(link.getId());
     }
 }

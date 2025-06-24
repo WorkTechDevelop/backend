@@ -12,6 +12,8 @@ import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
 import ru.worktechlab.work_task.dto.task_comment.*;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
+import ru.worktechlab.work_task.dto.task_link.LinkDto;
+import ru.worktechlab.work_task.dto.task_link.LinkResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
@@ -140,13 +142,28 @@ public class TaskController {
     @PostMapping("/all-comments")
     @Operation(summary = "Получить все комментарии к задаче")
     public List<AllTasksCommentsResponseDto> allTasksComments(@Valid
-                                                                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                                                                            description = "id задачи и проекта",
-                                                                            content = @Content(
-                                                                                    mediaType = "application/json", schema = @Schema(implementation = AllTasksCommentsDto.class)
-                                                                            )
-                                                                    )
-                                                                    @RequestBody AllTasksCommentsDto dto) throws NotFoundException {
+                                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                                      description = "id задачи и проекта",
+                                                                      content = @Content(
+                                                                              mediaType = "application/json", schema = @Schema(implementation = AllTasksCommentsDto.class)
+                                                                      )
+                                                              )
+                                                              @RequestBody AllTasksCommentsDto dto) throws NotFoundException {
         return taskService.allTasksComments(dto);
+    }
+
+    @PostMapping("/link-task")
+    @Operation(summary = "Создать связь между задачами")
+    public LinkResponseDto linkTask(
+            @Valid
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Модель связывания задач",
+                    content = @Content(
+                            mediaType = "application/json", schema = @Schema(implementation = LinkDto.class)
+                    )
+            )
+            @RequestBody LinkDto dto
+    ) throws NotFoundException {
+        return taskService.linkTask(dto);
     }
 }
