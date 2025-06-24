@@ -17,7 +17,6 @@ import java.util.List;
 
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
-
 @RestController
 @RequestMapping("work-task/v1/projects")
 @RequiredArgsConstructor
@@ -32,14 +31,14 @@ public class ProjectsController {
         return projectsService.getAllUserProjects();
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/active-project")
     @Operation(summary = "Получить ID основного проекта пользователя")
     public String getActiveProject() {
         return projectsService.getLastProjectId();
     }
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @PostMapping("/create-project")
     @Operation(summary = "Создание проекта")
     public ProjectDto createProject(
@@ -70,7 +69,7 @@ public class ProjectsController {
         return projectsService.getProjectDataByFilter(projectId, filter);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @PutMapping("/finish-project/{projectId}")
     @Operation(summary = "Завершение проекта по ИД")
     public ProjectDto finishProject(
@@ -80,7 +79,7 @@ public class ProjectsController {
         return projectsService.finishProject(projectId);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @PutMapping("/start-project/{projectId}")
     @Operation(summary = "Запуск проекта по ИД")
     public ProjectDto startProject(
@@ -102,7 +101,7 @@ public class ProjectsController {
         return projectsService.addProjectForUsers(projectId, data);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @DeleteMapping("/{projectId}/delete-users")
     @Operation(summary = "Удаление пользователей из проекта")
     public OkResponse deleteProjectForUsers(

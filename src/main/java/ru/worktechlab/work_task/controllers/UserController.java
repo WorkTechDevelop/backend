@@ -24,14 +24,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({ADMIN, PROJECT_OWNER})
     @Operation(summary = "Список всех пользователей")
     @GetMapping
     public List<UserShortDataDto> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @Operation(summary = "Список всех пользователей по существующим ИД")
     @PostMapping()
     public List<UserShortDataDto> findUsersByIdsIn(

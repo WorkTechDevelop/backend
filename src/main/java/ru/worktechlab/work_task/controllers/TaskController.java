@@ -28,12 +28,11 @@ import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 @RequestMapping("work-task/v1/task")
 @RequiredArgsConstructor
 @Tag(name = "Task", description = "Управление задачами")
-@RolesAllowed({PROJECT_MEMBER})
 public class TaskController {
     private final TaskService taskService;
     private final TaskHistoryService taskHistoryService;
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/create-task")
     @Operation(summary = "Создать задачу")
     @ResponseStatus(HttpStatus.CREATED)
@@ -50,7 +49,7 @@ public class TaskController {
         return taskService.createTask(taskModelDTO);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-task")
     @Operation(summary = "Обновить задачу")
     public TaskDataDto updateTask(
@@ -66,7 +65,7 @@ public class TaskController {
         return taskService.updateTask(updateTaskModelDTO);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-status")
     @Operation(summary = "Обновить статус задачи")
     public TaskDataDto updateTaskStatus(
@@ -82,14 +81,14 @@ public class TaskController {
         return taskService.updateTaskStatus(requestDto);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/tasks-in-project")
     @Operation(summary = "Получить все задачи активного проекта отсортированные по пользователям")
     public List<UsersTasksInProjectDTO> getTasksInProject() {
         return taskService.getProjectTaskByUserGuid();
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/history/{taskId}/{projectId}")
     @Operation(summary = "Получить историю изменения задачи по id {taskId}")
     public List<TaskHistoryResponseDto> getTaskHistory(
