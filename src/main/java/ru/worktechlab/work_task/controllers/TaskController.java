@@ -126,17 +126,21 @@ public class TaskController {
         return taskService.updateComment(dto);
     }
 
-    @DeleteMapping("/delete-comment/{commentId}/{projectId}")
+    @DeleteMapping("/delete-comment/{commentId}/{taskId}/{projectId}")
     @Operation(summary = "Удаление комментария")
     public ApiResponse deleteComment(
             @Parameter(description = "ИД комментария", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String commentId,
+            @Parameter(description = "Уникальный идентификатор задачи",
+                    example = "96cd710c-bd28-40b7-903e-4b8033892612",
+                    required = true)
+            @PathVariable("taskId") String taskId,
             @Parameter(description = "ИД проекта",
                     example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
                     required = true)
             @PathVariable("projectId") String projectId
     ) throws NotFoundException {
-        return taskService.deleteComment(commentId, projectId);
+        return taskService.deleteComment(commentId, taskId, projectId);
     }
 
     @PostMapping("/all-comments")

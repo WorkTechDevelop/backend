@@ -18,5 +18,6 @@ public interface CommentMapper {
     @Mapping(source = "id", target = "commentId")
     AllTasksCommentsResponseDto toGetAllDto(Comment comment);
 
+    @Mapping(source = "id", target = "commentId")
     List<AllTasksCommentsResponseDto> toGetAllDtoList(List<Comment> comments);
 }

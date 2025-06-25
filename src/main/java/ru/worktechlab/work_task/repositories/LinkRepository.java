@@ -14,11 +14,11 @@ public interface LinkRepository extends JpaRepository<Link, String> {
     SELECT l FROM Link l
     WHERE 
         (
-            (l.task_master.id = :firstId AND l.task_slave.id = :secondId)
+            (l.taskMaster.id = :firstId AND l.taskSlave.id = :secondId)
          OR
-            (l.task_master.id = :secondId AND l.task_slave.id = :firstId)
+            (l.taskMaster.id = :secondId AND l.taskSlave.id = :firstId)
         )
-      AND l.linkType.name = :linkTypeName
+      AND l.name = :linkTypeName
 """)
     Optional<Link> findByTasksLinkedAndType(
             @Param("firstId") String firstTaskId,

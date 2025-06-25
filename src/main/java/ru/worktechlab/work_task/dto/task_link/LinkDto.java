@@ -2,9 +2,9 @@ package ru.worktechlab.work_task.dto.task_link;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import ru.worktechlab.work_task.validators.ValidLinkTypeName;
 import ru.worktechlab.work_task.validators.ValidProjectId;
 import ru.worktechlab.work_task.validators.ValidTaskId;
 
@@ -28,7 +28,7 @@ public class LinkDto {
     @ValidProjectId
     private String projectId;
 
-    @Schema(description = "id LinkType", example = "1, 2, 3")
-    @NotNull(message = "linkType не может быть пустым")
-    private Long linkTypeId;
+    @Schema(description = "LinkTypeName", example = "RELATED")
+    @ValidLinkTypeName
+    private String LinkTypeName;
 }

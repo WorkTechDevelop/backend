@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.worktechlab.work_task.models.enums.LinkTypeName;
 
 @Entity
 @Table(name = "link")
 @NoArgsConstructor
 @Getter
-@Setter
 public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,19 +18,23 @@ public class Link {
 
     @OneToOne
     @JoinColumn(name = "task_master_id", referencedColumnName = "id")
-    private TaskModel task_master;
+    private TaskModel taskMaster;
 
     @OneToOne
     @JoinColumn(name = "task_slave_id", referencedColumnName = "id")
-    private TaskModel task_slave;
+    private TaskModel taskSlave;
 
-    @OneToOne
-    @JoinColumn(name = "link_type_id", referencedColumnName = "id")
-    private LinkType linkType;
+    @Column(name = "name", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private LinkTypeName name;
 
-    public Link(TaskModel master, TaskModel slave, LinkType linkType) {
-        this.task_master = master;
-        this.task_slave = slave;
-        this.linkType = linkType;
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    public Link(TaskModel master, TaskModel slave, LinkTypeName name) {
+        this.taskMaster = master;
+        this.taskSlave = slave;
+        this.name = name;
+        this.description = name.getDescription();
     }
 }

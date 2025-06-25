@@ -18,7 +18,6 @@ import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.DuplicateLinkException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
-import ru.worktechlab.work_task.exceptions.PermissionDeniedException;
 import ru.worktechlab.work_task.mappers.CommentMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
 import ru.worktechlab.work_task.models.enums.LinkTypeName;
@@ -46,7 +45,6 @@ public class TaskService {
     private final CheckerUtil checkerUtil;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
-    private final LinkTypeRepository linkTypeRepository;
     private final LinkRepository linkRepository;
 
     @TransactionRequired
@@ -157,57 +155,37 @@ public class TaskService {
         return new Link(
                 data.master(),
                 data.slave(),
-                data.linkType()
+                data.linkTypeName()
         );
     }
 
     @TransactionRequired
-    public Comment findCommentForUpdateByIdOrElseThrow(String id) {
-        return commentRepository.findCommentByIdForUpdate(id).orElseThrow(
+    public Comment findCommentForUpdateByIdOrElseThrow(String id, String taskId) {
+        return commentRepository.findCommentByIdForUpdate(id, taskId).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format("Не найден комментарий с таким id - %s", id)
+                        String.format("Не найден комментарий с таким id - %s для задачи - %s", id, taskId)
                 ));
     }
 
     @TransactionRequired
-    public Comment findCommentByIdOrElseThrow(String id) {
-        return commentRepository.findById(id).orElseThrow(
+    public Comment findCommentByIdOrElseThrow(String id, String taskId) {
+        return commentRepository.findByCommentAndTaskAds(id, taskId).orElseThrow(
                 () -> new EntityNotFoundException(
-                        String.format("Не найден комментарий с таким id - %s", id)
+                        String.format("Не найден комментарий с таким id - %s для задачи - %s", id, taskId)
                 ));
     }
 
-    public LinkType findLinkTypeByIdOrElseThrow(Long id) {
-        return linkTypeRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(
-                        String.format("Не найден LinkType с таким id - %s", id)
-
-                ));
-    }
-
-    public LinkType findLinkTypeByNameOrElseThrow(LinkTypeName name) {
-        return linkTypeRepository.findByName(name).orElseThrow(
-                () -> new EntityNotFoundException(
-                        String.format("Не найден LinkType с таким названием - %s", name)
-
-                ));
-    }
-
-    public boolean isSameProjects(TaskModel first, TaskModel second) {
-        return first.getProject().getId().equals(second.getProject().getId());
-    }
-
-    private NormalizedLinkData normalizedLink(TaskModel first, TaskModel second, LinkType linkType) {
-        LinkTypeName typeName = linkType.getName();
+    private NormalizedLinkData normalizedLink(TaskModel first, TaskModel second, String linkTypeName) {
+        LinkTypeName typeName = LinkTypeName.valueOf(linkTypeName);
         if (typeName.inverseExist()) {
-            LinkType canonicalLinkType = findLinkTypeByNameOrElseThrow(typeName.getInverse());
+            LinkTypeName canonicalLinkType = typeName.getInverse();
             return new NormalizedLinkData(second, first, canonicalLinkType);
         }
-        return new NormalizedLinkData(first, second, linkType);
+        return new NormalizedLinkData(first, second, typeName);
     }
 
     private void checkHasTasksLinkExist(NormalizedLinkData data) {
-        linkRepository.findByTasksLinkedAndType(data.master().getId(), data.slave().getId(), data.linkType().getName())
+        linkRepository.findByTasksLinkedAndType(data.master().getId(), data.slave().getId(), data.linkTypeName())
                 .ifPresent(existing -> {
                     throw new DuplicateLinkException("Связь между задачами уже существует");
                 });
@@ -217,7 +195,7 @@ public class TaskService {
     public CommentResponseDto createComment(CommentDto dto) throws NotFoundException {
         log.debug("Создать комментарий к задаче");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
-        TaskModel task = findTaskByIdOrThrow(dto.getTaskId());
+        TaskModel task = findTaskByIdAndProject(dto.getTaskId(), data.getProject());
         Comment comment = convertToEntity(dto, data.getUser(), task);
         commentRepository.saveAndFlush(comment);
         return commentMapper.toDto(comment);
@@ -227,23 +205,24 @@ public class TaskService {
     public CommentResponseDto updateComment(UpdateCommentDto dto) throws NotFoundException {
         log.debug("Обновить комментарий к задаче");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
-        Comment comment = findCommentForUpdateByIdOrElseThrow(dto.getCommentId());
-        TaskModel task = findTaskByIdOrThrow(dto.getTaskId());
-        taskHistorySaverService.saveTaskCommentChanges(comment, dto, data.getUser(),task);
+        TaskModel task = findTaskByIdAndProject(dto.getTaskId(), data.getProject());
+        Comment comment = findCommentForUpdateByIdOrElseThrow(dto.getCommentId(), task.getId());
+        taskHistorySaverService.saveTaskCommentChanges(comment, dto, data.getUser(), task);
         commentRepository.flush();
         log.debug("Комментарий обновлен: id={}", comment.getId());
         return commentMapper.toDto(comment);
     }
 
     @TransactionRequired
-    public ApiResponse deleteComment(String commentId, String projectId) throws NotFoundException {
+    public ApiResponse deleteComment(String commentId, String taskId, String projectId) throws NotFoundException {
         log.debug("Удалить комментарий к задаче");
-        findCommentByIdOrElseThrow(commentId);
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        TaskModel task = findTaskByIdAndProject(taskId, data.getProject());
+        findCommentByIdOrElseThrow(commentId, task.getId());
         commentRepository.deleteCommentById(commentId);
         commentRepository.flush();
         ApiResponse apiResponse = new ApiResponse("Комментарий успешно удалён");
-        log.info("Пользователь {} удалил комментарий {}", data.getUser().getFirstName() + data.getUser().getLastName(), commentId);
+        log.info("Пользователь {} удалил комментарий {}", data.getUser().getFirstName() + " " + data.getUser().getLastName(), commentId);
         return apiResponse;
     }
 
@@ -258,14 +237,11 @@ public class TaskService {
 
     @TransactionRequired
     public LinkResponseDto linkTask(LinkDto dto) throws NotFoundException {
-        checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
-        TaskModel taskFirst = findTaskByIdOrThrow(dto.getTaskIdFirst());
-        TaskModel taskSecond = findTaskByIdOrThrow(dto.getTaskIdSecond());
-        if (!isSameProjects(taskFirst, taskSecond)) {
-            throw new PermissionDeniedException("Нельзя связать задачи из разных пректов");
-        }
-        LinkType initialLinkType = findLinkTypeByIdOrElseThrow(dto.getLinkTypeId());
-        NormalizedLinkData linkData = normalizedLink(taskFirst, taskSecond, initialLinkType);
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        Project project = data.getProject();
+        TaskModel taskFirst = findTaskByIdAndProject(dto.getTaskIdFirst(), project);
+        TaskModel taskSecond = findTaskByIdAndProject(dto.getTaskIdSecond(), project);
+        NormalizedLinkData linkData = normalizedLink(taskFirst, taskSecond, dto.getLinkTypeName());
         checkHasTasksLinkExist(linkData);
         Link link = convertToEntity(linkData);
         linkRepository.saveAndFlush(link);

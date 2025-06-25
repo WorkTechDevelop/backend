@@ -19,7 +19,7 @@ public class Comment {
     @Column(name = "id", nullable = false, unique = true)
     private String id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "task_id", referencedColumnName = "id")
     private TaskModel task;
 
@@ -49,11 +49,12 @@ public class Comment {
     }
 
     public Comment(TaskModel task, User user, String comment) {
+        var date = LocalDateTime.now();
         this.task = task;
         this.user = user;
         this.comment = comment;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = date;
+        this.updatedAt = date;
     }
 
     public Comment() {

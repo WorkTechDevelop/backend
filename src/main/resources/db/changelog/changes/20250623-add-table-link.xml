@@ -15,7 +15,9 @@
             <column name="task_slave_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="link_type_id" type="BIGINT">
+            <column name="name"
+                    type="ENUM('RELATED', 'BLOCKS', 'BLOCKED_BY', 'DEPENDS_ON', 'DUPLICATES', 'PARENT_OF', 'CHILD_OF', 'AFFECTS')"/>
+            <column name="description" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
