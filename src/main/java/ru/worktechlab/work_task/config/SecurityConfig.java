@@ -11,6 +11,8 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +33,11 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(
+        prePostEnabled = true,
+        proxyTargetClass = true,
+        securedEnabled = true,
+        jsr250Enabled = true) // для поддержки @RolesAllowed, @PermitAll, and @DenyAll
 public class SecurityConfig {
 
     private static final String[] AUTH_URLS = {"/work-task/v1/auth/login", "/work-task/v1/registration/registry", "/work-task/v1/auth/refresh", "/work-task/v1/auth/confirm-email"};

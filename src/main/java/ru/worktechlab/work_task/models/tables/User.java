@@ -1,11 +1,11 @@
 package ru.worktechlab.work_task.models.tables;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.worktechlab.work_task.models.enums.Gender;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class User {
     private RoleModel role;
 
     @Column(name = "birth_date")
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "is_active", nullable = false)
     private boolean active;
@@ -89,7 +89,7 @@ public class User {
                 String email,
                 String phone,
                 RoleModel role,
-                String birthDate,
+                LocalDate birthDate,
                 Gender gender,
                 String password) {
         this.lastName = lastName;
@@ -101,5 +101,29 @@ public class User {
         this.birthDate = birthDate;
         this.gender = gender;
         this.password = password;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }

@@ -12,7 +12,7 @@
             <column name="is_active" type="BOOL">
                 <constraints nullable="false"/>
             </column>
-            <column name="birth_date" type="VARCHAR(255)"/>
+            <column name="birth_date" type="DATE"/>
             <column name="email" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
