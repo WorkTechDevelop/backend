@@ -86,4 +86,9 @@ public class Project {
     public void incrementCounter() {
         this.taskCounter = this.taskCounter == null ? 1 : this.taskCounter + 1;
     }
+
+    public void setProjectOwner(User user) {
+        this.owner = user;
+        this.updateDate = LocalDate.now();
+    }
 }

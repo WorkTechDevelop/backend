@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
+import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.models.tables.Project;
 import ru.worktechlab.work_task.models.tables.User;
@@ -77,5 +78,11 @@ public class CheckerUtil {
         return userRepository.findActiveUserById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         String.format("Пользователь с ИД %s не найден или не активен", userId)));
+    }
+
+    public void checkProjectOwner(Project project,
+                                  User user) throws BadRequestException {
+        if (!Objects.equals(project.getOwner().getId(), user.getId()))
+            throw new BadRequestException(String.format("Вы не являетесь руководителем проекта %s", project.getName()));
     }
 }

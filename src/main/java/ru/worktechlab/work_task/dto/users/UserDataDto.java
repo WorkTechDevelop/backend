@@ -6,8 +6,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import ru.worktechlab.work_task.dto.roles.RoleDataDto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,6 +47,6 @@ public class UserDataDto {
     @Schema(description = "Пол пользователя", example = "MALE")
     private String gender;
 
-    @Schema(description = "Роль пользователя", example = "MALE")
-    private String role;
+    @Schema(description = "Роли пользователя")
+    private List<RoleDataDto> roles;
 }

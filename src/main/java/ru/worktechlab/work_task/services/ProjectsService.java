@@ -10,6 +10,7 @@ import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.projects.*;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
+import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.ProjectMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
@@ -110,8 +111,9 @@ public class ProjectsService {
     }
 
     @TransactionRequired
-    public ProjectDto finishProject(String projectId) throws NotFoundException {
+    public ProjectDto finishProject(String projectId) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, true, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         data.getProject().finishProject(data.getUser());
         projectRepository.flush();
         Project project = findProjectById(projectId);
@@ -119,8 +121,9 @@ public class ProjectsService {
     }
 
     @TransactionRequired
-    public ProjectDto startProject(String projectId) throws NotFoundException {
+    public ProjectDto startProject(String projectId) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, true, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         data.getProject().startProject();
         projectRepository.flush();
         Project project = findProjectById(projectId);
@@ -134,11 +137,13 @@ public class ProjectsService {
 
     @TransactionRequired
     public void addProjectForUsers(String projectId,
-                                   StringIdsDto data) throws NotFoundException {
-        if (data == null || org.springframework.util.CollectionUtils.isEmpty(data.getIds()))
+                                   StringIdsDto request) throws NotFoundException, BadRequestException {
+        if (request == null || CollectionUtils.isEmpty(request.getIds()))
             return;
-        Project project = findProjectById(projectId);
-        List<User> users = userService.findAndCheckUsers(data.getIds());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Project project = data.getProject();
+        checkerUtil.checkProjectOwner(project, data.getUser());
+        List<User> users = userService.findAndCheckUsers(request.getIds());
         usersProjectsRepository.saveAllAndFlush(users.stream()
                 .filter(user -> !hasProject(user, project.getId()))
                 .map(user -> new UsersProject(user, project))
@@ -147,12 +152,13 @@ public class ProjectsService {
 
     @TransactionRequired
     public void deleteProjectForUsers(String projectId,
-                                      StringIdsDto data) throws NotFoundException {
-        if (data == null || CollectionUtils.isEmpty(data.getIds()))
+                                      StringIdsDto request) throws NotFoundException, BadRequestException {
+        if (request == null || CollectionUtils.isEmpty(request.getIds()))
             return;
-        findProjectById(projectId);
-        userService.findAndCheckUsers(data.getIds());
-        usersProjectsRepository.deleteProjectForUsers(projectId, data.getIds());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
+        userService.findAndCheckUsers(request.getIds());
+        usersProjectsRepository.deleteProjectForUsers(projectId, request.getIds());
         usersProjectsRepository.flush();
     }
 
@@ -181,5 +187,14 @@ public class ProjectsService {
                 .map(taskMapper::toDo)
                 .toList();
         return new UserWithTasksDto(user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getGender().name(), tasks);
+    }
+
+    @TransactionRequired
+    public void addProjectOwner(String projectId,
+                                String userId) throws NotFoundException, BadRequestException {
+        Project project = findProjectByIdForUpdate(projectId);
+        User owner = userService.findActiveUserById(userId);
+        project.setProjectOwner(owner);
+        projectRepository.flush();
     }
 }
