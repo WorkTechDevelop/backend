@@ -19,7 +19,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="updated_at" type="timestamp">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
