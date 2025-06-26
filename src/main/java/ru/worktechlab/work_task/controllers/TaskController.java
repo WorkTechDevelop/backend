@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.dto.task_comment.*;
+import ru.worktechlab.work_task.dto.task_comment.AllTasksCommentsResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.task_link.LinkDto;
 import ru.worktechlab.work_task.dto.task_link.LinkResponseDto;
@@ -107,6 +110,7 @@ public class TaskController {
         return taskHistoryService.getTaskHistoryById(taskId, projectId);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/create-comment")
     @Operation(summary = "Создать комментарий")
     public CommentResponseDto createComment(@Valid
@@ -121,6 +125,7 @@ public class TaskController {
         return taskService.createComment(commentDto);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-comment")
     @Operation(summary = "Обноаить комментарий")
     public CommentResponseDto updateComment(@Valid
@@ -135,6 +140,7 @@ public class TaskController {
         return taskService.updateComment(dto);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @DeleteMapping("/delete-comment/{commentId}/{taskId}/{projectId}")
     @Operation(summary = "Удаление комментария")
     public ApiResponse deleteComment(
@@ -152,19 +158,18 @@ public class TaskController {
         return taskService.deleteComment(commentId, taskId, projectId);
     }
 
-    @PostMapping("/all-comments")
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @GetMapping("/all-comments/{taskId}/{projectId}")
     @Operation(summary = "Получить все комментарии к задаче")
-    public List<AllTasksCommentsResponseDto> allTasksComments(@Valid
-                                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                                                                      description = "id задачи и проекта",
-                                                                      content = @Content(
-                                                                              mediaType = "application/json", schema = @Schema(implementation = AllTasksCommentsDto.class)
-                                                                      )
-                                                              )
-                                                              @RequestBody AllTasksCommentsDto dto) throws NotFoundException {
-        return taskService.allTasksComments(dto);
+    public List<AllTasksCommentsResponseDto> allTasksComments(@PathVariable("taskId") String taskId,
+                                                              @Parameter(description = "ИД проекта",
+                                                                      example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
+                                                                      required = true)
+                                                              @PathVariable("projectId") String projectId) throws NotFoundException {
+        return taskService.allTasksComments(taskId, projectId);
     }
 
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PostMapping("/link-task")
     @Operation(summary = "Создать связь между задачами")
     public LinkResponseDto linkTask(
@@ -178,5 +183,17 @@ public class TaskController {
             @RequestBody LinkDto dto
     ) throws NotFoundException {
         return taskService.linkTask(dto);
+    }
+
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @GetMapping("/all-links/{taskId}/{projectId}")
+    public List<LinkResponseDto> allTasksLinks(
+            @PathVariable("taskId") String taskId,
+            @Parameter(description = "ИД проекта",
+                    example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
+                    required = true)
+            @PathVariable("projectId") String projectId
+    ) throws NotFoundException {
+        return taskService.allTasksLinks(taskId, projectId);
     }
 }

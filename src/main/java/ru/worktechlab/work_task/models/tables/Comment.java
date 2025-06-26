@@ -23,7 +23,7 @@ public class Comment {
     @JoinColumn(name = "task_id", referencedColumnName = "id")
     private TaskModel task;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

@@ -16,12 +16,12 @@ public class LinkDto {
     @Schema(description = "ID задачи")
     @NotBlank(message = "Поле taskId не может быть пустым")
     @ValidTaskId
-    private String taskIdFirst;
+    private String taskIdSource;
 
     @Schema(description = "ID задачи")
     @NotBlank(message = "Поле taskId не может быть пустым")
     @ValidTaskId
-    private String taskIdSecond;
+    private String taskIdTarget;
 
     @Schema(description = "Проект задачи")
     @NotBlank(message = "Поле PROJECT_ID не может быть пустым")

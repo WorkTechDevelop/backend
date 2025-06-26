@@ -16,6 +16,7 @@ public enum LinkTypeName {
 
     private final String description;
     private LinkTypeName inverse;
+    private LinkTypeName canonical;
 
     LinkTypeName(String description) {
         this.description = description;
@@ -29,10 +30,24 @@ public enum LinkTypeName {
         return this.inverse != null;
     }
 
+    public LinkTypeName getCanonical() {
+        return canonical != null ? canonical : this;
+    }
+
     static {
         BLOCKS.inverse = BLOCKED_BY;
         BLOCKED_BY.inverse = BLOCKS;
         PARENT_OF.inverse = CHILD_OF;
         CHILD_OF.inverse = PARENT_OF;
+
+        BLOCKS.canonical = BLOCKS;
+        BLOCKED_BY.canonical = BLOCKS;
+        PARENT_OF.canonical = PARENT_OF;
+        CHILD_OF.canonical = PARENT_OF;
+        RELATED.canonical = RELATED;
+
+        DEPENDS_ON.canonical = DEPENDS_ON;
+        DUPLICATES.canonical = DUPLICATES;
+        AFFECTS.canonical = AFFECTS;
     }
 }

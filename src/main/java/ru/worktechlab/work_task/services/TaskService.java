@@ -9,7 +9,10 @@ import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
-import ru.worktechlab.work_task.dto.task_comment.*;
+import ru.worktechlab.work_task.dto.task_comment.AllTasksCommentsResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_link.LinkDto;
 import ru.worktechlab.work_task.dto.task_link.LinkResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
@@ -19,6 +22,7 @@ import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
 import ru.worktechlab.work_task.exceptions.DuplicateLinkException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.CommentMapper;
+import ru.worktechlab.work_task.mappers.LinkMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
 import ru.worktechlab.work_task.models.enums.LinkTypeName;
 import ru.worktechlab.work_task.models.tables.*;
@@ -46,6 +50,7 @@ public class TaskService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final LinkRepository linkRepository;
+    private final LinkMapper linkMapper;
 
     @TransactionRequired
     public TaskDataDto updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
@@ -175,13 +180,14 @@ public class TaskService {
                 ));
     }
 
-    private NormalizedLinkData normalizedLink(TaskModel first, TaskModel second, String linkTypeName) {
+    private NormalizedLinkData normalizedLink(TaskModel source, TaskModel target, String linkTypeName) {
         LinkTypeName typeName = LinkTypeName.valueOf(linkTypeName);
-        if (typeName.inverseExist()) {
+        LinkTypeName canonical = typeName.getCanonical();
+        if (typeName != canonical && typeName.inverseExist()) {
             LinkTypeName canonicalLinkType = typeName.getInverse();
-            return new NormalizedLinkData(second, first, canonicalLinkType);
+            return new NormalizedLinkData(target, source, canonicalLinkType);
         }
-        return new NormalizedLinkData(first, second, typeName);
+        return new NormalizedLinkData(source, target, typeName);
     }
 
     private void checkHasTasksLinkExist(NormalizedLinkData data) {
@@ -227,24 +233,34 @@ public class TaskService {
     }
 
     @TransactionRequired
-    public List<AllTasksCommentsResponseDto> allTasksComments(AllTasksCommentsDto dto) throws NotFoundException {
+    public List<AllTasksCommentsResponseDto> allTasksComments(String taskId, String projectId) throws NotFoundException {
         log.debug("Получить все комментарии к задаче");
-        findTaskByIdOrThrow(dto.getTaskId());
-        checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
-        List<Comment> comments = commentRepository.findAllByTaskIdOrderByCreatedAtAsc(dto.getTaskId());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        findTaskByIdAndProject(taskId, data.getProject());
+        List<Comment> comments = commentRepository.findAllByTaskIdOrderByCreatedAtAsc(taskId);
         return commentMapper.toGetAllDtoList(comments);
     }
 
     @TransactionRequired
     public LinkResponseDto linkTask(LinkDto dto) throws NotFoundException {
+        log.debug("Создать связь мкжду задачами");
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
         Project project = data.getProject();
-        TaskModel taskFirst = findTaskByIdAndProject(dto.getTaskIdFirst(), project);
-        TaskModel taskSecond = findTaskByIdAndProject(dto.getTaskIdSecond(), project);
-        NormalizedLinkData linkData = normalizedLink(taskFirst, taskSecond, dto.getLinkTypeName());
+        TaskModel source = findTaskByIdAndProject(dto.getTaskIdSource(), project);
+        TaskModel target = findTaskByIdAndProject(dto.getTaskIdTarget(), project);
+        NormalizedLinkData linkData = normalizedLink(source, target, dto.getLinkTypeName());
         checkHasTasksLinkExist(linkData);
         Link link = convertToEntity(linkData);
         linkRepository.saveAndFlush(link);
+        log.debug("Связь мкжду задачами {}, {} создана", source.getCode(), target.getCode());
         return new LinkResponseDto(link.getId());
+    }
+
+    @TransactionRequired
+    public List<LinkResponseDto> allTasksLinks(String taskId, String projectId) throws NotFoundException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        TaskModel task = findTaskByIdAndProject(taskId, data.getProject());
+        List<Link> links = linkRepository.findLinksByTaskId(task.getId());
+        return linkMapper.convertToDto(links, task);
     }
 }
