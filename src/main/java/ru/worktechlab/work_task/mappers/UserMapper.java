@@ -13,7 +13,7 @@ import ru.worktechlab.work_task.dto.users.RegisterDTO;
 
 import java.util.List;
 
-@Mapper(config = MapStructConfiguration.class)
+@Mapper(config = MapStructConfiguration.class, uses = {RoleMapper.class})
 public interface UserMapper {
 
     UserShortDataDto toShortDataDto(User user);
@@ -21,14 +21,8 @@ public interface UserMapper {
     List<UserShortDataDto> toShortDataList(List<User> users);
 
     @Mapping(source = "id", target = "userId")
-    @Mapping(target = "role", source = "role", qualifiedByName = "roleDescription")
     @Mapping(target = "gender", source = "gender", qualifiedByName = "genderDescription")
     UserDataDto toUserFullData(User user);
-
-    @Named("roleDescription")
-    default String getRoleDescription(RoleModel roleModel) {
-        return roleModel.getRoleDescription();
-    }
 
     @Named("genderDescription")
     default String getGenderDescription(Gender gender) {

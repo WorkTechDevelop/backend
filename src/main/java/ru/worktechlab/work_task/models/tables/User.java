@@ -3,11 +3,13 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.models.enums.Gender;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -34,10 +36,6 @@ public class User {
 
     @Column(name = "phone")
     private String phone;
-
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "role_id")
-    private RoleModel role;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
@@ -67,6 +65,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private final List<Project> projects = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private final List<RoleModel> roles = new ArrayList<>();
+
     public void setActive(boolean active) {
         this.active = active;
     }
@@ -88,7 +92,7 @@ public class User {
                 String middleName,
                 String email,
                 String phone,
-                RoleModel role,
+                Collection<RoleModel> roles,
                 LocalDate birthDate,
                 Gender gender,
                 String password) {
@@ -97,10 +101,11 @@ public class User {
         this.middleName = middleName;
         this.email = email;
         this.phone = phone;
-        this.role = role;
         this.birthDate = birthDate;
         this.gender = gender;
         this.password = password;
+        if (!CollectionUtils.isEmpty(roles))
+            this.roles.addAll(roles);
     }
 
     public void setLastName(String lastName) {

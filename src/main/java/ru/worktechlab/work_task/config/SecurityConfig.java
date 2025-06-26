@@ -26,6 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.worktechlab.work_task.authorization.jwt.AuthEntryPointJwt;
 import ru.worktechlab.work_task.authorization.jwt.AuthTokenFilter;
+import ru.worktechlab.work_task.repositories.UserRepository;
 import ru.worktechlab.work_task.services.UsersDetailsService;
 
 import java.util.List;
@@ -50,8 +51,8 @@ public class SecurityConfig {
     private String allowedLocal;
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new UsersDetailsService();
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return new UsersDetailsService(userRepository);
     }
 
     @Autowired
@@ -107,9 +108,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(UsersDetailsService usersDetailsService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
+        provider.setUserDetailsService(usersDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }

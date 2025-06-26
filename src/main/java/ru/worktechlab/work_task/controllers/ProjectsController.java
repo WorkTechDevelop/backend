@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.projects.*;
+import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.services.ProjectsService;
 
@@ -30,7 +31,7 @@ public class ProjectsController {
         return projectsService.getAllUserProjects();
     }
 
-    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER, PROJECT_MEMBER})
     @GetMapping("/active-project")
     @Operation(summary = "Получить ID основного проекта пользователя")
     public String getActiveProject() {
@@ -74,7 +75,7 @@ public class ProjectsController {
     public ProjectDto finishProject(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         return projectsService.finishProject(projectId);
     }
 
@@ -84,19 +85,19 @@ public class ProjectsController {
     public ProjectDto startProject(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         return projectsService.startProject(projectId);
     }
 
     @PutMapping("/{projectId}/add-users")
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @Operation(summary = "Добавление проекта пользователям")
     public void addProjectForUsers(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId,
             @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
             @RequestBody StringIdsDto data
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         projectsService.addProjectForUsers(projectId, data);
     }
 
@@ -108,7 +109,19 @@ public class ProjectsController {
             @PathVariable String projectId,
             @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
             @RequestBody StringIdsDto data
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
        projectsService.deleteProjectForUsers(projectId, data);
+    }
+
+    @RolesAllowed({ADMIN})
+    @PutMapping("/{projectId}/{userId}/update-owner")
+    @Operation(summary = "Добавление руководителя проекта")
+    public void updateProjectOwner(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId,
+            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String userId
+    ) throws NotFoundException, BadRequestException {
+        projectsService.addProjectOwner(projectId, userId);
     }
 }

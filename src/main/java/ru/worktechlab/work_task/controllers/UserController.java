@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.worktechlab.work_task.dto.EnumValuesResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.users.UpdateUserRequest;
 import ru.worktechlab.work_task.dto.users.UserDataDto;
@@ -32,7 +33,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER})
     @Operation(summary = "Список всех пользователей по существующим ИД")
     @PostMapping()
     public List<UserShortDataDto> findUsersByIdsIn(
@@ -59,7 +60,7 @@ public class UserController {
         userService.activateUsers(data, false);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_MEMBER, POWER_USER})
+    @RolesAllowed({ADMIN, PROJECT_OWNER, PROJECT_MEMBER, POWER_USER})
     @Operation(summary = "Редактирование пользователя")
     @PutMapping("/update")
     public UserDataDto updateUser(
@@ -68,10 +69,26 @@ public class UserController {
         return userService.updateUser(data);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_MEMBER, POWER_USER})
-    @Operation(summary = "Полные данные пользователя")
+    @RolesAllowed({ADMIN, PROJECT_OWNER, PROJECT_MEMBER, POWER_USER})
+    @Operation(summary = "Полные данные пользователя(текущего)")
     @GetMapping("/profile")
-    public UserDataDto getUser() throws NotFoundException {
+    public UserDataDto getUser() {
         return userService.getUser();
+    }
+
+    @RolesAllowed({ADMIN})
+    @Operation(summary = "Полные данные пользователя")
+    @GetMapping("/{userId}/profile")
+    public UserDataDto getUser(
+            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String userId) throws NotFoundException {
+        return userService.getUser(userId);
+    }
+
+    @RolesAllowed({ADMIN, PROJECT_OWNER, PROJECT_MEMBER, POWER_USER})
+    @Operation(summary = "Список возможных значений при выборе пола")
+    @GetMapping("/gender-values")
+    public EnumValuesResponse getGenderValues() {
+        return userService.getGenderValues();
     }
 }

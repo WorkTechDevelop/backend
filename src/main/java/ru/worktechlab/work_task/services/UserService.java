@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.config.params.MailParams;
+import ru.worktechlab.work_task.dto.EnumDto;
+import ru.worktechlab.work_task.dto.EnumValuesResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.users.RegisterDTO;
 import ru.worktechlab.work_task.dto.users.UpdateUserRequest;
@@ -42,7 +44,7 @@ public class UserService {
         RoleModel defaultRole = roleService.getDefaultRole();
         Gender gender = Gender.valueOf(registerDto.getGender());
         User user = new User(registerDto.getLastName(), registerDto.getFirstName(), registerDto.getMiddleName(), registerDto.getEmail(),
-                registerDto.getPhone(), defaultRole, registerDto.getBirthDate(), gender, passwordEncoder.encode(registerDto.getPassword()));
+                registerDto.getPhone(), Collections.singletonList(defaultRole), registerDto.getBirthDate(), gender, passwordEncoder.encode(registerDto.getPassword()));
         if (mailParams.isEnable()) {
             user.setConfirmationToken(UUID.randomUUID().toString());
             userRepository.save(user);
@@ -65,6 +67,13 @@ public class UserService {
         return userRepository.findActiveUserByIdForUpdate(userId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Пользователь с ИД %s не найден или не активен", userId)));
+    }
+
+    @TransactionMandatory
+    public User findUserById(String userId) throws NotFoundException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Пользователь с ИД %s не найден", userId)));
     }
 
     @TransactionMandatory
@@ -156,8 +165,19 @@ public class UserService {
     }
 
     @TransactionRequired
-    public UserDataDto getUser() throws NotFoundException {
+    public UserDataDto getUser() {
         String userId = userContext.getUserData().getUserId();
         return userMapper.toUserFullData(findActiveUserById(userId));
+    }
+
+    @TransactionRequired
+    public UserDataDto getUser(String userId) throws NotFoundException {
+        return userMapper.toUserFullData(findUserById(userId));
+    }
+
+    public EnumValuesResponse getGenderValues() {
+        return new EnumValuesResponse(Arrays.stream(Gender.values())
+                .map(gender -> new EnumDto(gender.name(), gender.getDescription()))
+                .toList());
     }
 }
