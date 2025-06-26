@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryResponseDto;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
@@ -15,6 +16,7 @@ import ru.worktechlab.work_task.models.tables.*;
 import ru.worktechlab.work_task.repositories.TaskHistoryRepository;
 import ru.worktechlab.work_task.utils.CheckerUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,11 +44,28 @@ public class TaskHistoryService {
         saveHistory(createTaskStatusHistory(oldTask, dto, project), oldTask.getId(), user);
     }
 
+    public void saveTaskCommentChanges(Comment comment,
+                                       UpdateCommentDto dto,
+                                       User user,
+                                       TaskModel task
+    ) {
+        saveHistory(createTaskCommentHistory(comment, dto), task, user);
+
+    }
+
     private void saveHistory(List<TaskHistoryDto> dto,
                              String taskId,
                              User user) {
         if (CollectionUtils.isEmpty(dto)) return;
         List<TaskHistory> histories = convertToEntity(dto, user, taskId);
+        saveAll(histories);
+    }
+
+    private void saveHistory(List<TaskHistoryDto> dto,
+                             TaskModel task,
+                             User user) {
+        if (CollectionUtils.isEmpty(dto)) return;
+        List<TaskHistory> histories = convertToEntity(dto, user, task.getId());
         saveAll(histories);
     }
 
@@ -86,6 +105,12 @@ public class TaskHistoryService {
         return oldTask.getChanges();
     }
 
+    private List<TaskHistoryDto> createTaskCommentHistory(Comment comment, UpdateCommentDto dto) {
+        comment.setComment(dto.getComment());
+        comment.setUpdatedAt(LocalDateTime.now());
+        return comment.getChanges();
+    }
+
     private List<TaskHistory> convertToEntity(List<TaskHistoryDto> dtos, User user, String taskId) {
         if (CollectionUtils.isEmpty(dtos)) {
             return java.util.Collections.emptyList();
@@ -103,7 +128,7 @@ public class TaskHistoryService {
     @TransactionRequired
     public List<TaskHistoryResponseDto> getTaskHistoryById(String taskId, String projectId) throws NotFoundException {
         checkerUtil.findAndCheckProjectUserData(projectId, false, false);
-        List<TaskHistory> taskHistories = repository.findAllByTaskIdOrderByCreatedAtDesc(taskId);
+        List<TaskHistory> taskHistories = repository.findAllByTaskIdOrderByCreatedAtAsc(taskId);
         return taskHistoryMapper.convertToDto(taskHistories);
     }
 }

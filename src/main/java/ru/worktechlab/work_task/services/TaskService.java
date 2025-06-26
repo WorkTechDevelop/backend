@@ -1,25 +1,34 @@
 package ru.worktechlab.work_task.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
+import ru.worktechlab.work_task.dto.ApiResponse;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.response_dto.UsersTasksInProjectDTO;
+import ru.worktechlab.work_task.dto.task_comment.AllTasksCommentsResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentDto;
+import ru.worktechlab.work_task.dto.task_comment.CommentResponseDto;
+import ru.worktechlab.work_task.dto.task_comment.UpdateCommentDto;
+import ru.worktechlab.work_task.dto.task_link.LinkDto;
+import ru.worktechlab.work_task.dto.task_link.LinkResponseDto;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
 import ru.worktechlab.work_task.dto.tasks.TaskModelDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateStatusRequestDTO;
 import ru.worktechlab.work_task.dto.tasks.UpdateTaskModelDTO;
+import ru.worktechlab.work_task.exceptions.DuplicateLinkException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
+import ru.worktechlab.work_task.mappers.CommentMapper;
+import ru.worktechlab.work_task.mappers.LinkMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
+import ru.worktechlab.work_task.models.enums.LinkTypeName;
 import ru.worktechlab.work_task.models.tables.*;
-import ru.worktechlab.work_task.repositories.TaskRepository;
-import ru.worktechlab.work_task.repositories.UserRepository;
-import ru.worktechlab.work_task.repositories.UsersProjectsRepository;
+import ru.worktechlab.work_task.repositories.*;
 import ru.worktechlab.work_task.utils.CheckerUtil;
+import ru.worktechlab.work_task.utils.NormalizedLinkData;
 import ru.worktechlab.work_task.utils.UserContext;
 
 import java.util.List;
@@ -38,8 +47,12 @@ public class TaskService {
     private final SprintsService sprintsService;
     private final TaskMapper taskMapper;
     private final CheckerUtil checkerUtil;
+    private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
+    private final LinkRepository linkRepository;
+    private final LinkMapper linkMapper;
 
-    @Transactional
+    @TransactionRequired
     public TaskDataDto updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
         log.debug("Processing update-task with model: {}", dto);
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
@@ -133,5 +146,121 @@ public class TaskService {
         taskHistorySaverService.saveTaskModelChanges(task, requestDto, data.getProject(), data.getUser());
         taskRepository.flush();
         return taskMapper.toDo(findTaskByIdOrThrow(task.getId()));
+    }
+
+    private Comment convertToEntity(CommentDto dto, User user, TaskModel task) {
+        return new Comment(
+                task,
+                user,
+                dto.getComment()
+        );
+    }
+
+    private Link convertToEntity(NormalizedLinkData data) {
+        return new Link(
+                data.master(),
+                data.slave(),
+                data.linkTypeName()
+        );
+    }
+
+    @TransactionRequired
+    public Comment findCommentForUpdateByIdOrElseThrow(String id, String taskId) {
+        return commentRepository.findCommentByIdForUpdate(id, taskId).orElseThrow(
+                () -> new EntityNotFoundException(
+                        String.format("Не найден комментарий с таким id - %s для задачи - %s", id, taskId)
+                ));
+    }
+
+    @TransactionRequired
+    public Comment findCommentByIdOrElseThrow(String id, String taskId) {
+        return commentRepository.findByCommentAndTaskAds(id, taskId).orElseThrow(
+                () -> new EntityNotFoundException(
+                        String.format("Не найден комментарий с таким id - %s для задачи - %s", id, taskId)
+                ));
+    }
+
+    private NormalizedLinkData normalizedLink(TaskModel source, TaskModel target, String linkTypeName) {
+        LinkTypeName typeName = LinkTypeName.valueOf(linkTypeName);
+        LinkTypeName canonical = typeName.getCanonical();
+        if (typeName != canonical && typeName.inverseExist()) {
+            LinkTypeName canonicalLinkType = typeName.getInverse();
+            return new NormalizedLinkData(target, source, canonicalLinkType);
+        }
+        return new NormalizedLinkData(source, target, typeName);
+    }
+
+    private void checkHasTasksLinkExist(NormalizedLinkData data) {
+        linkRepository.findByTasksLinkedAndType(data.master().getId(), data.slave().getId(), data.linkTypeName())
+                .ifPresent(existing -> {
+                    throw new DuplicateLinkException("Связь между задачами уже существует");
+                });
+    }
+
+    @TransactionRequired
+    public CommentResponseDto createComment(CommentDto dto) throws NotFoundException {
+        log.debug("Создать комментарий к задаче");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        TaskModel task = findTaskByIdAndProject(dto.getTaskId(), data.getProject());
+        Comment comment = convertToEntity(dto, data.getUser(), task);
+        commentRepository.saveAndFlush(comment);
+        return commentMapper.toDto(comment);
+    }
+
+    @TransactionRequired
+    public CommentResponseDto updateComment(UpdateCommentDto dto) throws NotFoundException {
+        log.debug("Обновить комментарий к задаче");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        TaskModel task = findTaskByIdAndProject(dto.getTaskId(), data.getProject());
+        Comment comment = findCommentForUpdateByIdOrElseThrow(dto.getCommentId(), task.getId());
+        taskHistorySaverService.saveTaskCommentChanges(comment, dto, data.getUser(), task);
+        commentRepository.flush();
+        log.debug("Комментарий обновлен: id={}", comment.getId());
+        return commentMapper.toDto(comment);
+    }
+
+    @TransactionRequired
+    public ApiResponse deleteComment(String commentId, String taskId, String projectId) throws NotFoundException {
+        log.debug("Удалить комментарий к задаче");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        TaskModel task = findTaskByIdAndProject(taskId, data.getProject());
+        findCommentByIdOrElseThrow(commentId, task.getId());
+        commentRepository.deleteCommentById(commentId);
+        commentRepository.flush();
+        ApiResponse apiResponse = new ApiResponse("Комментарий успешно удалён");
+        log.info("Пользователь {} удалил комментарий {}", data.getUser().getFirstName() + " " + data.getUser().getLastName(), commentId);
+        return apiResponse;
+    }
+
+    @TransactionRequired
+    public List<AllTasksCommentsResponseDto> allTasksComments(String taskId, String projectId) throws NotFoundException {
+        log.debug("Получить все комментарии к задаче");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        findTaskByIdAndProject(taskId, data.getProject());
+        List<Comment> comments = commentRepository.findAllByTaskIdOrderByCreatedAtAsc(taskId);
+        return commentMapper.toGetAllDtoList(comments);
+    }
+
+    @TransactionRequired
+    public LinkResponseDto linkTask(LinkDto dto) throws NotFoundException {
+        log.debug("Создать связь мкжду задачами");
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
+        Project project = data.getProject();
+        TaskModel source = findTaskByIdAndProject(dto.getTaskIdSource(), project);
+        TaskModel target = findTaskByIdAndProject(dto.getTaskIdTarget(), project);
+        NormalizedLinkData linkData = normalizedLink(source, target, dto.getLinkTypeName());
+        checkHasTasksLinkExist(linkData);
+        Link link = convertToEntity(linkData);
+        linkRepository.saveAndFlush(link);
+        log.debug("Связь мкжду задачами {}, {} создана", source.getCode(), target.getCode());
+        return new LinkResponseDto(link.getId());
+    }
+
+    @TransactionRequired
+    public List<LinkResponseDto> allTasksLinks(String taskId, String projectId) throws NotFoundException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        TaskModel task = findTaskByIdAndProject(taskId, data.getProject());
+        List<Link> links = linkRepository.findLinksByTaskId(task.getId());
+        return linkMapper.convertToDto(links, task);
     }
 }

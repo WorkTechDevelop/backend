@@ -13,11 +13,20 @@ public class TaskChangeDetector {
     private final List<TaskHistoryDto> taskHistories = new ArrayList<>();
 
     public void add(String fieldName, String oldVal, String newVal) {
-       if (!Objects.equals(oldVal, newVal)) {
-           taskHistories.add(new TaskHistoryDto(fieldName,
-                   oldVal == null ?  "" : oldVal,
-                   newVal == null ?  "" : newVal
-                   ));
-       }
+        if (!Objects.equals(oldVal, newVal)) {
+            taskHistories.add(new TaskHistoryDto(fieldName,
+                    oldVal == null ? "" : oldVal,
+                    newVal == null ? "" : newVal
+            ));
+        }
+    }
+
+    public void add(String oldVal, String newVal) {
+        if (!Objects.equals(oldVal, newVal)) {
+            taskHistories.add(new TaskHistoryDto("Комментарий",
+                    oldVal,
+                    newVal
+            ));
+        }
     }
 }

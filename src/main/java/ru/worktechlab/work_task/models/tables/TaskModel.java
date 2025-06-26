@@ -5,11 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import ru.worktechlab.work_task.dto.task_history.TaskHistoryDto;
 import ru.worktechlab.work_task.utils.TaskChangeDetector;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -69,6 +69,9 @@ public class TaskModel {
 
     @Column
     private String code;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Comment> comments = new ArrayList<>();
 
     @Transient
     private TaskChangeDetector taskChangeDetector = new TaskChangeDetector();

@@ -47,8 +47,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        log.error("Пользователь с таким email уже зарегистрирован");
-        return new ResponseEntity<>("Пользователь с таким email уже зарегистрирован", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -67,12 +66,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpiredTokenException.class)
     public ResponseEntity<?> handleExpiredToken(ExpiredTokenException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<?> handleInvalidToken(InvalidTokenException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -83,6 +82,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handleBadRequestException(BadRequestException ex) {
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PermissionDeniedException.class)
+    public ResponseEntity<String> handlePermissionDenied(PermissionDeniedException ex) {
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateLinkException.class)
+    public ResponseEntity<String> handlePermissionDenied(DuplicateLinkException ex) {
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
