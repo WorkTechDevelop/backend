@@ -32,7 +32,7 @@ import java.util.List;
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
-@RequestMapping("work-task/v1/task")
+@RequestMapping("work-task/api/v1/tasks")
 @RequiredArgsConstructor
 @Tag(name = "Task", description = "Управление задачами")
 public class TaskController {
@@ -40,7 +40,7 @@ public class TaskController {
     private final TaskHistoryService taskHistoryService;
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @PostMapping("/create-task")
+    @PostMapping("/create")
     @Operation(summary = "Создать задачу")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskDataDto createTask(
@@ -57,7 +57,7 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @PutMapping("/update-task")
+    @PutMapping("/update")
     @Operation(summary = "Обновить задачу")
     public TaskDataDto updateTask(
             @Valid
@@ -96,7 +96,7 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @GetMapping("/history/{taskId}/{projectId}")
+    @GetMapping("/{projectId}/{taskId}/history")
     @Operation(summary = "Получить историю изменения задачи по id {taskId}")
     public List<TaskHistoryResponseDto> getTaskHistory(
             @Parameter(description = "Уникальный идентификатор задачи",
@@ -127,7 +127,7 @@ public class TaskController {
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @PutMapping("/update-comment")
-    @Operation(summary = "Обноаить комментарий")
+    @Operation(summary = "Обновить комментарий")
     public CommentResponseDto updateComment(@Valid
                                             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                     description = "Данные комментария",
@@ -141,7 +141,7 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @DeleteMapping("/delete-comment/{commentId}/{taskId}/{projectId}")
+    @DeleteMapping("/{commentId}/{taskId}/{projectId}/delete-comment")
     @Operation(summary = "Удаление комментария")
     public ApiResponse deleteComment(
             @Parameter(description = "ИД комментария", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -159,7 +159,7 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @GetMapping("/all-comments/{taskId}/{projectId}")
+    @GetMapping("/{taskId}/{projectId}/comments")
     @Operation(summary = "Получить все комментарии к задаче")
     public List<AllTasksCommentsResponseDto> allTasksComments(@PathVariable("taskId") String taskId,
                                                               @Parameter(description = "ИД проекта",
@@ -170,7 +170,7 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @PostMapping("/link-task")
+    @PostMapping("/create-link")
     @Operation(summary = "Создать связь между задачами")
     public LinkResponseDto linkTask(
             @Valid
@@ -186,7 +186,7 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @GetMapping("/all-links/{taskId}/{projectId}")
+    @GetMapping("/{taskId}/{projectId}/links")
     public List<LinkResponseDto> allTasksLinks(
             @PathVariable("taskId") String taskId,
             @Parameter(description = "ИД проекта",

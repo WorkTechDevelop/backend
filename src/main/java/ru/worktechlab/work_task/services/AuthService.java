@@ -9,6 +9,7 @@ import ru.worktechlab.work_task.dto.auth.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.dto.auth.LoginResponseDTO;
 import ru.worktechlab.work_task.exceptions.ExpiredTokenException;
 import ru.worktechlab.work_task.exceptions.InvalidTokenException;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.AuthMapper;
 import ru.worktechlab.work_task.models.tables.RefreshToken;
 import ru.worktechlab.work_task.models.tables.User;
@@ -38,6 +39,7 @@ public class AuthService {
         return new LoginResponseDTO(accessToken, refreshToken.getToken());
     }
 
+    @TransactionRequired
     public LoginResponseDTO refreshAccessToken(TokenRefreshRequestDTO refreshToken) {
         RefreshToken token = refreshTokenRepository.findByToken(refreshToken.getRefreshToken())
                 .orElseThrow(() -> new InvalidTokenException("Refresh token not found"));
@@ -51,5 +53,12 @@ public class AuthService {
         String newAccessToken = tokenService.generateToken(user);
 
         return new LoginResponseDTO(newAccessToken, refreshToken.getRefreshToken());
+    }
+
+    @TransactionRequired
+    public void logout() throws NotFoundException {
+        User user = userService.findCurrentUser();
+        refreshTokenRepository.deleteByUserId(user.getId());
+        refreshTokenRepository.flush();
     }
 }

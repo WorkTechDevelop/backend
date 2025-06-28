@@ -56,6 +56,12 @@ public class UserService {
     }
 
     @TransactionMandatory
+    public User findCurrentUser() throws NotFoundException {
+        String userId = userContext.getUserData().getUserId();
+        return findUserById(userId);
+    }
+
+    @TransactionMandatory
     public User findActiveUserById(String userId) {
         return userRepository.findActiveUserById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException(

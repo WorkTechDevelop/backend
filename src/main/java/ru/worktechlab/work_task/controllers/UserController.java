@@ -19,9 +19,9 @@ import java.util.List;
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
-@RequestMapping("/work-task/v1/user")
+@RequestMapping("/work-task/api/v1/users")
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "Управление с пользователями")
+@Tag(name = "User", description = "Управление пользователями")
 public class UserController {
 
     private final UserService userService;
@@ -33,32 +33,14 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER})
-    @Operation(summary = "Список всех пользователей по существующим ИД")
-    @PostMapping()
-    public List<UserShortDataDto> findUsersByIdsIn(
-            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
-            @RequestBody StringIdsDto data) throws NotFoundException {
-        return userService.findUsersByIdsIn(data);
-    }
-
-    @RolesAllowed({ADMIN})
-    @Operation(summary = "Активировать пользователей по существующим ИД")
-    @PutMapping("/activate")
-    public void activateUsers(
-            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
-            @RequestBody StringIdsDto data) throws NotFoundException {
-        userService.activateUsers(data, true);
-    }
-
-    @RolesAllowed({ADMIN})
-    @Operation(summary = "Заблокировать пользователей по существующим ИД")
-    @PutMapping("/block")
-    public void blockUsers(
-            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
-            @RequestBody StringIdsDto data) throws NotFoundException {
-        userService.activateUsers(data, false);
-    }
+//    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER})
+//    @Operation(summary = "Список всех пользователей по существующим ИД")
+//    @PostMapping()
+//    public List<UserShortDataDto> findUsersByIdsIn(
+//            @Parameter(description = "Идентификаторы пользователей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
+//            @RequestBody StringIdsDto data) throws NotFoundException {
+//        return userService.findUsersByIdsIn(data);
+//    }
 
     @RolesAllowed({ADMIN, PROJECT_OWNER, PROJECT_MEMBER, POWER_USER})
     @Operation(summary = "Редактирование пользователя")
@@ -74,15 +56,6 @@ public class UserController {
     @GetMapping("/profile")
     public UserDataDto getUser() {
         return userService.getUser();
-    }
-
-    @RolesAllowed({ADMIN})
-    @Operation(summary = "Полные данные пользователя")
-    @GetMapping("/{userId}/profile")
-    public UserDataDto getUser(
-            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
-            @PathVariable String userId) throws NotFoundException {
-        return userService.getUser(userId);
     }
 
     @RolesAllowed({ADMIN, PROJECT_OWNER, PROJECT_MEMBER, POWER_USER})

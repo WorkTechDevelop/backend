@@ -18,28 +18,29 @@ import java.util.List;
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
-@RequestMapping("work-task/v1/projects")
+@RequestMapping("work-task/api/v1/projects")
 @RequiredArgsConstructor
 @Tag(name = "Project", description = "Управление проектами")
-public class ProjectsController {
+public class ProjectController {
+
     private final ProjectsService projectsService;
 
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @GetMapping("/all-user-project")
+    @GetMapping("/for-user")
     @Operation(summary = "Вывести список проектов пользователя")
     public List<ShortProjectDataDto> getAllUserProjects() {
         return projectsService.getAllUserProjects();
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER, PROJECT_MEMBER})
-    @GetMapping("/active-project")
+    @GetMapping("/last")
     @Operation(summary = "Получить ID основного проекта пользователя")
     public String getActiveProject() {
         return projectsService.getLastProjectId();
     }
 
     @RolesAllowed({PROJECT_OWNER})
-    @PostMapping("/create-project")
+    @PostMapping("/create")
     @Operation(summary = "Создание проекта")
     public ProjectDto createProject(
             @RequestBody @Valid ProjectRequestDto data
@@ -58,7 +59,7 @@ public class ProjectsController {
     }
 
     @RolesAllowed({ADMIN, PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @PostMapping("/{projectId}")
+    @PostMapping("/{projectId}/filtered")
     @Operation(summary = "Получение данных проекта по ИД и фильтру")
     public ProjectDataDto getProjectDataByFilter(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -70,7 +71,7 @@ public class ProjectsController {
     }
 
     @RolesAllowed({PROJECT_OWNER})
-    @PutMapping("/finish-project/{projectId}")
+    @PutMapping("/{projectId}/finish")
     @Operation(summary = "Завершение проекта по ИД")
     public ProjectDto finishProject(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -80,7 +81,7 @@ public class ProjectsController {
     }
 
     @RolesAllowed({PROJECT_OWNER})
-    @PutMapping("/start-project/{projectId}")
+    @PutMapping("/{projectId}/start")
     @Operation(summary = "Запуск проекта по ИД")
     public ProjectDto startProject(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -111,17 +112,5 @@ public class ProjectsController {
             @RequestBody StringIdsDto data
     ) throws NotFoundException, BadRequestException {
        projectsService.deleteProjectForUsers(projectId, data);
-    }
-
-    @RolesAllowed({ADMIN})
-    @PutMapping("/{projectId}/{userId}/update-owner")
-    @Operation(summary = "Добавление руководителя проекта")
-    public void updateProjectOwner(
-            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
-            @PathVariable String projectId,
-            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
-            @PathVariable String userId
-    ) throws NotFoundException, BadRequestException {
-        projectsService.addProjectOwner(projectId, userId);
     }
 }

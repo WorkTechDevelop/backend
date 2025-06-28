@@ -15,7 +15,7 @@ import ru.worktechlab.work_task.services.SprintsService;
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
-@RequestMapping("work-task/v1/sprint")
+@RequestMapping("work-task/api/v1/sprints")
 @RequiredArgsConstructor
 @Tag(name = "Sprint", description = "Управление спринтами")
 public class SprintController {

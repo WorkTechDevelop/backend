@@ -18,7 +18,7 @@ import ru.worktechlab.work_task.services.TaskStatusService;
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
-@RequestMapping("work-task/v1/status")
+@RequestMapping("work-task/api/v1/statuses")
 @RequiredArgsConstructor
 @Tag(name = "Status", description = "Управление статусами")
 public class TaskStatusController {
@@ -26,7 +26,7 @@ public class TaskStatusController {
     private final TaskStatusService taskStatusService;
 
     @RolesAllowed({ADMIN, PROJECT_OWNER})
-    @GetMapping("/project/{projectId}/statuses")
+    @GetMapping("/project/{projectId}")
     @Operation(summary = "Список статусов проекта")
     public StatusListResponseDto getStatuses(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -36,7 +36,7 @@ public class TaskStatusController {
     }
 
     @RolesAllowed({ADMIN, PROJECT_OWNER})
-    @PostMapping("/project/{projectId}/create-status")
+    @PostMapping("/project/{projectId}/create")
     @Operation(summary = "Создание статуса")
     public TaskStatusDto createStatus(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
@@ -47,7 +47,7 @@ public class TaskStatusController {
     }
 
     @RolesAllowed({ADMIN, PROJECT_OWNER})
-    @PutMapping("/project/{projectId}/update-statuses")
+    @PutMapping("/project/{projectId}/update")
     @Operation(summary = "Обновление данных статусов")
     public StatusListResponseDto updateStatuses(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
