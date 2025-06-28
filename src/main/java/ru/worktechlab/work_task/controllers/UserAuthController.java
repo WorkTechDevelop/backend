@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.auth.LoginRequestDTO;
 import ru.worktechlab.work_task.dto.auth.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.dto.auth.LoginResponseDTO;
+import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.services.AuthService;
 import ru.worktechlab.work_task.services.UserService;
 
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
-@RequestMapping("/work-task/v1/auth")
+@RequestMapping("/work-task/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authenticate", description = "Аутентификация пользователей")
 public class UserAuthController {
@@ -49,6 +50,12 @@ public class UserAuthController {
     public Boolean confirmEmail(@Parameter(description = "Токен подтверждения", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
                                 @RequestParam String token) {
         return userService.emailConfirmation(token);
+    }
+
+    @Operation(summary = "Выход из системы")
+    @PostMapping("/logout")
+    public void logout() throws NotFoundException {
+        authService.logout();
     }
 }
 

@@ -13,7 +13,7 @@ import ru.worktechlab.work_task.services.RoleService;
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.ADMIN;
 
 @RestController
-@RequestMapping("work-task/v1/role")
+@RequestMapping("work-task/api/v1/roles")
 @RequiredArgsConstructor
 @Tag(name = "Role", description = "Управление по ролями системы")
 public class RoleController {

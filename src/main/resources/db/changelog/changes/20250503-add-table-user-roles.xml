@@ -6,7 +6,7 @@
       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <changeSet id="add-table-user_role-20250625" author="mastanov-mv">
         <createTable tableName="user_role">
-            <column name="id" type="bigserial">
+            <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="user_id" type="VARCHAR(255)">
