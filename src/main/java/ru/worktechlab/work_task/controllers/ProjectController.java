@@ -32,7 +32,7 @@ public class ProjectController {
         return projectsService.getAllUserProjects();
     }
 
-    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER, PROJECT_MEMBER})
+    @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER, ADMIN})
     @GetMapping("/last")
     @Operation(summary = "Получить ID основного проекта пользователя")
     public String getActiveProject() {

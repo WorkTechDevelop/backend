@@ -23,6 +23,12 @@ public interface RoleModelRepository extends JpaRepository<RoleModel, Integer> {
 
     @Modifying
     @Query(nativeQuery = true,
+            value = "delete from user_role ur where ur.user_id = :userId " +
+                    "and ur.role_id = (select r.id from role r where r.name = :roleName)")
+    void deleteUserRolesByUserIdAndRoleName(String userId, String roleName);
+
+    @Modifying
+    @Query(nativeQuery = true,
             value = "insert into user_role (id, user_id, role_id) " +
                     "values(:id, :userId, :roleId)")
     void createUserRole(String id, String userId, String roleId);
@@ -34,4 +40,17 @@ public interface RoleModelRepository extends JpaRepository<RoleModel, Integer> {
                     "values(:id, :userId, :roleId) " +
                     "on conflict on constraint unique_role_user do nothing")
     void createOrUpdateUserRole(String id, String userId, String roleId);
+
+    @Modifying
+    @Query(
+            nativeQuery = true,
+            value = "insert into extended_permission (id, user_id, project_id) " +
+                    "values(:id, :userId, :projectId) " +
+                    "on conflict on constraint unique_project_user_extended_permission do nothing")
+    void createOrUpdateExtendedPermissions(String id, String userId, String projectId);
+
+    @Modifying
+    @Query(nativeQuery = true,
+            value = "delete from extended_permission where user_id = :userId and project_id = :projectId")
+    void deleteExtendedPermissionsByUserId(String userId, String projectId);
 }

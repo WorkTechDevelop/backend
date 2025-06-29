@@ -18,6 +18,9 @@ public class UserDataDto {
     @Schema(description = "ИД пользователя")
     private String userId;
 
+    @Schema(description = "ИД последнего проекта")
+    private String lastProjectId;
+
     @Schema(description = "Фамилия пользователя", example = "Пин")
     @NotBlank(message = "Фамилия не может быть пустым")
     private String lastName;
@@ -49,4 +52,7 @@ public class UserDataDto {
 
     @Schema(description = "Роли пользователя")
     private List<RoleDataDto> roles;
+
+    @Schema(description = "Проекты пользователя с указанием его полномочий")
+    private List<UsersProjectsDTO> permissionProjects;
 }

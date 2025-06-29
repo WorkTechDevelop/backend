@@ -25,7 +25,7 @@ public class TaskStatusController {
 
     private final TaskStatusService taskStatusService;
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({ADMIN, PROJECT_OWNER, POWER_USER, PROJECT_MEMBER})
     @GetMapping("/project/{projectId}")
     @Operation(summary = "Список статусов проекта")
     public StatusListResponseDto getStatuses(
@@ -35,18 +35,18 @@ public class TaskStatusController {
         return taskStatusService.getStatuses(projectId);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @PostMapping("/project/{projectId}/create")
     @Operation(summary = "Создание статуса")
     public TaskStatusDto createStatus(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId,
             @RequestBody @Valid TaskStatusRequestDto data
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         return taskStatusService.createStatus(projectId, data);
     }
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({PROJECT_OWNER})
     @PutMapping("/project/{projectId}/update")
     @Operation(summary = "Обновление данных статусов")
     public StatusListResponseDto updateStatuses(

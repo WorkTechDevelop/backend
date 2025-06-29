@@ -41,7 +41,7 @@ import java.util.List;
         jsr250Enabled = true) // для поддержки @RolesAllowed, @PermitAll, and @DenyAll
 public class SecurityConfig {
 
-    private static final String[] AUTH_URLS = {"/work-task/v1/auth/login", "/work-task/v1/registration/registry", "/work-task/v1/auth/refresh", "/work-task/v1/auth/confirm-email"};
+    private static final String[] AUTH_URLS = {"/work-task/api/v1/auth/login", "/work-task/api/v1/registration/registry", "/work-task/api/v1/auth/refresh", "/work-task/api/v1/auth/confirm-email"};
     private static final String[] SWAGGER_URLS = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"};
 
     @Value("${spring.cors.allowed.origins}")

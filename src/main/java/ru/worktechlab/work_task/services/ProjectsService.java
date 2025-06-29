@@ -14,6 +14,7 @@ import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.ProjectMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
+import ru.worktechlab.work_task.models.enums.Roles;
 import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.models.tables.*;
 import ru.worktechlab.work_task.repositories.*;
@@ -41,6 +42,7 @@ public class ProjectsService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final RoleService roleService;
 
     @TransactionRequired
     public List<ShortProjectDataDto> getAllUserProjects() {
@@ -191,10 +193,36 @@ public class ProjectsService {
 
     @TransactionRequired
     public void addProjectOwner(String projectId,
-                                String userId) throws NotFoundException, BadRequestException {
+                                String userId) throws NotFoundException {
         Project project = findProjectByIdForUpdate(projectId);
         User owner = userService.findActiveUserById(userId);
         project.setProjectOwner(owner);
+        roleService.addUserRoles(owner, Roles.PROJECT_OWNER);
+        if (!hasProject(owner, projectId))
+            usersProjectsRepository.save(new UsersProject(owner, project));
+        projectRepository.flush();
+    }
+
+    @TransactionRequired
+    public void addExtendedPermissionsForUserProject(String projectId,
+                                                     String userId) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
+        User userForUpdatePermissions = userService.findActiveUserById(userId);
+        roleService.addUserRoles(userForUpdatePermissions, Roles.POWER_USER);
+        roleService.addUserExtendedPermissions(userForUpdatePermissions, data.getProject());
+        if (!hasProject(userForUpdatePermissions, projectId))
+            usersProjectsRepository.save(new UsersProject(userForUpdatePermissions, data.getProject()));
+        projectRepository.flush();
+    }
+
+    @TransactionRequired
+    public void deleteExtendedPermissionsForUserProject(String projectId,
+                                                        String userId) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
+        User userForUpdatePermissions = userService.findActiveUserById(userId);
+        roleService.deleteUserExtendedPermissions(userForUpdatePermissions, data.getProject());
         projectRepository.flush();
     }
 }

@@ -21,6 +21,10 @@
                    ('37563a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'2001-01-01','test3@mail.ru','Пользователь','MALE','Иванов','Иванович',
                     '$2a$10$KaVHluqzpnf5SZt5AQMwHu012fwB2DE803njWq9y19cddH3Qj8baW','89109999999','2025-01-01'),
                    ('47563a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'2001-01-01','test4@mail.ru','Пользователь, доп.функц.','MALE','Иванов','Иванович',
+                    '$2a$10$KaVHluqzpnf5SZt5AQMwHu012fwB2DE803njWq9y19cddH3Qj8baW','89109999999','2025-01-01'),
+                   ('57563a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'2001-01-01','test5@mail.ru','Пользователь1','MALE','Иванов','Иванович',
+                    '$2a$10$KaVHluqzpnf5SZt5AQMwHu012fwB2DE803njWq9y19cddH3Qj8baW','89109999999','2025-01-01'),
+                   ('67563a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'2001-01-01','test6@mail.ru','Пользователь2','MALE','Иванов','Иванович',
                     '$2a$10$KaVHluqzpnf5SZt5AQMwHu012fwB2DE803njWq9y19cddH3Qj8baW','89109999999','2025-01-01')
         </sql>
         <sql>

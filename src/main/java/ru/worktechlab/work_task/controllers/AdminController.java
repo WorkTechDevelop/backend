@@ -14,6 +14,7 @@ import ru.worktechlab.work_task.services.ProjectsService;
 import ru.worktechlab.work_task.services.UserService;
 
 import static ru.worktechlab.work_task.models.enums.Roles.Fields.ADMIN;
+import static ru.worktechlab.work_task.models.enums.Roles.Fields.PROJECT_OWNER;
 
 @RestController
 @RequestMapping("/work-task/api/v1/admin")
@@ -59,7 +60,42 @@ public class AdminController {
             @PathVariable String projectId,
             @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String userId
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         projectsService.addProjectOwner(projectId, userId);
+    }
+
+    @RolesAllowed({ADMIN})
+    @Operation(summary = "Заблокировать пользователей по существующим ИД")
+    @PutMapping("/{userId}/update-roles")
+    public UserDataDto updateUserRoles(
+            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String userId,
+            @Parameter(description = "Идентификаторы ролей", example = "[\"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", \"656c989e-ceb1-4a9f-a6a9-9ab40cc11540\", ...]")
+            @RequestBody StringIdsDto data) throws NotFoundException {
+        return userService.updateUserRoles(userId, data);
+    }
+
+    @RolesAllowed({PROJECT_OWNER})
+    @PutMapping("/{projectId}/{userId}/add-extended-permission")
+    @Operation(summary = "Добавление расширенных прав")
+    public void addExtendedPermissionsForUserProject(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId,
+            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String userId
+    ) throws NotFoundException, BadRequestException {
+        projectsService.addExtendedPermissionsForUserProject(projectId, userId);
+    }
+
+    @RolesAllowed({PROJECT_OWNER})
+    @PutMapping("/{projectId}/{userId}/delete-extended-permission")
+    @Operation(summary = "Удаление расширенных прав")
+    public void deleteExtendedPermissionsForUserProject(
+            @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String projectId,
+            @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
+            @PathVariable String userId
+    ) throws NotFoundException, BadRequestException {
+        projectsService.deleteExtendedPermissionsForUserProject(projectId, userId);
     }
 }
