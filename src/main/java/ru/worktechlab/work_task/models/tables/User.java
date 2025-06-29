@@ -59,6 +59,9 @@ public class User {
     @Column
     private LocalDateTime confirmedAt;
 
+    @OneToMany
+    private final List<ExtendedPermission> extendedPermissions = new ArrayList<>();
+
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "users_projects",
             joinColumns = @JoinColumn(name = "user_id"),

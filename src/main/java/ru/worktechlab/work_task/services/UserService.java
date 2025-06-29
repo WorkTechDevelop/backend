@@ -11,10 +11,7 @@ import ru.worktechlab.work_task.config.params.MailParams;
 import ru.worktechlab.work_task.dto.EnumDto;
 import ru.worktechlab.work_task.dto.EnumValuesResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
-import ru.worktechlab.work_task.dto.users.RegisterDTO;
-import ru.worktechlab.work_task.dto.users.UpdateUserRequest;
-import ru.worktechlab.work_task.dto.users.UserDataDto;
-import ru.worktechlab.work_task.dto.users.UserShortDataDto;
+import ru.worktechlab.work_task.dto.users.*;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.enums.Gender;
@@ -185,5 +182,15 @@ public class UserService {
         return new EnumValuesResponse(Arrays.stream(Gender.values())
                 .map(gender -> new EnumDto(gender.name(), gender.getDescription()))
                 .toList());
+    }
+
+    @TransactionRequired
+    public UserDataDto updateUserRoles(String userId,
+                                       StringIdsDto data) throws NotFoundException {
+        User user = findUserById(userId);
+        if (data == null || CollectionUtils.isEmpty(data.getIds()))
+            return userMapper.toUserFullData(findUserById(userId));
+        roleService.updateUserRoles(user, data.getIds());
+        return userMapper.toUserFullData(findUserById(userId));
     }
 }

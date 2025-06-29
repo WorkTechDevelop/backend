@@ -45,8 +45,9 @@ public class TaskStatusService {
 
     @TransactionRequired
     public TaskStatusDto createStatus(String projectId,
-                                      TaskStatusRequestDto requestData) throws NotFoundException {
+                                      TaskStatusRequestDto requestData) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         TaskStatus status = taskStatusRepository.saveAndFlush(new TaskStatus(
                 requestData.getPriority(), requestData.getCode(), requestData.getDescription(), requestData.getViewed(), requestData.isDefaultTaskStatus(), data.getProject()
         ));
@@ -60,6 +61,7 @@ public class TaskStatusService {
             return null;
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         Project project = data.getProject();
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         checkHasDefaultValue(project, requestStatusesDto.getStatuses());
         for (TaskStatusRequestDto status : requestStatusesDto.getStatuses()) {
             TaskStatus dbStatus = findStatusByIdAndProjectForUpdate(status.getId(), project);

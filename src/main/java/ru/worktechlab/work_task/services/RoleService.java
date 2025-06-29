@@ -9,6 +9,8 @@ import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.exceptions.RoleNotFoundException;
 import ru.worktechlab.work_task.mappers.RoleMapper;
 import ru.worktechlab.work_task.models.enums.Roles;
+import ru.worktechlab.work_task.models.tables.ExtendedPermission;
+import ru.worktechlab.work_task.models.tables.Project;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.RoleModelRepository;
@@ -43,7 +45,6 @@ public class RoleService {
     public void updateUserRoles(User user,
                                 Collection<String> roleIds) throws NotFoundException {
         List<RoleModel> roles = getAndCheckRolesByIds(roleIds);
-        checkExistingRoles(roles, roleIds);
         roleModelRepository.deleteUserRolesByUserId(user.getId());
         creatUserRoles(user, roles);
     }
@@ -54,6 +55,37 @@ public class RoleService {
         RoleModel dbRole = getRoleByName(role);
         roleModelRepository.createOrUpdateUserRole(UUID.randomUUID().toString(), user.getId(), dbRole.getId());
         roleModelRepository.flush();
+    }
+
+    @TransactionMandatory
+    public void addUserExtendedPermissions(User user,
+                                           Project project) {
+        roleModelRepository.createOrUpdateExtendedPermissions(UUID.randomUUID().toString(), user.getId(), project.getId());
+        roleModelRepository.flush();
+    }
+
+    @TransactionMandatory
+    public void deleteUserExtendedPermissions(User user,
+                                              Project project) {
+        roleModelRepository.deleteExtendedPermissionsByUserId(user.getId(), project.getId());
+        roleModelRepository.flush();
+        if (hasExtendedPermissionsForOtherProject(user, project))
+            return;
+        correctUserRole(user, Roles.POWER_USER.name());
+    }
+
+    @TransactionMandatory
+    public void correctUserRole(User user,
+                                String roleName) {
+        roleModelRepository.deleteUserRolesByUserIdAndRoleName(user.getId(), roleName);
+        roleModelRepository.flush();
+    }
+
+    private boolean hasExtendedPermissionsForOtherProject(User user,
+                                                          Project project) {
+        return user.getExtendedPermissions().stream()
+                .map(ExtendedPermission::getProject)
+                .anyMatch(pr -> !Objects.equals(pr.getId(), project.getId()));
     }
 
     @TransactionMandatory

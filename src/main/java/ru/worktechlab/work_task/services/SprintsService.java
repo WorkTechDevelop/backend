@@ -41,6 +41,7 @@ public class SprintsService {
     public SprintInfoDTO createSprint(String projectId,
                                       SprintDtoRequest request) throws NotFoundException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkExtendedPermission(data.getUser(), data.getProject());
         Sprint sprint = sprintsRepository.saveAndFlush(new Sprint(
                 request.getName(), request.getStartDate(), request.getEndDate(), data.getUser(), data.getProject()
         ));
@@ -59,6 +60,7 @@ public class SprintsService {
     public SprintInfoDTO activateSprint(String sprintId,
                                         String projectId) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkExtendedPermission(data.getUser(), data.getProject());
         Sprint sprint = findSprintByIdForUpdate(sprintId, data.getProject());
         checkHasActiveSprint(sprint);
         sprint.activate();
@@ -71,6 +73,7 @@ public class SprintsService {
     public SprintInfoDTO finishSprint(String sprintId,
                                       String projectId) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkExtendedPermission(data.getUser(), data.getProject());
         Sprint sprint = findSprintByIdForUpdate(sprintId, data.getProject());
         sprint.finish(data.getUser());
         sprintsRepository.flush();
@@ -108,6 +111,7 @@ public class SprintsService {
                                       String projectId,
                                       SprintDtoRequest requestData) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkExtendedPermission(data.getUser(), data.getProject());
         Sprint sprint = findSprintByIdForUpdate(sprintId, data.getProject());
         sprint.setName(requestData.getName());
         sprint.setStartDate(requestData.getStartDate());
