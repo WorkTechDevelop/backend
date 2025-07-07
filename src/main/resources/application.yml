@@ -4,14 +4,15 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
     enabled: true
+    default-schema: ${LIQUIBASE_SCHEMA:wt_prod}
   app:
     jwtSecret: mySecretKey123912738aopsgjnspkmndfsopkvajoirjg94gf2opfng2moknm
     jwtExpirationMs: ${EXPIRATIONS_MS:1800000}
     refreshExpiration: ${REFRESH_EXPIRATIONS:86400000}
   datasource:
     url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     show-sql: ${SHOW_SQL:false}
     hibernate:

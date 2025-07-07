@@ -16,7 +16,7 @@ public class TaskHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
-    private Long id;
+    private Integer id;
 
     @Column(name = "task_id", nullable = false)
     private String taskId;

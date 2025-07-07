@@ -1,0 +1,14 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <changeSet id="link-name-constraint" author="a1234">
+        <sql>
+            ALTER TABLE link
+            ADD CONSTRAINT ck_link_name_valid
+            CHECK (name IN ('LINK'));
+        </sql>
+    </changeSet>
+</databaseChangeLog>
