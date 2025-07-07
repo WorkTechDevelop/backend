@@ -12,7 +12,7 @@
                    ('87563a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'POWER_USER')
         </sql>
         <sql>
-            insert into user
+            insert into users
                 (id, is_active, birth_date, email, first_name, gender, last_name, middle_name, password, phone, confirmed_at)
             values ('17563a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'2001-01-01','test1@mail.ru','Админ','MALE','Иванов','Иванович',
                     '$2a$10$KaVHluqzpnf5SZt5AQMwHu012fwB2DE803njWq9y19cddH3Qj8baW','89109999999','2025-01-01'),
