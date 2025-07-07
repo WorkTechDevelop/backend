@@ -1,6 +1,6 @@
 package ru.worktechlab.work_task.config;
 
-import ru.worktechlab.work_task.model.db.Users;
+import ru.worktechlab.work_task.models.tables.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,28 +10,21 @@ import java.util.Collection;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
-    private Users user;
+    private User user;
 
-    public CustomUserDetails(Users user) {
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole_id()));
+        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())));
         return authorities;
     }
 
     public String getGuid() {
         return user.getId();
-    }
-
-    public String getFullName() {
-        return getFullUserName();
-    }
-    public String getFullUserName() {
-        return String.join(" ", user.getLastName(), user.getFirstName(), user.getMiddleName());
     }
 
     @Override

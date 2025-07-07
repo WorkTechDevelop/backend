@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,15 +24,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import ru.worktechlab.work_task.jwt.AuthEntryPointJwt;
-import ru.worktechlab.work_task.jwt.AuthTokenFilter;
-import ru.worktechlab.work_task.user.service.UsersDetailsService;
+import ru.worktechlab.work_task.authorization.jwt.AuthEntryPointJwt;
+import ru.worktechlab.work_task.authorization.jwt.AuthTokenFilter;
+import ru.worktechlab.work_task.repositories.UserRepository;
+import ru.worktechlab.work_task.services.UsersDetailsService;
 
 import java.util.List;
+
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(
+        prePostEnabled = true,
+        proxyTargetClass = true,
+        securedEnabled = true,
+        jsr250Enabled = true) // для поддержки @RolesAllowed, @PermitAll, and @DenyAll
 public class SecurityConfig {
+
+    private static final String[] AUTH_URLS = {"/work-task/api/v1/auth/login", "/work-task/api/v1/registration/registry", "/work-task/api/v1/auth/refresh", "/work-task/api/v1/auth/confirm-email"};
+    private static final String[] SWAGGER_URLS = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"};
 
     @Value("${spring.cors.allowed.origins}")
     private String allowedOrigins;
@@ -38,8 +51,8 @@ public class SecurityConfig {
     private String allowedLocal;
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new UsersDetailsService();
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return new UsersDetailsService(userRepository);
     }
 
     @Autowired
@@ -59,15 +72,10 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults());
         http.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.requestMatchers("work-task/v1/welcome").permitAll()
-                        .requestMatchers("work-task/v1/login").permitAll()
-                        .requestMatchers("work-task/v1/registry").permitAll()
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/webjars/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()); /// .permitAll())
+                authorizeRequests
+                        .requestMatchers(AUTH_URLS).permitAll()
+                        .requestMatchers(SWAGGER_URLS).permitAll()
+                        .anyRequest().authenticated());
         http.sessionManagement(
                 session ->
                         session.sessionCreationPolicy(
@@ -100,9 +108,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(UsersDetailsService usersDetailsService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
+        provider.setUserDetailsService(usersDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
