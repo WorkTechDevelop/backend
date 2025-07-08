@@ -38,8 +38,8 @@ public class ProjectDto {
     @Schema(description = "Комментарий к проекту")
     private String description;
     @NotNull
-    @Schema(description = "Флаг активности проекта")
-    private boolean active;
+    @Schema(description = "Статус проекта")
+    private String projectStatus;
     @NotNull
     @Schema(description = "Создатель проекта")
     private UserShortDataDto creator;

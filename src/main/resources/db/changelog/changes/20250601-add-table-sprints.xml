@@ -9,6 +9,7 @@
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
+            <column name="goal" type="VARCHAR(255)"/>
             <column name="is_active" type="BOOL">
                 <constraints nullable="false"/>
             </column>

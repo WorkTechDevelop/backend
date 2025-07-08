@@ -15,6 +15,8 @@ public class SprintDtoRequest {
     @NotNull
     @Schema(description = "Название спринта")
     private String name;
+    @Schema(description = "цель спринта")
+    private String goal;
     @Schema(description = "Дата окончания спринта")
     private LocalDate startDate;
     @Schema(description = "Дата завершения спринта")

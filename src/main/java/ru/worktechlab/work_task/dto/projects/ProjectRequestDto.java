@@ -18,6 +18,4 @@ public class ProjectRequestDto {
     @NotNull
     @Schema(description = "Код проекта")
     private String code;
-    @Schema(description = "Признак активности проекта")
-    private boolean active;
 }

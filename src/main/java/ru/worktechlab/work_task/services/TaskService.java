@@ -53,10 +53,12 @@ public class TaskService {
     private final LinkMapper linkMapper;
 
     @TransactionRequired
-    public TaskDataDto updateTask(UpdateTaskModelDTO dto) throws NotFoundException {
+    public TaskDataDto updateTask(String projectId,
+                                  String taskId,
+                                  UpdateTaskModelDTO dto) throws NotFoundException {
         log.debug("Processing update-task with model: {}", dto);
-        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(dto.getProjectId(), false, false);
-        TaskModel existingTask = findTaskByIdAndProjectForUpdate(dto.getId(), data.getProject());
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        TaskModel existingTask = findTaskByIdAndProjectForUpdate(taskId, data.getProject());
         taskHistorySaverService.saveTaskModelChanges(existingTask, dto, data.getProject(), data.getUser());
         taskRepository.flush();
         log.debug("Задача обновлена: id={}, title={}", existingTask.getId(), existingTask.getTitle());
