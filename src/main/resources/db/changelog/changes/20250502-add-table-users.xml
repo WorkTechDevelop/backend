@@ -34,6 +34,6 @@
             <column name="confirmation_token" type="varchar(255)"/>
             <column name="last_project_id" type="VARCHAR(255)"/>
         </createTable>
-<!--        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="users" constraintName="users_roles_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="role" validate="true"/>-->
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="users" constraintName="users_roles_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="role" validate="true"/>
     </changeSet>
 </databaseChangeLog>
