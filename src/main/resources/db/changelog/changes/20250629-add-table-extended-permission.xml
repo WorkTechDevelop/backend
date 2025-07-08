@@ -25,7 +25,7 @@
                                  baseTableName="extended_permission"
                                  constraintName="extended_permission_project_FK"
                                  referencedColumnNames="id"
-                                 referencedTableName="users"/>
+                                 referencedTableName="user"/>
         <addUniqueConstraint
                 columnNames="project_id, user_id"
                 constraintName="unique_project_user_extended_permission"

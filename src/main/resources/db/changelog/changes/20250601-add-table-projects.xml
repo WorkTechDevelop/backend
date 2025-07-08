@@ -30,8 +30,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="project" constraintName="project_owner_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="project" constraintName="project_creator_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="project" constraintName="project_finisher_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="project" constraintName="project_owner_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="project" constraintName="project_creator_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="project" constraintName="project_finisher_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
     </changeSet>
 </databaseChangeLog>

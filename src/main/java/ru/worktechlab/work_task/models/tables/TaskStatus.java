@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class TaskStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private long id;
     @Column(nullable = false)
     private int priority;
     @Column(nullable = false)
