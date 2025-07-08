@@ -33,7 +33,7 @@
             </column>
         </createTable>
         <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="sprint" constraintName="sprints_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="sprint" constraintName="sprint_finisher_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="sprint" constraintName="sprint_creator_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="sprint" constraintName="sprint_finisher_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="sprint" constraintName="sprint_creator_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
     </changeSet>
 </databaseChangeLog>

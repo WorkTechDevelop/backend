@@ -1,6 +1,3 @@
 server:
   servlet:
     context-path:
-spring:
-  liquibase:
-    default-schema: wt_test
