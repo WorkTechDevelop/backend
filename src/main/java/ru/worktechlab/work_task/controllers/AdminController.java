@@ -65,7 +65,7 @@ public class AdminController {
     }
 
     @RolesAllowed({ADMIN})
-    @Operation(summary = "Заблокировать пользователей по существующим ИД")
+    @Operation(summary = "Обновление ролей пользователя")
     @PutMapping("/{userId}/update-roles")
     public UserDataDto updateUserRoles(
             @Parameter(description = "ИД пользователя", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)

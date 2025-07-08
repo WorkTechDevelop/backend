@@ -7,9 +7,9 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.worktechlab.work_task.dto.statuses.TaskStatusDto;
-import ru.worktechlab.work_task.dto.statuses.TaskStatusRequestDto;
+import ru.worktechlab.work_task.dto.statuses.CreateTaskStatusDto;
 import ru.worktechlab.work_task.dto.statuses.StatusListResponseDto;
+import ru.worktechlab.work_task.dto.statuses.TaskStatusDto;
 import ru.worktechlab.work_task.dto.statuses.UpdateRequestStatusesDto;
 import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
@@ -41,7 +41,7 @@ public class TaskStatusController {
     public TaskStatusDto createStatus(
             @Parameter(description = "ИД проекта", example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540", required = true)
             @PathVariable String projectId,
-            @RequestBody @Valid TaskStatusRequestDto data
+            @RequestBody @Valid CreateTaskStatusDto data
     ) throws NotFoundException, BadRequestException {
         return taskStatusService.createStatus(projectId, data);
     }

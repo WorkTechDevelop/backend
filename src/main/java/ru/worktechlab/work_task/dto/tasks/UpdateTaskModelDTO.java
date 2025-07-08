@@ -2,7 +2,6 @@ package ru.worktechlab.work_task.dto.tasks;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +12,6 @@ import ru.worktechlab.work_task.validators.*;
 @Getter
 @Setter
 public class UpdateTaskModelDTO {
-
-    @Schema(description = "id задачи")
-    @NotBlank(message = "Поле ID не может быть пустым")
-    @ValidTaskId
-    private String id;
 
     @Schema(description = "Заголовок", example = "Создание задачи")
     @NotBlank(message = "Поле TITLE не может быть пустым")
@@ -37,11 +31,6 @@ public class UpdateTaskModelDTO {
     @ValidAssignee
     @NotBlank(message = "ASSIGNEE не может быть пустым")
     private String assignee;
-
-    @Schema(description = "Проект задачи", example = "id проекта")
-    @NotNull(message = "Поле PROJECT_ID не может быть пустым")
-    @ValidProjectId
-    private String projectId;
 
     @Schema(description = "Спринт", example = "id спринта")
     @ValidSprintId

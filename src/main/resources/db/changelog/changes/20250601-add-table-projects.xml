@@ -9,7 +9,9 @@
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="is_active" type="BOOL"/>
+            <column name="status" type="VARCHAR(55)">
+                <constraints nullable="false"/>
+            </column>
             <column name="creation_date" type="date">
                 <constraints nullable="false"/>
             </column>
