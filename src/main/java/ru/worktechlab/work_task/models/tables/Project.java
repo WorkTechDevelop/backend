@@ -3,6 +3,7 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.worktechlab.work_task.models.enums.ProjectStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,8 +32,9 @@ public class Project {
     private LocalDate updateDate;
     @Column
     private String description;
-    @Column(name = "is_active")
-    private boolean active;
+    @Enumerated(EnumType.STRING)
+    @Column
+    private ProjectStatus status;
     @OneToOne
     private User creator;
     @OneToOne
@@ -51,22 +53,21 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private final List<User> users = new ArrayList<>();
 
-    public Project(String name, User owner, String description, boolean active, User creator, String code) {
+    public Project(String name, User owner, String description, User creator, String code) {
         this.name = name;
         this.owner = owner;
         this.description = description;
-        this.active = active;
         this.creator = creator;
         this.code = code;
+        this.status = ProjectStatus.DRAFT;
         LocalDate date = LocalDate.now();
         this.creationDate = date;
         this.updateDate = date;
         this.taskCounter = 0;
-        if (active)
-            this.startDate = date;
     }
 
     public void finishProject(User user) {
+        this.status = ProjectStatus.FINISHED;
         this.finisher = user;
         LocalDate date = LocalDate.now();
         this.updateDate = date;
@@ -74,7 +75,7 @@ public class Project {
     }
 
     public void startProject() {
-        this.active = true;
+        this.status = ProjectStatus.ACTIVE;
         this.finishDate = null;
         this.finisher = null;
         LocalDate date = LocalDate.now();

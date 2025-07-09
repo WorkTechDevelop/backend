@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProjectsService {
 
-    private static final String DEFAULT_SPRINT_NAME = "Список задач";
+    private static final String DEFAULT_SPRINT_NAME = "Бэклог";
 
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
@@ -80,7 +80,7 @@ public class ProjectsService {
     public ProjectDto createProject(ProjectRequestDto data) {
         String userId = userContext.getUserData().getUserId();
         User user = userService.findActiveUserById(userId);
-        Project project = new Project(data.getName(), user, data.getDescription(), data.isActive(), user, data.getCode());
+        Project project = new Project(data.getName(), user, data.getDescription(), user, data.getCode());
         projectRepository.saveAndFlush(project);
         createDefaultStatuses(project);
         createDefaultSprint(user, project);

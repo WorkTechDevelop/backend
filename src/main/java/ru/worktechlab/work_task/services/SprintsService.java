@@ -43,7 +43,7 @@ public class SprintsService {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         checkerUtil.checkExtendedPermission(data.getUser(), data.getProject());
         Sprint sprint = sprintsRepository.saveAndFlush(new Sprint(
-                request.getName(), request.getStartDate(), request.getEndDate(), data.getUser(), data.getProject()
+                request.getName(), request.getGoal(), request.getStartDate(), request.getEndDate(), data.getUser(), data.getProject()
         ));
         Sprint dbSprint = findSprintById(sprint.getId());
         return sprintMapper.toSprintInfoDto(dbSprint);

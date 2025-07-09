@@ -57,9 +57,17 @@ public class TaskController {
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
-    @PutMapping("/update")
+    @PutMapping("/{projectId}/{taskId}/update")
     @Operation(summary = "Обновить задачу")
     public TaskDataDto updateTask(
+            @Parameter(description = "Уникальный идентификатор задачи",
+                    example = "96cd710c-bd28-40b7-903e-4b8033892612",
+                    required = true)
+            @PathVariable("taskId") String taskId,
+            @Parameter(description = "ИД проекта",
+                    example = "656c989e-ceb1-4a9f-a6a9-9ab40cc11540",
+                    required = true)
+            @PathVariable("projectId") String projectId,
             @Valid
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Данные для обновления задачи",
@@ -69,7 +77,7 @@ public class TaskController {
                     )
             )
             @RequestBody UpdateTaskModelDTO updateTaskModelDTO) throws NotFoundException {
-        return taskService.updateTask(updateTaskModelDTO);
+        return taskService.updateTask(projectId, taskId, updateTaskModelDTO);
     }
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})

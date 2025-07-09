@@ -5,8 +5,8 @@
     <changeSet id="20250620-add-data" author="mastanov-mv">
         <sql>
             insert into project
-            (id, is_active, creation_date, start_date, creator_id, description, name, owner_id, update_date, code, task_counter)
-            values ('17565a09-5b2d-4edd-acf0-d69b3ce57b9d',true,'2020-01-01','2020-01-01','27563a09-5b2d-4edd-acf0-d69b3ce57b9d','Проект для теста',
+            (id, status, creation_date, start_date, creator_id, description, name, owner_id, update_date, code, task_counter)
+            values ('17565a09-5b2d-4edd-acf0-d69b3ce57b9d','ACTIVE','2020-01-01','2020-01-01','27563a09-5b2d-4edd-acf0-d69b3ce57b9d','Проект для теста',
                     'Тестовый проект','27563a09-5b2d-4edd-acf0-d69b3ce57b9d','2020-01-01','ТП',0);
         </sql>
         <sql>
@@ -20,9 +20,9 @@
         </sql>
         <sql>
             insert into sprint
-            (id, is_active, default_sprint, creator_id, end_date, created_at, name, start_date, project_id)
-            values ('14265a09-5b2d-4edd-acf0-d69b3ce57b9d',false,true,'27563a09-5b2d-4edd-acf0-d69b3ce57b9d',null,'2020-01-01','Список задач',null,'17565a09-5b2d-4edd-acf0-d69b3ce57b9d'),
-                   ('24265a09-5b2d-4edd-acf0-d69b3ce57b9d',true,false,'27563a09-5b2d-4edd-acf0-d69b3ce57b9d','2027-01-01','2020-01-01','Спринт 1 Тестовый','2020-01-01','17565a09-5b2d-4edd-acf0-d69b3ce57b9d');
+            (id, goal, is_active, default_sprint, creator_id, end_date, created_at, name, start_date, project_id)
+            values ('14265a09-5b2d-4edd-acf0-d69b3ce57b9d','тестовые данные',false,true,'27563a09-5b2d-4edd-acf0-d69b3ce57b9d',null,'2020-01-01','Бэклог',null,'17565a09-5b2d-4edd-acf0-d69b3ce57b9d'),
+                   ('24265a09-5b2d-4edd-acf0-d69b3ce57b9d','тестовые данные',true,false,'27563a09-5b2d-4edd-acf0-d69b3ce57b9d','2027-01-01','2020-01-01','Спринт 1 Тестовый','2020-01-01','17565a09-5b2d-4edd-acf0-d69b3ce57b9d');
         </sql>
         <sql>
             insert into users_projects
