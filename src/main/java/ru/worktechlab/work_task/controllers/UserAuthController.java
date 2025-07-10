@@ -5,17 +5,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.auth.LoginRequestDTO;
-import ru.worktechlab.work_task.dto.auth.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.dto.auth.LoginResponseDTO;
+import ru.worktechlab.work_task.dto.auth.TokenRefreshRequestDTO;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.services.AuthService;
 import ru.worktechlab.work_task.services.UserService;
-
-import static ru.worktechlab.work_task.models.enums.Roles.Fields.*;
 
 @RestController
 @RequestMapping("/work-task/api/v1/auth")
