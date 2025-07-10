@@ -41,6 +41,7 @@ public class UserAuthController {
     }
 
     @PostMapping("/refresh")
+        @Operation(summary = "Обновить accessToken клиента")
     public LoginResponseDTO refreshToken(@RequestBody TokenRefreshRequestDTO request) {
         return authService.refreshAccessToken(request);
     }

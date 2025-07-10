@@ -10,7 +10,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="is_active" type="BOOL"/>
-            <column name="name" type="ENUM('ADMIN', 'PROJECT_MEMBER', 'PROJECT_OWNER', 'POWER_USER')"/>
+            <column name="name" type="VARCHAR(50)"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
