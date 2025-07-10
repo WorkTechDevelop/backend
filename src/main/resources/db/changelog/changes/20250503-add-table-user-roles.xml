@@ -25,7 +25,7 @@
                                  baseTableName="user_role"
                                  constraintName="user_role_user_FK"
                                  referencedColumnNames="id"
-                                 referencedTableName="user"/>
+                                 referencedTableName="users"/>
         <addUniqueConstraint
                 columnNames="role_id, user_id"
                 constraintName="unique_role_user"
