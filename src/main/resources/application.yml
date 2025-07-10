@@ -10,8 +10,8 @@ spring:
     refreshExpiration: ${REFRESH_EXPIRATIONS:86400000}
   datasource:
     url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     show-sql: ${SHOW_SQL:false}
     hibernate:

@@ -195,6 +195,7 @@ public class TaskController {
 
     @RolesAllowed({PROJECT_MEMBER, PROJECT_OWNER, POWER_USER})
     @GetMapping("/{taskId}/{projectId}/links")
+    @Operation(summary = "Вывод всех связей задачи")
     public List<LinkResponseDto> allTasksLinks(
             @PathVariable("taskId") String taskId,
             @Parameter(description = "ИД проекта",
