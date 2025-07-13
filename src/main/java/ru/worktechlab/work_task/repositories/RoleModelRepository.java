@@ -30,16 +30,16 @@ public interface RoleModelRepository extends JpaRepository<RoleModel, Integer> {
     @Modifying
     @Query(nativeQuery = true,
             value = "insert into user_role (id, user_id, role_id) " +
-                    "values(:id, :userId, :roleId)")
-    void createUserRole(String id, String userId, String roleId);
+                    "values(nextval('user_role_id_seq'), :userId, :roleId)")
+    void createUserRole(String userId, String roleId);
 
     @Modifying
     @Query(
             nativeQuery = true,
             value = "insert into user_role (id, user_id, role_id) " +
-                    "values(:id, :userId, :roleId) " +
+                    "values(nextval('user_role_id_seq'), :userId, :roleId) " +
                     "on conflict on constraint unique_role_user do nothing")
-    void createOrUpdateUserRole(String id, String userId, String roleId);
+    void createOrUpdateUserRole(String userId, String roleId);
 
     @Modifying
     @Query(
