@@ -16,17 +16,17 @@ import java.time.LocalDate;
 @PasswordMatch
 public class RegisterDTO {
 
-    @Schema(description = "Email пользователя", example = "user@gmail.com")
+    @Schema(description = "Email пользователя", example = "user@mail.ru")
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Неверный формат email")
     private String email;
 
-    @Schema(description = "Пароль пользователя", example = "password123")
+    @Schema(description = "Пароль пользователя", example = "password12345")
     @NotBlank(message = "Пароль не может быть пустым")
     @Size(min = 8, message = "Пароль должен быть не менее 8 символов")
     private String password;
 
-    @Schema(description = "подтверждение пароля", example = "password123")
+    @Schema(description = "подтверждение пароля", example = "password12345")
     @NotBlank(message = " Поле не может быть пустым")
     private String confirmPassword;
 

@@ -30,11 +30,11 @@
         <sql>
             insert into user_role
             (id, role_id, user_id)
-            values (1,'57563a09-5b2d-4edd-acf0-d69b3ce57b9d','17563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
-            (2,'67563a09-5b2d-4edd-acf0-d69b3ce57b9d','27563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
-            (3,'77563a09-5b2d-4edd-acf0-d69b3ce57b9d','37563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
-            (4,'87563a09-5b2d-4edd-acf0-d69b3ce57b9d','47563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
-            (5,'57563a09-5b2d-4edd-acf0-d69b3ce57b9d','47563a09-5b2d-4edd-acf0-d69b3ce57b9d')
+            values (nextval('user_role_id_seq'),'57563a09-5b2d-4edd-acf0-d69b3ce57b9d','17563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
+            (nextval('user_role_id_seq'),'67563a09-5b2d-4edd-acf0-d69b3ce57b9d','27563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
+            (nextval('user_role_id_seq'),'77563a09-5b2d-4edd-acf0-d69b3ce57b9d','37563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
+            (nextval('user_role_id_seq'),'87563a09-5b2d-4edd-acf0-d69b3ce57b9d','47563a09-5b2d-4edd-acf0-d69b3ce57b9d'),
+            (nextval('user_role_id_seq'),'57563a09-5b2d-4edd-acf0-d69b3ce57b9d','47563a09-5b2d-4edd-acf0-d69b3ce57b9d')
         </sql>
     </changeSet>
 </databaseChangeLog>

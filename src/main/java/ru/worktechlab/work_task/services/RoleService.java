@@ -53,7 +53,7 @@ public class RoleService {
     public void addUserRoles(User user,
                              Roles role) {
         RoleModel dbRole = getRoleByName(role);
-        roleModelRepository.createOrUpdateUserRole(UUID.randomUUID().toString(), user.getId(), dbRole.getId());
+        roleModelRepository.createOrUpdateUserRole(user.getId(), dbRole.getId());
         roleModelRepository.flush();
     }
 
@@ -92,7 +92,7 @@ public class RoleService {
     public void creatUserRoles(User user,
                                List<RoleModel> roles) {
         for (RoleModel role : roles) {
-            roleModelRepository.createUserRole(UUID.randomUUID().toString(), user.getId(), role.getId());
+            roleModelRepository.createUserRole(user.getId(), role.getId());
         }
         roleModelRepository.flush();
     }

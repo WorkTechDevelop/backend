@@ -44,11 +44,11 @@ public class UserService {
                 registerDto.getPhone(), Collections.singletonList(defaultRole), registerDto.getBirthDate(), gender, passwordEncoder.encode(registerDto.getPassword()));
         if (mailParams.isEnable()) {
             user.setConfirmationToken(UUID.randomUUID().toString());
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
             notificationService.sendConfirmationToken(user);
         } else {
             user.setConfirmedAt(LocalDateTime.now());
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
         }
     }
 

@@ -34,7 +34,6 @@ public class TaskModelDTO {
     private String projectId;
 
     @Schema(description = "Спринт", example = "id спринта")
-    @ValidSprintId
     private String sprintId;
 
     @Schema(description = "Тип задачи", example = "TASK")
