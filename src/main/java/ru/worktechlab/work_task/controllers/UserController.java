@@ -7,7 +7,6 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.worktechlab.work_task.dto.EnumValuesResponse;
-import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.users.UpdateUserRequest;
 import ru.worktechlab.work_task.dto.users.UserDataDto;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
@@ -26,7 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @RolesAllowed({ADMIN, PROJECT_OWNER})
+    @RolesAllowed({ADMIN})
     @Operation(summary = "Список всех пользователей")
     @GetMapping
     public List<UserShortDataDto> getAllUsers() {

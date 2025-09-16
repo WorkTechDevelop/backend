@@ -160,6 +160,22 @@ public class ProjectsService {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         userService.findAndCheckUsers(request.getIds());
+
+        Set<String> usersInProject = new HashSet<>(
+                usersProjectsRepository.findUserByProjectId(projectId)
+        );
+
+        List<String> missingUsers = request.getIds().stream()
+                .filter(userId -> !usersInProject.contains(userId))
+                .toList();
+
+        if (!missingUsers.isEmpty()) {
+            String errorMessage = missingUsers.size() == 1 ?
+                    String.format("Пользователь с ID %s не найден в проекте", missingUsers.getFirst()) :
+                    String.format("Пользователи с ID %s не найдены в проекте", missingUsers);
+
+            throw new NotFoundException(errorMessage);
+        }
         usersProjectsRepository.deleteProjectForUsers(projectId, request.getIds());
         usersProjectsRepository.flush();
     }
