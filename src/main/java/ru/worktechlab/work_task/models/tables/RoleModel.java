@@ -24,4 +24,8 @@ public class RoleModel {
     public String getRoleName() {
         return name.name();
     }
+
+    public String getRoleDescription() {
+        return name.getDescription();
+    }
 }

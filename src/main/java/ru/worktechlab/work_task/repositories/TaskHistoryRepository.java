@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TaskHistoryRepository extends JpaRepository<TaskHistory, String> {
 
-    List<TaskHistory> findAllByTaskIdOrderByCreatedAtDesc(String taskId);
+    List<TaskHistory> findAllByTaskIdOrderByCreatedAtAsc(String taskId);
 }

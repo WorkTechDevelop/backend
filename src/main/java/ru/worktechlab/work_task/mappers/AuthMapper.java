@@ -11,6 +11,6 @@ public interface AuthMapper {
     @Mapping(target = "principal", source = "username")
     @Mapping(target = "credentials", source = "password")
     default UsernamePasswordAuthenticationToken toAuthenticationToken(LoginRequestDTO loginRequestDTO) {
-        return new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
+        return new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
     }
 }

@@ -29,8 +29,8 @@
         </createTable>
         <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="task_model" constraintName="task_model_projects_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <addForeignKeyConstraint baseColumnNames="sprint_id" baseTableName="task_model" constraintName="task_model_sprints_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="sprint" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="assignee_id" baseTableName="task_model" constraintName="task_model_assignee_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="task_model" constraintName="task_model_creator_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="assignee_id" baseTableName="task_model" constraintName="task_model_assignee_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="task_model" constraintName="task_model_creator_users_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="users" validate="true"/>
         <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="task_model" constraintName="task_model_status_FK" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="task_status" validate="true"/>
     </changeSet>
 </databaseChangeLog>

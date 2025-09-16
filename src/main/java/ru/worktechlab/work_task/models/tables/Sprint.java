@@ -3,7 +3,6 @@ package ru.worktechlab.work_task.models.tables;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -17,6 +16,8 @@ public class Sprint {
     private String id;
     @Column
     private String name;
+    @Column
+    private String goal;
     @Column
     private LocalDate startDate;
     @Column
@@ -36,8 +37,9 @@ public class Sprint {
     @ManyToOne
     private Project project;
 
-    public Sprint(String name, LocalDate startDate, LocalDate endDate, User creator, Project project) {
+    public Sprint(String name, String goal, LocalDate startDate, LocalDate endDate, User creator, Project project) {
         this.name = name;
+        this.goal = goal;
         this.startDate = startDate;
         this.endDate = endDate;
         this.creator = creator;

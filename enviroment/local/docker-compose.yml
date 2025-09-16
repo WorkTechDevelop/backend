@@ -1,15 +1,19 @@
 version: '3'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: local-mysql
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
     restart: always
     ports:
-      - "3306:3306"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=1234566
+
+volumes:
+  postgres_data:
 

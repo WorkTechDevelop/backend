@@ -14,7 +14,7 @@ import ru.worktechlab.work_task.dto.users.RegisterDTO;
 import ru.worktechlab.work_task.services.UserService;
 
 @RestController
-@RequestMapping("/work-task/v1/registration")
+@RequestMapping("/work-task/api/v1/registration")
 @RequiredArgsConstructor
 @Tag(name = "Registration", description = "Регистрация пользователя")
 public class AccountController {

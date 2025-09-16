@@ -9,7 +9,9 @@
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="is_active" type="BOOL"/>
+            <column name="status" type="VARCHAR(55)">
+                <constraints nullable="false"/>
+            </column>
             <column name="creation_date" type="date">
                 <constraints nullable="false"/>
             </column>
@@ -30,8 +32,8 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="project" constraintName="project_owner_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="project" constraintName="project_creator_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="project" constraintName="project_finisher_fk" referencedColumnNames="id" referencedTableName="user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="project" constraintName="project_owner_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="creator_id" baseTableName="project" constraintName="project_creator_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="finisher_id" baseTableName="project" constraintName="project_finisher_fk" referencedColumnNames="id" referencedTableName="users" validate="true"/>
     </changeSet>
 </databaseChangeLog>

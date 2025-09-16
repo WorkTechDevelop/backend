@@ -1,6 +1,7 @@
 package ru.worktechlab.work_task.dto.tasks;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -29,7 +30,7 @@ public class TaskDataDto {
     @ValidDescription
     private String description;
 
-    @Schema(description = "Приоритет", example = "MINOR")
+    @Schema(description = "Приоритет", example = "MEDIUM")
     @NotBlank(message = "Поле PRIORITY не может быть пустым")
     @ValidPriority
     private String priority;
@@ -60,4 +61,7 @@ public class TaskDataDto {
     @Schema(description = "Оценка задачи", example = "3")
     @ValidEstimation
     private Integer estimation;
+
+    @Schema(description = "Код задачи", example = "ТП-1")
+    private String code;
 }

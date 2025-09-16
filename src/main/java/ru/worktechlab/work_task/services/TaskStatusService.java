@@ -7,10 +7,7 @@ import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
-import ru.worktechlab.work_task.dto.statuses.StatusListResponseDto;
-import ru.worktechlab.work_task.dto.statuses.TaskStatusDto;
-import ru.worktechlab.work_task.dto.statuses.TaskStatusRequestDto;
-import ru.worktechlab.work_task.dto.statuses.UpdateRequestStatusesDto;
+import ru.worktechlab.work_task.dto.statuses.*;
 import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.TaskStatusMapper;
@@ -45,8 +42,9 @@ public class TaskStatusService {
 
     @TransactionRequired
     public TaskStatusDto createStatus(String projectId,
-                                      TaskStatusRequestDto requestData) throws NotFoundException {
+                                      CreateTaskStatusDto requestData) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         TaskStatus status = taskStatusRepository.saveAndFlush(new TaskStatus(
                 requestData.getPriority(), requestData.getCode(), requestData.getDescription(), requestData.getViewed(), requestData.isDefaultTaskStatus(), data.getProject()
         ));
@@ -60,6 +58,7 @@ public class TaskStatusService {
             return null;
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
         Project project = data.getProject();
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         checkHasDefaultValue(project, requestStatusesDto.getStatuses());
         for (TaskStatusRequestDto status : requestStatusesDto.getStatuses()) {
             TaskStatus dbStatus = findStatusByIdAndProjectForUpdate(status.getId(), project);

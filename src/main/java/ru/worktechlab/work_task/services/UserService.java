@@ -8,16 +8,17 @@ import org.springframework.stereotype.Service;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
 import ru.worktechlab.work_task.config.params.MailParams;
-import ru.worktechlab.work_task.dto.OkResponse;
+import ru.worktechlab.work_task.dto.EnumDto;
+import ru.worktechlab.work_task.dto.EnumValuesResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
-import ru.worktechlab.work_task.dto.users.RegisterDTO;
-import ru.worktechlab.work_task.dto.users.UserShortDataDto;
+import ru.worktechlab.work_task.dto.users.*;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.UserMapper;
 import ru.worktechlab.work_task.models.enums.Gender;
 import ru.worktechlab.work_task.models.tables.RoleModel;
 import ru.worktechlab.work_task.models.tables.User;
 import ru.worktechlab.work_task.repositories.UserRepository;
+import ru.worktechlab.work_task.utils.UserContext;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -33,21 +34,28 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
     private final MailParams mailParams;
+    private final UserContext userContext;
 
     @TransactionRequired
     public void registerUser(RegisterDTO registerDto) {
         RoleModel defaultRole = roleService.getDefaultRole();
         Gender gender = Gender.valueOf(registerDto.getGender());
         User user = new User(registerDto.getLastName(), registerDto.getFirstName(), registerDto.getMiddleName(), registerDto.getEmail(),
-                registerDto.getPhone(), defaultRole, registerDto.getBirthDate(), gender, passwordEncoder.encode(registerDto.getPassword()));
+                registerDto.getPhone(), Collections.singletonList(defaultRole), registerDto.getBirthDate(), gender, passwordEncoder.encode(registerDto.getPassword()));
         if (mailParams.isEnable()) {
             user.setConfirmationToken(UUID.randomUUID().toString());
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
             notificationService.sendConfirmationToken(user);
         } else {
             user.setConfirmedAt(LocalDateTime.now());
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
         }
+    }
+
+    @TransactionMandatory
+    public User findCurrentUser() throws NotFoundException {
+        String userId = userContext.getUserData().getUserId();
+        return findUserById(userId);
     }
 
     @TransactionMandatory
@@ -58,21 +66,24 @@ public class UserService {
     }
 
     @TransactionMandatory
+    public User findActiveUserByIdForUpdate(String userId) throws NotFoundException {
+        return userRepository.findActiveUserByIdForUpdate(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Пользователь с ИД %s не найден или не активен", userId)));
+    }
+
+    @TransactionMandatory
+    public User findUserById(String userId) throws NotFoundException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Пользователь с ИД %s не найден", userId)));
+    }
+
+    @TransactionMandatory
     public User findActiveUserByEmail(String email) {
         return userRepository.findActiveUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Пользователь с email %s не найден или не активен" + email));
-    }
-
-    @TransactionMandatory
-    public void checkHasProjectForUser(User user,
-                                       String projectId) throws NotFoundException {
-        boolean hasProject = user.getProjects().stream()
-                .anyMatch(pr -> Objects.equals(projectId, pr.getId()));
-        if (!hasProject)
-            throw new NotFoundException(
-                    String.format("Вам не доступен проект с ИД - %s", projectId)
-            );
     }
 
     @TransactionRequired
@@ -133,14 +144,53 @@ public class UserService {
     }
 
     @TransactionRequired
-    public OkResponse activateUsers(StringIdsDto data,
-                                    boolean activate) throws NotFoundException {
-        OkResponse response = new OkResponse();
+    public void activateUsers(StringIdsDto data,
+                              boolean activate) throws NotFoundException {
         if (data == null || CollectionUtils.isEmpty(data.getIds()))
-            return response;
+            return;
         List<User> users = findAndCheckUsers(data.getIds());
         users.forEach(user -> user.setActive(activate));
         userRepository.flush();
-        return response;
+    }
+
+    @TransactionRequired
+    public UserDataDto updateUser(UpdateUserRequest data) throws NotFoundException {
+        String userId = userContext.getUserData().getUserId();
+        User user = findActiveUserByIdForUpdate(userId);
+        user.setFirstName(data.getFirstName());
+        user.setLastName(data.getLastName());
+        user.setMiddleName(data.getMiddleName());
+        user.setEmail(data.getEmail());
+        user.setPhone(data.getPhone());
+        user.setBirthDate(data.getBirthDate());
+        userRepository.flush();
+        return userMapper.toUserFullData(findActiveUserById(userId));
+    }
+
+    @TransactionRequired
+    public UserDataDto getUser() {
+        String userId = userContext.getUserData().getUserId();
+        return userMapper.toUserFullData(findActiveUserById(userId));
+    }
+
+    @TransactionRequired
+    public UserDataDto getUser(String userId) throws NotFoundException {
+        return userMapper.toUserFullData(findUserById(userId));
+    }
+
+    public EnumValuesResponse getGenderValues() {
+        return new EnumValuesResponse(Arrays.stream(Gender.values())
+                .map(gender -> new EnumDto(gender.name(), gender.getDescription()))
+                .toList());
+    }
+
+    @TransactionRequired
+    public UserDataDto updateUserRoles(String userId,
+                                       StringIdsDto data) throws NotFoundException {
+        User user = findUserById(userId);
+        if (data == null || CollectionUtils.isEmpty(data.getIds()))
+            return userMapper.toUserFullData(findUserById(userId));
+        roleService.updateUserRoles(user, data.getIds());
+        return userMapper.toUserFullData(findUserById(userId));
     }
 }

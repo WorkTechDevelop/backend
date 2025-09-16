@@ -3,13 +3,11 @@ package ru.worktechlab.work_task.validators;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.worktechlab.work_task.models.tables.Project;
+import ru.worktechlab.work_task.models.enums.Priority;
+import ru.worktechlab.work_task.models.enums.ProjectStatus;
+import ru.worktechlab.work_task.models.enums.TaskType;
 import ru.worktechlab.work_task.models.tables.Sprint;
 import ru.worktechlab.work_task.models.tables.TaskModel;
-import ru.worktechlab.work_task.models.enums.Priority;
-import ru.worktechlab.work_task.models.enums.TaskType;
-import ru.worktechlab.work_task.repositories.ProjectRepository;
-import ru.worktechlab.work_task.repositories.SprintsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +17,13 @@ import java.util.stream.Stream;
 @Component
 public class ValidateTask {
 
-    private static final String ERROR_TITLE_FORMAT = "Некорректный формат поля TITLE";
-    private static final String ERROR_DESCRIPTION_FORMAT = "Некорректный формат поля DESCRIPTION";
-    private static final String ERROR_SPRINT_NOT_FOUND_OR_CLOSED = "Спринт закрыт или не существует";
-    private static final String ERROR_ESTIMATION_FORMAT = "Некорректный формат поля ESTIMATION";
-    private static final String ERROR_PRIORITY_VALUE = "Некорректное значение поля PRIORITY";
-    private static final String ERROR_TASK_TYPE_VALUE = "Некорректное значение поля TASK_TYPE";
-    private static final String ERROR_PROJECT_ID_VALUE = "Проект закрыт или не существует";
+    private static final String ERROR_TITLE_FORMAT = "Некорректный формат поля TITLE" ;
+    private static final String ERROR_DESCRIPTION_FORMAT = "Некорректный формат поля DESCRIPTION" ;
+    private static final String ERROR_SPRINT_NOT_FOUND_OR_CLOSED = "Спринт закрыт или не существует" ;
+    private static final String ERROR_ESTIMATION_FORMAT = "Некорректный формат поля ESTIMATION" ;
+    private static final String ERROR_PRIORITY_VALUE = "Некорректное значение поля PRIORITY" ;
+    private static final String ERROR_TASK_TYPE_VALUE = "Некорректное значение поля TASK_TYPE" ;
+    private static final String ERROR_PROJECT_ID_VALUE = "Проект закрыт или не существует" ;
     public List<String> errors;
 
     public List<String> validateTask(TaskModel taskModel) {
@@ -44,10 +42,10 @@ public class ValidateTask {
 
     private void validateProjectId(TaskModel taskModel) {
         if (taskModel.getSprint() != null) {
-            if (!taskModel.getProject().isActive()) {
+            if (taskModel.getProject().getStatus() != ProjectStatus.ACTIVE) {
                 errors.add(ERROR_PROJECT_ID_VALUE);
             }
-        } else  {
+        } else {
             errors.add(ERROR_PROJECT_ID_VALUE);
         }
     }

@@ -6,14 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import ru.worktechlab.work_task.annotations.TransactionMandatory;
 import ru.worktechlab.work_task.annotations.TransactionRequired;
-import ru.worktechlab.work_task.dto.OkResponse;
 import ru.worktechlab.work_task.dto.StringIdsDto;
 import ru.worktechlab.work_task.dto.UserAndProjectData;
 import ru.worktechlab.work_task.dto.projects.*;
 import ru.worktechlab.work_task.dto.tasks.TaskDataDto;
+import ru.worktechlab.work_task.exceptions.BadRequestException;
 import ru.worktechlab.work_task.exceptions.NotFoundException;
 import ru.worktechlab.work_task.mappers.ProjectMapper;
 import ru.worktechlab.work_task.mappers.TaskMapper;
+import ru.worktechlab.work_task.models.enums.Roles;
 import ru.worktechlab.work_task.models.enums.StatusName;
 import ru.worktechlab.work_task.models.tables.*;
 import ru.worktechlab.work_task.repositories.*;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProjectsService {
 
-    private static final String DEFAULT_SPRINT_NAME = "Список задач";
+    private static final String DEFAULT_SPRINT_NAME = "Бэклог";
 
     private final UsersProjectsRepository usersProjectsRepository;
     private final ProjectRepository projectRepository;
@@ -41,6 +42,7 @@ public class ProjectsService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final RoleService roleService;
 
     @TransactionRequired
     public List<ShortProjectDataDto> getAllUserProjects() {
@@ -78,7 +80,7 @@ public class ProjectsService {
     public ProjectDto createProject(ProjectRequestDto data) {
         String userId = userContext.getUserData().getUserId();
         User user = userService.findActiveUserById(userId);
-        Project project = new Project(data.getName(), user, data.getDescription(), data.isActive(), user, data.getCode());
+        Project project = new Project(data.getName(), user, data.getDescription(), user, data.getCode());
         projectRepository.saveAndFlush(project);
         createDefaultStatuses(project);
         createDefaultSprint(user, project);
@@ -111,8 +113,9 @@ public class ProjectsService {
     }
 
     @TransactionRequired
-    public ProjectDto finishProject(String projectId) throws NotFoundException {
+    public ProjectDto finishProject(String projectId) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, true, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         data.getProject().finishProject(data.getUser());
         projectRepository.flush();
         Project project = findProjectById(projectId);
@@ -120,8 +123,9 @@ public class ProjectsService {
     }
 
     @TransactionRequired
-    public ProjectDto startProject(String projectId) throws NotFoundException {
+    public ProjectDto startProject(String projectId) throws NotFoundException, BadRequestException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, true, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
         data.getProject().startProject();
         projectRepository.flush();
         Project project = findProjectById(projectId);
@@ -134,36 +138,35 @@ public class ProjectsService {
     }
 
     @TransactionRequired
-    public OkResponse addProjectForUsers(String projectId,
-                                         StringIdsDto data) throws NotFoundException {
-        OkResponse response = new OkResponse();
-        if (data == null || org.springframework.util.CollectionUtils.isEmpty(data.getIds()))
-            return response;
-        Project project = findProjectById(projectId);
-        List<User> users = userService.findAndCheckUsers(data.getIds());
+    public void addProjectForUsers(String projectId,
+                                   StringIdsDto request) throws NotFoundException, BadRequestException {
+        if (request == null || CollectionUtils.isEmpty(request.getIds()))
+            return;
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        Project project = data.getProject();
+        checkerUtil.checkProjectOwner(project, data.getUser());
+        List<User> users = userService.findAndCheckUsers(request.getIds());
         usersProjectsRepository.saveAllAndFlush(users.stream()
                 .filter(user -> !hasProject(user, project.getId()))
                 .map(user -> new UsersProject(user, project))
                 .toList());
-        return response;
     }
 
     @TransactionRequired
-    public OkResponse deleteProjectForUsers(String projectId,
-                                            StringIdsDto data) throws NotFoundException {
-        OkResponse response = new OkResponse();
-        if (data == null || CollectionUtils.isEmpty(data.getIds()))
-            return response;
-        findProjectById(projectId);
-        userService.findAndCheckUsers(data.getIds());
-        usersProjectsRepository.deleteProjectForUsers(projectId, data.getIds());
+    public void deleteProjectForUsers(String projectId,
+                                      StringIdsDto request) throws NotFoundException, BadRequestException {
+        if (request == null || CollectionUtils.isEmpty(request.getIds()))
+            return;
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
+        userService.findAndCheckUsers(request.getIds());
+        usersProjectsRepository.deleteProjectForUsers(projectId, request.getIds());
         usersProjectsRepository.flush();
-        return response;
     }
 
     @TransactionRequired
     public ProjectDataDto getProjectDataByFilter(String projectId,
-                                     ProjectDataFilterDto filter) throws NotFoundException {
+                                                 ProjectDataFilterDto filter) throws NotFoundException {
         UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, true);
         User user = data.getUser();
         user.setLastProjectId(projectId);
@@ -186,5 +189,40 @@ public class ProjectsService {
                 .map(taskMapper::toDo)
                 .toList();
         return new UserWithTasksDto(user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getGender().name(), tasks);
+    }
+
+    @TransactionRequired
+    public void addProjectOwner(String projectId,
+                                String userId) throws NotFoundException {
+        Project project = findProjectByIdForUpdate(projectId);
+        User owner = userService.findActiveUserById(userId);
+        project.setProjectOwner(owner);
+        roleService.addUserRoles(owner, Roles.PROJECT_OWNER);
+        if (!hasProject(owner, projectId))
+            usersProjectsRepository.save(new UsersProject(owner, project));
+        projectRepository.flush();
+    }
+
+    @TransactionRequired
+    public void addExtendedPermissionsForUserProject(String projectId,
+                                                     String userId) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
+        User userForUpdatePermissions = userService.findActiveUserById(userId);
+        roleService.addUserRoles(userForUpdatePermissions, Roles.POWER_USER);
+        roleService.addUserExtendedPermissions(userForUpdatePermissions, data.getProject());
+        if (!hasProject(userForUpdatePermissions, projectId))
+            usersProjectsRepository.save(new UsersProject(userForUpdatePermissions, data.getProject()));
+        projectRepository.flush();
+    }
+
+    @TransactionRequired
+    public void deleteExtendedPermissionsForUserProject(String projectId,
+                                                        String userId) throws NotFoundException, BadRequestException {
+        UserAndProjectData data = checkerUtil.findAndCheckProjectUserData(projectId, false, false);
+        checkerUtil.checkProjectOwner(data.getProject(), data.getUser());
+        User userForUpdatePermissions = userService.findActiveUserById(userId);
+        roleService.deleteUserExtendedPermissions(userForUpdatePermissions, data.getProject());
+        projectRepository.flush();
     }
 }

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.worktechlab.work_task.dto.users.UserShortDataDto;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 @NoArgsConstructor
@@ -20,6 +19,8 @@ public class SprintInfoDTO {
     @NotNull
     @Schema(description = "Название спринта")
     private String name;
+    @Schema(description = "Цель спринта")
+    private String goal;
     @Schema(description = "Дата окончания спринта")
     private LocalDate startDate;
     @Schema(description = "Дата завершения спринта")

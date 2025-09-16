@@ -19,19 +19,12 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName()));
+        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())));
         return authorities;
     }
 
     public String getGuid() {
         return user.getId();
-    }
-
-    public String getFullName() {
-        return getFullUserName();
-    }
-    public String getFullUserName() {
-        return String.join(" ", user.getLastName(), user.getFirstName(), user.getMiddleName());
     }
 
     @Override
